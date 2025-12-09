@@ -1,6 +1,4 @@
 import {
-  ShoppingBag,
-  Forklift,
   Mail,
   MessageSquare,
   Calendar,
@@ -13,8 +11,6 @@ import {
   LayoutDashboard,
   ChartBar,
   Banknote,
-  Gauge,
-  GraduationCap,
   type LucideIcon,
 } from "lucide-react";
 
@@ -62,30 +58,6 @@ export const sidebarItems: NavGroup[] = [
         title: "Finance",
         url: "/dashboard/finance",
         icon: Banknote,
-      },
-      {
-        title: "Analytics",
-        url: "/dashboard/coming-soon",
-        icon: Gauge,
-        comingSoon: true,
-      },
-      {
-        title: "E-commerce",
-        url: "/dashboard/coming-soon",
-        icon: ShoppingBag,
-        comingSoon: true,
-      },
-      {
-        title: "Academy",
-        url: "/dashboard/coming-soon",
-        icon: GraduationCap,
-        comingSoon: true,
-      },
-      {
-        title: "Logistics",
-        url: "/dashboard/coming-soon",
-        icon: Forklift,
-        comingSoon: true,
       },
     ],
   },
