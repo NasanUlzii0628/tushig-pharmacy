@@ -107,7 +107,6 @@ export const productColumns: ColumnDef<ProductType>[] = [
     },
   },
 
-  // ACTIONS MENU
   {
     id: "actions",
     cell: ({ row }) => (
@@ -120,17 +119,14 @@ export const productColumns: ColumnDef<ProductType>[] = [
 
         <DropdownMenuContent align="end" className="w-32">
           <DropdownMenuItem onClick={() => alert(`Edit ${row.original.name}`)}>
-            Edit
-          </DropdownMenuItem>
-          <DropdownMenuItem onClick={() => alert(`Duplicate ${row.original.id}`)}>
-            Duplicate
+            Шинэчлэх
           </DropdownMenuItem>
           <DropdownMenuSeparator />
           <DropdownMenuItem
             className="text-red-500"
             onClick={() => alert(`Delete ${row.original.id}`)}
           >
-            Delete
+            Устгах
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
