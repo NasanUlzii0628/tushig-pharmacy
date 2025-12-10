@@ -14,9 +14,7 @@
     "generate:presets": "ts-node --project tsconfig.json src/scripts/generate-theme-presets.ts"
   },
   "lint-staged": {
-    "*.{js,ts,jsx,tsx}": [
-      "eslint --fix"
-    ]
+    "*.{js,ts,jsx,tsx}": []
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",

@@ -157,7 +157,6 @@ export const DELETE = async <T>({ path }: GetParams): Promise<ResponseType<T>> =
   }
 };
 
-// --- TOKEN + URL BUILDER ---
 export const validateAndGetUrl = async (path: string) => {
   const apiUrl = process.env.API_BASE_URL;
 
