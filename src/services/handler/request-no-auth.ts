@@ -3,7 +3,7 @@ import logger from '@/lib/logger'
 import { baseHeaderOptions } from '@/constants/auth'
 
 const apiUrl = process.env.API_BASE_URL
-const baseUrl = `${apiUrl}/api`
+const baseUrl = `${apiUrl}`
 
 if (!baseUrl) {
   throw new Error('API_BASE_URL environment variable is not set.')

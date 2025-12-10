@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { SidebarMenu, SidebarMenuButton, SidebarMenuItem, useSidebar } from "@/components/ui/sidebar";
 import { getInitials } from "@/lib/utils";
+import { logoutAction } from "@/lib/logout";
 
 export function NavUser({
   user,
@@ -80,7 +81,12 @@ export function NavUser({
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>
+            <DropdownMenuItem
+              onClick={async () => {
+                await logoutAction();
+                window.location.href = "/auth/login";
+              }}
+            >
               <LogOut />
               Log out
             </DropdownMenuItem>

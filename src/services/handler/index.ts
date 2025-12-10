@@ -161,7 +161,7 @@ export const validateAndGetUrl = async (path: string) => {
   const apiUrl = process.env.API_BASE_URL;
 
   const cookieStore = await cookies();
-  const accessToken = cookieStore.get("accessToken")?.value;
+  const accessToken = cookieStore.get("token")?.value;
 
   if (!accessToken) throw new Error("Authentication required");
 

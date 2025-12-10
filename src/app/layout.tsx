@@ -1,6 +1,5 @@
 import { ReactNode } from "react";
 
-import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 
 import { Toaster } from "@/components/ui/sonner";
@@ -13,10 +12,6 @@ import "./globals.css";
 
 const inter = Inter({ subsets: ["latin"] });
 
-export const metadata: Metadata = {
-  title: APP_CONFIG.meta.title,
-  description: APP_CONFIG.meta.description,
-};
 
 export default function RootLayout({ children }: Readonly<{ children: ReactNode }>) {
   const { theme_mode, theme_preset, content_layout, navbar_style, sidebar_variant, sidebar_collapsible } =
@@ -33,7 +28,6 @@ export default function RootLayout({ children }: Readonly<{ children: ReactNode 
       suppressHydrationWarning
     >
       <head>
-        {/* Applies theme and layout preferences on load to avoid flicker and unnecessary server rerenders. */}
         <ThemeBootScript />
       </head>
       <body className={`${inter.className} min-h-screen antialiased`}>

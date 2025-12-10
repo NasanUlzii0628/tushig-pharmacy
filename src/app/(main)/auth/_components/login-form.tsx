@@ -37,7 +37,7 @@ export function LoginForm() {
     }
 
     toast.success("Амжилттай нэвтэрлээ!");
-    router.push("/dashboard");
+    router.push("/dashboard/default");
   };
 
   return (

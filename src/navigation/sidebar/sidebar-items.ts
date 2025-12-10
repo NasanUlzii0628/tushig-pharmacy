@@ -11,6 +11,7 @@ import {
   LayoutDashboard,
   ChartBar,
   Banknote,
+  PackageSearch,
   type LucideIcon,
 } from "lucide-react";
 
@@ -45,9 +46,9 @@ export const sidebarItems: NavGroup[] = [
     label: "Dashboards",
     items: [
       {
-        title: "Default",
+        title: "Бүтээгдэхүүн",
         url: "/dashboard/default",
-        icon: LayoutDashboard,
+        icon: PackageSearch,
       },
       {
         title: "CRM",
@@ -69,62 +70,6 @@ export const sidebarItems: NavGroup[] = [
         title: "Email",
         url: "/dashboard/coming-soon",
         icon: Mail,
-        comingSoon: true,
-      },
-      {
-        title: "Chat",
-        url: "/dashboard/coming-soon",
-        icon: MessageSquare,
-        comingSoon: true,
-      },
-      {
-        title: "Calendar",
-        url: "/dashboard/coming-soon",
-        icon: Calendar,
-        comingSoon: true,
-      },
-      {
-        title: "Kanban",
-        url: "/dashboard/coming-soon",
-        icon: Kanban,
-        comingSoon: true,
-      },
-      {
-        title: "Invoice",
-        url: "/dashboard/coming-soon",
-        icon: ReceiptText,
-        comingSoon: true,
-      },
-      {
-        title: "Users",
-        url: "/dashboard/coming-soon",
-        icon: Users,
-        comingSoon: true,
-      },
-      {
-        title: "Roles",
-        url: "/dashboard/coming-soon",
-        icon: Lock,
-        comingSoon: true,
-      },
-      {
-        title: "Authentication",
-        url: "/auth",
-        icon: Fingerprint,
-        subItems: [
-          { title: "Login v1", url: "/auth/login", newTab: true },
-        ],
-      },
-    ],
-  },
-  {
-    id: 3,
-    label: "Misc",
-    items: [
-      {
-        title: "Others",
-        url: "/dashboard/coming-soon",
-        icon: SquareArrowUpRight,
         comingSoon: true,
       },
     ],

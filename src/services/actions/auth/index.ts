@@ -1,64 +1,47 @@
 'use server'
 
-import logger from '@/lib/logger'
-import { ERROR_MESSAGE_MAP } from '@/constants/auth'
-import { type ActionResult, makeApiRequest } from '@/services/handler/request-no-auth'
+import { makeApiRequest } from "@/services/handler/request-no-auth"
+import type { ActionResult } from "@/services/handler/request-no-auth"
 
 type LoginResponse = {
-  accessToken: string
-  refreshToken?: string
-  expiresIn?: number
-  message?: string
-}
+  message: string;
+  token: string;
+  user: {
+    id: number;
+    username: string;
+    role: string;
+  };
+};
 
 export async function login({
   username,
   password,
 }: {
-  username: string
-  password: string
+  username: string;
+  password: string;
 }): Promise<ActionResult<LoginResponse>> {
-  try {
-    const { response, data, errorData } = await makeApiRequest<LoginResponse>(
-      '/auth/login',
-      'POST',
-      {
-        body: { username, password },
-      }
-    )
 
-    const status = response.status
+  const { response, data, errorData } = await makeApiRequest<LoginResponse>(
+    "/auth/login",
+    "POST",
+    { body: { username, password } }
+  );
 
-    if (!response.ok) {
-      const message =
-        errorData?.message ||
-        data?.message ||
-        ERROR_MESSAGE_MAP[status] ||
-        'Нэвтрэх үед алдаа гарлаа.'
+  const status = response.status;
 
-      return {
-        data: null,
-        errorData,
-        message,
-        status,
-        success: false,
-      }
-    }
-
-
+  if (!response.ok) {
     return {
-      message: 'Амжилттай нэвтэрлээ',
-      status,
-      success: true,
-    }
-  } catch (error) {
-    logger.error(`Error in login service: ${error}`)
-
-    return {
-      data: null,
-      message: 'Нэвтрэх үйлдэл амжилтгүй боллоо. Дахин оролдоно уу.',
-      status: 500,
       success: false,
-    }
+      message: errorData?.message || "Login failed",
+      status,
+      errorData
+    };
   }
+
+  return {
+    success: true,
+    message: data?.message ?? "Амжилттай нэвтэрлээ",
+    status,
+    data,  // 🔥 now data is included!
+  };
 }

@@ -20,6 +20,7 @@ import { usePreferencesStore } from "@/stores/preferences/preferences-provider";
 
 import { NavMain } from "./nav-main";
 import { NavUser } from "./nav-user";
+import { getAuthUser } from "@/lib/auth-user";
 
 const data = {
   navSecondary: [
@@ -82,7 +83,11 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         {/* <NavSecondary items={data.navSecondary} className="mt-auto" /> */}
       </SidebarContent>
       <SidebarFooter>
-        <NavUser user={rootUser} />
+        <NavUser user={{
+          name: "Unknown",
+          email: "No role",
+          avatar: "",
+        }} />
       </SidebarFooter>
     </Sidebar>
   );

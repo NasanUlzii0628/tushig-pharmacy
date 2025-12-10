@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import logger from "./lib/logger";
 
 /**
  * Admin panel authentication middleware using Next.js proxy (Next 16+)
@@ -8,7 +9,7 @@ export function proxy(req: NextRequest) {
   const { pathname } = req.nextUrl;
 
   // Read token from cookies
-  const token = req.cookies.get("accessToken")?.value;
+  const token = req.cookies.get("token")?.value;
 
   // Public routes (no auth required)
   const publicRoutes = [
@@ -25,6 +26,8 @@ export function proxy(req: NextRequest) {
   if (isPublic) {
     return NextResponse.next();
   }
+
+  console.log("asdasd123", token)
 
   // 3️⃣ Protect everything inside /dashboard or other protected areas
   if (!token && pathname.startsWith("/dashboard")) {
