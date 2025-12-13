@@ -1,7 +1,4 @@
 'use server'
-import { notFound } from 'next/navigation'
-
-import logger from '@/lib/logger'
 
 import { DEFAULT_PAGE, DEFAULT_SIZE } from '@/constants'
 import { GET, POST, PUT, DELETE } from '@/services/handler'

@@ -11,16 +11,15 @@ import {
     DrawerTitle,
     DrawerTrigger,
 } from "@/components/ui/drawer";
-
-import type { SupplierType } from "@/types/supplier";
 import { Input } from "@/components/ui/input";
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
-import { cn } from "@/lib/utils";
-import { createProdcut } from "@/services/actions/product";
 import { X, Upload } from "lucide-react";
-import { Label } from "recharts";
 import { toast } from "sonner";
-import { fileToBase64 } from "@/utils";
+import { cn } from "@/lib/utils";
+
+import type { SupplierType } from "@/types/supplier";
+import { createProdcut } from "@/services/actions/product";
+import { uploadProductImages } from "@/services/actions/upload";
 
 export function CreateDrawer({
     supplierData,
@@ -35,18 +34,15 @@ export function CreateDrawer({
 }) {
     return (
         <Drawer direction="right" open={open} onOpenChange={setOpen}>
-            {/* Button that opens the drawer */}
             <DrawerTrigger asChild>
                 <Button variant="outline">Бүтээгдэхүүн нэмэх +</Button>
             </DrawerTrigger>
 
-            {/* Drawer Content */}
             <DrawerContent className="w-[420px] sm:w-[520px] md:w-[620px]">
                 <DrawerHeader className="text-left">
                     <DrawerTitle className="pt-4">Бүтээгдэхүүн нэмэх</DrawerTitle>
                 </DrawerHeader>
 
-                {/* The form */}
                 <ProductForm
                     className="px-4 pt-2"
                     supplierData={supplierData}
@@ -64,7 +60,6 @@ export function CreateDrawer({
     );
 }
 
-
 export function ProductForm({
     className,
     supplierData,
@@ -78,68 +73,79 @@ export function ProductForm({
 }) {
     const [product, setProduct] = React.useState({
         name: "",
-        img: "",
-        addi_imgs: [] as string[],
         default_price: 0,
         default_supplier_id: 1,
     });
+    const [mainImage, setMainImage] = React.useState<File | null>(null);
+    const [addiImages, setAddiImages] = React.useState<File[]>([]);
+    const [previewMain, setPreviewMain] = React.useState<string>("");
+    const [previewAddi, setPreviewAddi] = React.useState<string[]>([]);
 
-    // Handle main image
     const handleMainImage = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (!file) return;
-
-        const url = URL.createObjectURL(file);
-        setProduct((prev) => ({ ...prev, img: url }));
+        setMainImage(file);
+        setPreviewMain(URL.createObjectURL(file));
     };
 
-    // Handle additional images
-    const handleAddiImages = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const handleAddiImages = (e: React.ChangeEvent<HTMLInputElement>) => {
         const files = Array.from(e.target.files || []);
-
-        const base64Images = await Promise.all(files.map((file) => fileToBase64(file)));
-
-        setProduct((prev) => ({
-            ...prev,
-            addi_imgs: [...prev.addi_imgs, ...base64Images],
-        }));
+        setAddiImages((prev) => [...prev, ...files]);
+        const newPreviews = files.map((f) => URL.createObjectURL(f));
+        setPreviewAddi((prev) => [...prev, ...newPreviews]);
     };
-
 
     async function onSubmit(e: React.FormEvent) {
         e.preventDefault();
+        toast.loading("Зураг байршуулж байна...");
 
-        toast.loading("Бүтээгдэхүүн хадгалж байна...");
+        try {
+            let imgName = "";
+            let addiImgNames: string[] = [];
 
-        const payload = {
-            ...product,
-            img: product.img || "",
-            addi_imgs: product.addi_imgs,
-        };
+            if (mainImage) {
+                const [uploaded] = await uploadProductImages([mainImage]);
+                imgName = uploaded;
+            }
 
-        const res = await createProdcut(payload);
+            if (addiImages.length > 0) {
+                addiImgNames = await uploadProductImages(addiImages);
+            }
 
-        if (!res.success) {
-            toast.error(res.message || "Алдаа гарлаа");
-            return;
+            toast.loading("Бүтээгдэхүүн хадгалж байна...");
+
+            const payload = {
+                name: product.name,
+                img: imgName,
+                addi_imgs: addiImgNames,
+                default_price: product.default_price,
+                default_supplier_id: product.default_supplier_id,
+            };
+
+            const res = await createProdcut(payload);
+
+            if (!res.success) {
+                toast.error(res.message || "Алдаа гарлаа");
+                return;
+            }
+
+            toast.success("Бүтээгдэхүүн амжилттай нэмэгдлээ!");
+            closeDrawer();
+            await refresh();
+        } catch (err) {
+            console.error(err);
+            toast.error("Алдаа гарлаа!");
         }
-
-        toast.success("Бүтээгдэхүүн амжилттай нэмэгдлээ!");
-
-        closeDrawer();
-        await refresh();
     }
 
     return (
         <form className={cn("grid gap-6", className)} onSubmit={onSubmit}>
             {/* Product Name */}
             <div className="grid gap-2">
-                <Label>Бүтээгдэхүүний нэр</Label>
+                <label>Бүтээгдэхүүний нэр</label>
                 <Input
                     value={product.name}
-                    onChange={(e) =>
-                        setProduct((prev) => ({ ...prev, name: e.target.value }))
-                    }
+                    onChange={(e) => setProduct((p) => ({ ...p, name: e.target.value }))}
                     placeholder="Жишээ: Нарийн лент"
                     required
                 />
@@ -147,14 +153,14 @@ export function ProductForm({
 
             {/* Default Price */}
             <div className="grid gap-2">
-                <Label>Үнэ (¥)</Label>
+                <label>Үнэ (¥)</label>
                 <Input
                     type="number"
                     placeholder="Үнэ"
                     value={product.default_price === 0 ? "" : product.default_price}
                     onChange={(e) =>
-                        setProduct((prev) => ({
-                            ...prev,
+                        setProduct((p) => ({
+                            ...p,
                             default_price: e.target.value === "" ? 0 : Number(e.target.value),
                         }))
                     }
@@ -164,23 +170,19 @@ export function ProductForm({
 
             {/* Supplier Selection */}
             <div className="grid gap-2">
-                <Label>Нийлүүлэгч</Label>
+                <label>Нийлүүлэгч</label>
                 <Select
                     onValueChange={(value) =>
-                        setProduct((prev) => ({
-                            ...prev,
-                            default_supplier_id: Number(value),
-                        }))
+                        setProduct((p) => ({ ...p, default_supplier_id: Number(value) }))
                     }
                 >
                     <SelectTrigger className="w-full">
                         <SelectValue placeholder="Нийлүүлэгч сонгох" />
                     </SelectTrigger>
-
                     <SelectContent>
-                        {supplierData.map((supplier) => (
-                            <SelectItem key={supplier.id} value={supplier.id.toString()}>
-                                {supplier.name}
+                        {supplierData.map((s) => (
+                            <SelectItem key={s.id} value={s.id.toString()}>
+                                {s.name}
                             </SelectItem>
                         ))}
                     </SelectContent>
@@ -189,18 +191,20 @@ export function ProductForm({
 
             {/* Main Image */}
             <div className="grid gap-2">
-                <Label>Зураг</Label>
-
-                {product.img ? (
+                <label>Зураг</label>
+                {previewMain ? (
                     <div className="relative w-32 h-32">
                         <img
-                            src={product.img}
+                            src={previewMain}
                             className="w-full h-full rounded-md object-cover border"
                         />
                         <button
                             type="button"
                             className="absolute top-1 right-1 bg-black/60 rounded-full p-1"
-                            onClick={() => setProduct((prev) => ({ ...prev, img: "" }))}
+                            onClick={() => {
+                                setMainImage(null);
+                                setPreviewMain("");
+                            }}
                         >
                             <X className="w-4 h-4 text-white" />
                         </button>
@@ -219,11 +223,9 @@ export function ProductForm({
                 )}
             </div>
 
-
             {/* Additional Images */}
             <div className="grid gap-2">
-                <Label>Нэмэлт зургууд</Label>
-
+                <label>Нэмэлт зургууд</label>
                 <label className="flex flex-col items-center justify-center h-24 border rounded-md cursor-pointer hover:bg-accent">
                     <Upload className="w-5 h-5 mb-1" />
                     <span className="text-xs text-muted-foreground">Файлууд нэмэх</span>
@@ -237,18 +239,16 @@ export function ProductForm({
                 </label>
 
                 <div className="flex gap-2 flex-wrap">
-                    {product.addi_imgs.map((src, index) => (
-                        <div key={index} className="relative w-20 h-20">
+                    {previewAddi.map((src, i) => (
+                        <div key={i} className="relative w-20 h-20">
                             <img src={src} className="w-full h-full rounded-md object-cover border" />
                             <button
                                 type="button"
                                 className="absolute top-1 right-1 bg-black/60 rounded-full p-1"
-                                onClick={() =>
-                                    setProduct((prev) => ({
-                                        ...prev,
-                                        addi_imgs: prev.addi_imgs.filter((_, i) => i !== index),
-                                    }))
-                                }
+                                onClick={() => {
+                                    setAddiImages((prev) => prev.filter((_, idx) => idx !== i));
+                                    setPreviewAddi((prev) => prev.filter((_, idx) => idx !== i));
+                                }}
                             >
                                 <X className="w-3 h-3 text-white" />
                             </button>
@@ -257,11 +257,9 @@ export function ProductForm({
                 </div>
             </div>
 
-
             <Button type="submit" className="w-full mt-2">
                 Хадгалах
             </Button>
         </form>
     );
 }
-
