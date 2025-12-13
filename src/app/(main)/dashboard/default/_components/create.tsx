@@ -147,9 +147,10 @@ export function ProductForm({
 
             {/* Default Price */}
             <div className="grid gap-2">
-                <Label>Анхны үнэ (₮)</Label>
+                <Label>Үнэ (¥)</Label>
                 <Input
                     type="number"
+                    placeholder="Үнэ"
                     value={product.default_price === 0 ? "" : product.default_price}
                     onChange={(e) =>
                         setProduct((prev) => ({

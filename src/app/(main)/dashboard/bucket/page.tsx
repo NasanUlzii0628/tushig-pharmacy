@@ -1,10 +1,11 @@
-import { DataTable } from "./_components/data-table";
+import BucketCards from "./_components/cards";
 
 export default async function Page() {
 
   return (
     <div className="@container/main flex flex-col gap-4 md:gap-6">
-      <DataTable />
+      {/* <DataTable /> */}
+      <BucketCards />
     </div>
   );
 }

@@ -5,6 +5,7 @@ import {
   Banknote,
   PackageSearch,
   ListOrdered,
+  ShoppingBasket,
   type LucideIcon,
 } from "lucide-react";
 
@@ -50,19 +51,24 @@ export const sidebarItems: NavGroup[] = [
       },
       {
         title: "Захиалгын хүсэлт",
+        url: "/dashboard/bucket",
+        icon: ShoppingBasket,
+      },
+      {
+        title: "Захиалга",
         url: "/dashboard/order",
         icon: ListOrdered,
       },
-      {
-        title: "CRM",
-        url: "/dashboard/crm",
-        icon: ChartBar,
-      },
-      {
-        title: "Finance",
-        url: "/dashboard/finance",
-        icon: Banknote,
-      },
+      // {
+      //   title: "CRM",
+      //   url: "/dashboard/crm",
+      //   icon: ChartBar,
+      // },
+      // {
+      //   title: "Finance",
+      //   url: "/dashboard/finance",
+      //   icon: Banknote,
+      // },
     ],
   },
   {

@@ -2,10 +2,6 @@
 "use no memo";
 
 import * as React from "react";
-
-import { Plus } from "lucide-react";
-
-import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent } from "@/components/ui/tabs";
 import { useDataTableInstance } from "@/hooks/use-data-table-instance";
@@ -36,7 +32,7 @@ export function DataTable({ data: initialData, supplier: supplierData }: {
     setData(res.data ?? []);
   };
 
-   const openOrder = (product: ProductType) => {
+  const openOrder = (product: ProductType) => {
     setSelectedProduct(product)
     setOrderOpen(true)
   }
@@ -52,7 +48,7 @@ export function DataTable({ data: initialData, supplier: supplierData }: {
     getRowId: (row) => row.id.toString(),
   })
 
-   return (
+  return (
     <>
       <OrderDialog
         open={orderOpen}

@@ -1,5 +1,5 @@
 const formatCurrencyNumber = (numberValue: string | number, isUSD?: boolean) => {
-  const suffix = isUSD ? '$' : '₮'
+  const suffix = isUSD ? '$' : '¥'
 
   if (!numberValue) return `0${suffix}`
 
@@ -8,7 +8,7 @@ const formatCurrencyNumber = (numberValue: string | number, isUSD?: boolean) => 
 }
 
 const formatCurrencyNumberFixedSuffix = (numberValue: string | number, isUSD?: boolean) => {
-  const suffix = isUSD ? '$' : '₮'
+  const suffix = isUSD ? '$' : '¥'
 
   if (!numberValue) return `0${suffix}`
 
