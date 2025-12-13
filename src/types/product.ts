@@ -12,3 +12,20 @@ export interface ProductType {
   createdAt: string
   updatedAt: string
 }
+
+export interface ProductCreateForm {
+  name: string
+  img: string
+  addi_imgs: string[]
+  default_price: number
+  default_supplier_id: number
+}
+
+export interface ProductUpdateForm {
+  id: number
+  name: string
+  img: string
+  addi_imgs: string[]
+  default_price: number
+  default_supplier_id: number
+}

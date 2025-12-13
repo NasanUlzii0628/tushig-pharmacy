@@ -17,7 +17,9 @@ import { DataTableColumnHeader } from "@/components/data-table/data-table-column
 
 import type { ProductType } from "@/types/product";
 
-export const productColumns: ColumnDef<ProductType>[] = [
+export const productColumns = (
+  onOrder: (product: ProductType) => void
+): ColumnDef<ProductType>[] => [
   {
     id: "select",
     header: ({ table }) => (
@@ -88,7 +90,6 @@ export const productColumns: ColumnDef<ProductType>[] = [
     ),
   },
 
-  // STATUS
   {
     accessorKey: "status",
     header: ({ column }) => (
@@ -118,6 +119,12 @@ export const productColumns: ColumnDef<ProductType>[] = [
         </DropdownMenuTrigger>
 
         <DropdownMenuContent align="end" className="w-32">
+          <DropdownMenuItem
+            onClick={() => onOrder(row.original)}
+          >
+            Захиалах
+          </DropdownMenuItem>
+          <DropdownMenuSeparator />
           <DropdownMenuItem onClick={() => alert(`Edit ${row.original.name}`)}>
             Шинэчлэх
           </DropdownMenuItem>

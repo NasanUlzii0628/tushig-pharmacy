@@ -10,8 +10,6 @@ import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent } from "@/components/ui/tabs";
 import { useDataTableInstance } from "@/hooks/use-data-table-instance";
 
-import { Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerFooter, DrawerClose } from "@/components/ui/drawer";
-
 import { DataTable as DataTableNew } from "../../../../../components/data-table/data-table";
 import { DataTablePagination } from "../../../../../components/data-table/data-table-pagination";
 import { DataTableViewOptions } from "../../../../../components/data-table/data-table-view-options";
@@ -19,59 +17,63 @@ import { withDndColumn } from "../../../../../components/data-table/table-utils"
 
 import { productColumns } from "./columns";
 import type { ProductType } from "@/types/product";
+import { CreateDrawer } from "./create";
+import { SupplierType } from "@/types/supplier";
+import { fetchCustomers } from "@/services/actions/product";
+import { OrderDialog } from "./order";
 
-export function DataTable({ data: initialData }: { data: ProductType[] }) {
-  const [data, setData] = React.useState<ProductType[]>(() => initialData);
+export function DataTable({ data: initialData, supplier: supplierData }: {
+  data: ProductType[],
+  supplier: SupplierType[]
+}) {
+  const [data, setData] = React.useState<ProductType[]>(initialData);
   const [openDrawer, setOpenDrawer] = React.useState(false);
+  const [orderOpen, setOrderOpen] = React.useState(false)
+  const [selectedProduct, setSelectedProduct] = React.useState<ProductType | null>(null)
 
-  const columns = withDndColumn(productColumns);
+  const refreshProducts = async () => {
+    const res = await fetchCustomers({ page: 1, size: 10 });
+    setData(res.data ?? []);
+  };
+
+   const openOrder = (product: ProductType) => {
+    setSelectedProduct(product)
+    setOrderOpen(true)
+  }
+
+
+  const columns = withDndColumn(
+    productColumns(openOrder)
+  )
 
   const table = useDataTableInstance({
     data,
     columns,
     getRowId: (row) => row.id.toString(),
-  });
+  })
 
-  return (
+   return (
     <>
-      {/* ---------------- RIGHT DRAWER ---------------- */}
-      <Drawer direction="right" open={openDrawer} onOpenChange={setOpenDrawer}>
-        <DrawerContent className="fixed right-0 top-0 h-full w-[420px] rounded-none border-l bg-background">
-          <DrawerHeader>
-            <DrawerTitle>Шинэ бүтээгдэхүүн нэмэх</DrawerTitle>
-          </DrawerHeader>
-
-          <div className="p-4">
-            {/* Place your form fields here */}
-            <p className="text-sm text-muted-foreground">
-              Энд бүтээгдэхүүний форм тавигдана...
-            </p>
-          </div>
-
-          <DrawerFooter>
-            <Button className="w-full">Хадгалах</Button>
-            <DrawerClose asChild>
-              <Button variant="outline" className="w-full">Болих</Button>
-            </DrawerClose>
-          </DrawerFooter>
-        </DrawerContent>
-      </Drawer>
+      <OrderDialog
+        open={orderOpen}
+        onOpenChange={setOrderOpen}
+        product={selectedProduct}
+      />
 
       <Tabs defaultValue="outline" className="w-full flex-col justify-start gap-6">
         <div className="flex items-center justify-between">
           <h4>Бүтээгдэхүүн</h4>
-
           <Label htmlFor="view-selector" className="sr-only">
             View
           </Label>
-
           <div className="flex items-center gap-2">
             <DataTableViewOptions table={table} />
-
-            <Button variant="outline" size="sm" onClick={() => setOpenDrawer(true)}>
-              <Plus />
-              <span className="hidden lg:inline">Шинэ бүтээгдэхүүн</span>
-            </Button>
+            <CreateDrawer
+              supplierData={supplierData}
+              open={openDrawer}
+              setOpen={setOpenDrawer}
+              refresh={refreshProducts}
+            />
           </div>
         </div>
 

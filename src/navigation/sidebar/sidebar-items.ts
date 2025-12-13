@@ -1,17 +1,10 @@
 import {
   Mail,
-  MessageSquare,
-  Calendar,
-  Kanban,
-  ReceiptText,
-  Users,
-  Lock,
-  Fingerprint,
-  SquareArrowUpRight,
-  LayoutDashboard,
+  PackagePlus,
   ChartBar,
   Banknote,
   PackageSearch,
+  ListOrdered,
   type LucideIcon,
 } from "lucide-react";
 
@@ -49,6 +42,16 @@ export const sidebarItems: NavGroup[] = [
         title: "Бүтээгдэхүүн",
         url: "/dashboard/default",
         icon: PackageSearch,
+      },
+      {
+        title: "Нийлүүлэгч",
+        url: "/dashboard/supplier",
+        icon: PackagePlus,
+      },
+      {
+        title: "Захиалгын хүсэлт",
+        url: "/dashboard/order",
+        icon: ListOrdered,
       },
       {
         title: "CRM",
