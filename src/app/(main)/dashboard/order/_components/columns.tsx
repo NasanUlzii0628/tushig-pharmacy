@@ -3,21 +3,20 @@
 import { ColumnDef } from "@tanstack/react-table";
 import { EllipsisVertical } from "lucide-react";
 
-import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
 import {
     DropdownMenu,
     DropdownMenuContent,
     DropdownMenuTrigger,
     DropdownMenuItem,
-    DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
 import { DataTableColumnHeader } from "@/components/data-table/data-table-column-header";
 
 import type { OrderTypes } from "@/types/order";
 
 export const orderColumns = (
-    onRefresh: () => void
+    onRefresh: () => void,
+    handleNavigate: (orderId: number) => void
 ): ColumnDef<OrderTypes>[] => [
         {
             id: "index",
@@ -60,6 +59,9 @@ export const orderColumns = (
 
         {
             id: "actions",
+            header: ({ column }) => (
+                <DataTableColumnHeader column={column} title="Үйлдэл" />
+            ),
             cell: ({ row }) => (
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
@@ -69,10 +71,9 @@ export const orderColumns = (
                     </DropdownMenuTrigger>
 
                     <DropdownMenuContent align="end" className="w-32">
-                        <DropdownMenuItem onClick={() => alert(`View ${row.original.id}`)}>
+                        <DropdownMenuItem onClick={() => handleNavigate(row.original.id)}>
                             Дэлгэрэнгүй
                         </DropdownMenuItem>
-
                     </DropdownMenuContent>
                 </DropdownMenu>
             ),

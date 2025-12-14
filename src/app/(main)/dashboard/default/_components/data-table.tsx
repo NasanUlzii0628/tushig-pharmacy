@@ -1,3 +1,4 @@
+// DataTable component
 "use client";
 "use no memo";
 
@@ -24,29 +25,28 @@ export function DataTable({ data: initialData, supplier: supplierData }: {
 }) {
   const [data, setData] = React.useState<ProductType[]>(initialData);
   const [openDrawer, setOpenDrawer] = React.useState(false);
-  const [orderOpen, setOrderOpen] = React.useState(false)
-  const [selectedProduct, setSelectedProduct] = React.useState<ProductType | null>(null)
+  const [orderOpen, setOrderOpen] = React.useState(false);
+  const [selectedProduct, setSelectedProduct] = React.useState<ProductType | null>(null);
 
-  const refreshProducts = async () => {
+  const refreshProducts = React.useCallback(async () => {
     const res = await fetchCustomers({ page: 1, size: 10 });
     setData(res.data ?? []);
-  };
+  }, []);
 
   const openOrder = (product: ProductType) => {
-    setSelectedProduct(product)
-    setOrderOpen(true)
-  }
-
+    setSelectedProduct(product);
+    setOrderOpen(true);
+  };
 
   const columns = withDndColumn(
-    productColumns(openOrder)
-  )
+    productColumns(openOrder, refreshProducts)
+  );
 
   const table = useDataTableInstance({
     data,
     columns,
     getRowId: (row) => row.id.toString(),
-  })
+  });
 
   return (
     <>

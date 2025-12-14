@@ -1,5 +1,4 @@
-// src/app/(main)/dashboard/products/_components/columns.ts
-
+// columns.ts
 import { ColumnDef } from "@tanstack/react-table";
 import { EllipsisVertical } from "lucide-react";
 
@@ -14,47 +13,50 @@ import {
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
 import { DataTableColumnHeader } from "@/components/data-table/data-table-column-header";
+import { DeleteProductDialog } from "./delete";
+import { getImageUrl } from "@/utils/image";
 
 import type { ProductType } from "@/types/product";
 
 export const productColumns = (
-  onOrder: (product: ProductType) => void
+  onOrder: (product: ProductType) => void,
+  onDelete: () => Promise<void>
 ): ColumnDef<ProductType>[] => [
     {
-      id: "select",
-      header: ({ table }) => (
-        <div className="flex items-center justify-center">
-          <Checkbox
-            checked={
-              table.getIsAllPageRowsSelected() ||
-              (table.getIsSomePageRowsSelected() && "indeterminate")
-            }
-            onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-          />
-        </div>
-      ),
-      cell: ({ row }) => (
-        <div className="flex items-center justify-center">
-          <Checkbox
-            checked={row.getIsSelected()}
-            onCheckedChange={(value) => row.toggleSelected(!!value)}
-          />
-        </div>
-      ),
+      id: "index",
+      header: () => <span>#</span>,
+      cell: ({ row }) => <span>{row.index + 1}</span>,
       enableSorting: false,
-      enableHiding: false,
     },
-
     {
       accessorKey: "img",
-      header: () => <span>Зураг</span>,
-      cell: ({ row }) => (
-        <img
-          src={row.original.img}
-          alt={row.original.name}
-          className="h-10 w-10 rounded-md object-cover border"
-        />
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title="Бүтээгдэхүүний зураг" />
       ),
+      cell: ({ row }) => {
+        const imageUrl = getImageUrl(row.original.img);
+
+        return (
+          <div className="">
+            {imageUrl ? (
+              <img
+                src={imageUrl}
+                alt={row.original.name}
+                className="h-10 w-10 rounded-md object-cover border"
+                onError={(e) => {
+                  const target = e.currentTarget;
+                  target.src = "/placeholder-image.png";
+                  target.onerror = null;
+                }}
+              />
+            ) : (
+              <div className="h-10 w-10 rounded-md bg-muted flex items-center justify-center border">
+                <span className="text-xs text-muted-foreground">No img</span>
+              </div>
+            )}
+          </div>
+        );
+      },
       enableSorting: false,
     },
 
@@ -132,12 +134,11 @@ export const productColumns = (
               Шинэчлэх
             </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem
-              className="text-red-500"
-              onClick={() => alert(`Delete ${row.original.id}`)}
-            >
-              Устгах
-            </DropdownMenuItem>
+            <DeleteProductDialog
+              productId={row.original.id}
+              productName={row.original.name}
+              onDeleted={onDelete} // ✅ Pass the refresh function
+            />
           </DropdownMenuContent>
         </DropdownMenu>
       ),

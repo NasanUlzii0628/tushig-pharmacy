@@ -1,9 +1,9 @@
 'use server'
-import { notFound } from 'next/navigation'
+import { notFound, redirect } from 'next/navigation'
 
 
 import { GET, POST } from '@/services/handler'
-import { BucketList, OrderAdd, OrderCheck, OrderTypes } from '@/types/order'
+import { BucketList, OrderAdd, OrderCheck, OrderTypes, OrderDetailData } from '@/types/order'
 import { getQueryString } from '@/utils'
 import { DEFAULT_PAGE, DEFAULT_SIZE } from '@/constants'
 
@@ -93,6 +93,22 @@ export async function FetchOrderList(params: FetchOrderParams) {
         success,
     }
 }
+
+
+export const fetchOrderDetail = async (id: string) => {
+    const path = `/order/detail/${id}`
+
+    const { data, success } = await GET<OrderDetailData>({ path })
+
+    if (!success || !data) {
+        redirect(`/dashboard/order/${id}/404`)
+    }
+
+    return {
+        data,
+    }
+}
+
 
 
 

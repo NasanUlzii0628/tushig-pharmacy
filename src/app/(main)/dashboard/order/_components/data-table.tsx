@@ -1,7 +1,8 @@
+// src/app/(main)/dashboard/order/_components/data-table.tsx
 "use client";
-"use no memo";
 
 import * as React from "react";
+import { useRouter } from "next/navigation";
 
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent } from "@/components/ui/tabs";
@@ -15,25 +16,35 @@ import { withDndColumn } from "@/components/data-table/table-utils";
 import { orderColumns } from "./columns";
 import type { OrderTypes } from "@/types/order";
 import { FetchOrderList } from "@/services/actions/order";
-import { useState } from "react";
 
-export function DataTable() {
-    const [data, setData] = useState<OrderTypes[]>([]);
-    const [loading, setLoading] = useState(true);
+type DataTableProps = {
+    initialData: OrderTypes[];
+};
 
-    const loadSuppliers = async () => {
-        setLoading(true);
+export function DataTable({ initialData }: DataTableProps) {
+    const router = useRouter();
+    const [data, setData] = React.useState<OrderTypes[]>(initialData);
+    const [loadingMap, setLoadingMap] = React.useState<Record<number, boolean>>({});
+    const [isRefreshing, setIsRefreshing] = React.useState(false);
+
+    // ✅ Refresh function without useEffect
+    const handleRefresh = React.useCallback(async () => {
+        setIsRefreshing(true);
         const res = await FetchOrderList({ page: 1, size: 10 });
         setData(res.data ?? []);
-        setLoading(false);
-    };
-
-    React.useEffect(() => {
-        loadSuppliers();
+        setIsRefreshing(false);
     }, []);
 
-    const columns = withDndColumn(orderColumns(loadSuppliers))
+    // ✅ Navigation handler
+    const handleNavigate = React.useCallback((orderId: number) => {
+        setLoadingMap((prev) => ({ ...prev, [orderId]: true }));
+        router.push(`/dashboard/order/${orderId}`);
+    }, [router]);
 
+    const columns = React.useMemo(
+        () => withDndColumn(orderColumns(handleRefresh, handleNavigate)),
+        [handleRefresh, handleNavigate]
+    );
 
     const table = useDataTableInstance({
         data,
@@ -42,37 +53,37 @@ export function DataTable() {
     });
 
     return (
-        <>
-            <Tabs defaultValue="outline" className="w-full flex-col justify-start gap-6">
-                <div className="flex items-center justify-between">
-                    <h4>Нийлүүлэгчид</h4>
+        <Tabs defaultValue="outline" className="w-full flex-col justify-start gap-6">
+            <div className="flex items-center justify-between">
+                <h4>Захиалгууд</h4>
 
-                    <Label htmlFor="view-selector" className="sr-only">
-                        View
-                    </Label>
+                <Label htmlFor="view-selector" className="sr-only">
+                    View
+                </Label>
 
-                    <div className="flex items-center gap-2">
-                        <DataTableViewOptions table={table} />
-                    </div>
+                <div className="flex items-center gap-2">
+                    <DataTableViewOptions table={table} />
+                </div>
+            </div>
+
+            <TabsContent value="outline" className="relative flex flex-col gap-4 overflow-auto">
+                <div className="overflow-hidden rounded-lg border">
+                    {isRefreshing ? (
+                        <div className="p-6 text-center text-muted-foreground">
+                            Шинэчилж байна...
+                        </div>
+                    ) : (
+                        <DataTableNew
+                            dndEnabled
+                            table={table}
+                            columns={columns}
+                            onReorder={setData}
+                        />
+                    )}
                 </div>
 
-                <TabsContent value="outline" className="relative flex flex-col gap-4 overflow-auto">
-                    <div className="overflow-hidden rounded-lg border">
-                        {loading ? (
-                            <div className="p-6 text-center text-muted-foreground">Loading...</div>
-                        ) : (
-                            <DataTableNew
-                                dndEnabled
-                                table={table}
-                                columns={columns}
-                                onReorder={setData}
-                            />
-                        )}
-                    </div>
-
-                    <DataTablePagination table={table} />
-                </TabsContent>
-            </Tabs>
-        </>
+                <DataTablePagination table={table} />
+            </TabsContent>
+        </Tabs>
     );
 }

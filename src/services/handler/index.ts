@@ -8,10 +8,9 @@ import type { Nullish } from "@/types";
 
 type RequestPayloadType = {
   path: string;
-  payload: Record<string, unknown>;
+  payload: Record<string, unknown> | FormData;
   plainRequest?: boolean;
 };
-
 type GetParams = { path: string };
 
 type ResponseType<T> = {
@@ -52,7 +51,29 @@ const handleBadRequest = async <T>(response: Response): Promise<ResponseType<T>>
 const handleSuccess = async <T>(response: Response, plain: boolean): Promise<ResponseType<T>> => {
   const status = response.status;
 
-  if (status === 201 || status === 204) {
+  // ✅ FIX: Try to parse JSON for 201 responses too
+  if (status === 201) {
+    try {
+      const data = await response.json();
+      logger.debug(`201 response data: ${JSON.stringify(data)}`);
+      return {
+        data,
+        httpStatus: status,
+        message: data.message || "Амжилттай",
+        success: true
+      };
+    } catch (error) {
+      logger.debug(`201 response has no body, returning null`);
+      return {
+        data: null,
+        httpStatus: status,
+        message: "Амжилттай",
+        success: true
+      };
+    }
+  }
+
+  if (status === 204) {
     return { data: null, httpStatus: status, message: "Амжилттай", success: true };
   }
 
@@ -108,17 +129,28 @@ export const POST = async <T>({
   const { url, accessToken } = await validateAndGetUrl(path);
   logger.info(`POST request URL: ${url}`);
 
+  const isFormData = payload instanceof FormData;
+
   try {
     const response = await fetch(url, {
       method: "POST",
-      headers: buildHeaders(accessToken),
-      body: JSON.stringify(payload),
+      headers: isFormData
+        ? {
+          Authorization: `Bearer ${accessToken}`,
+        }
+        : buildHeaders(accessToken),
+      body: isFormData ? payload : JSON.stringify(payload),
     });
 
     return handleResponse<T>(response, plainRequest);
   } catch (error) {
     logger.error(`POST request error: ${error}`);
-    return { data: null, httpStatus: 500, message: (error as Error).message, success: false };
+    return {
+      data: null,
+      httpStatus: 500,
+      message: (error as Error).message,
+      success: false,
+    };
   }
 };
 
