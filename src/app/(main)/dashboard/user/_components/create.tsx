@@ -31,10 +31,10 @@ import { createUser } from "@/services/actions/user";
 
 
 const UserCreateSchema = z.object({
-  username: z.string().min(3, "Хэрэглэгчийн нэр заавал шаардлагатай"),
+  username: z.string().min(1, ""),
   password: z
     .string()
-    .min(6, "Нууц үг хамгийн багадаа 6 тэмдэгт байх ёстой"),
+    .min(4, "Нууц үг хамгийн багадаа 4 тэмдэгт байх ёстой"),
 });
 
 type UserCreateFormValues = z.infer<typeof UserCreateSchema>;

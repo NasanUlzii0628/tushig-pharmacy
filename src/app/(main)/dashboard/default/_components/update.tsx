@@ -25,9 +25,9 @@ const MAX_ADDITIONAL_IMAGES = 2;
 const ACCEPTED_IMAGE_TYPES = ["image/jpeg", "image/jpg", "image/png", "image/webp"];
 
 const ProductUpdateSchema = z.object({
-  name: z.string().min(1, "Бүтээгдэхүүний нэр заавал шаардлагатай"),
-  default_price: z.coerce.number().min(0, "Үнэ 0-ээс их байх ёстой"),
-  default_supplier_id: z.coerce.number().min(1, "Нийлүүлэгч сонгох шаардлагатай"),
+  name: z.string().min(1, ""),
+  default_price: z.coerce.number().min(0, ""),
+  default_supplier_id: z.coerce.number().min(1, ""),
 });
 
 type ProductUpdateFormValues = z.infer<typeof ProductUpdateSchema>;
@@ -113,7 +113,6 @@ function UpdateProductForm({
   const [mainImage, setMainImage] = React.useState<File | null>(null);
   const [addiImages, setAddiImages] = React.useState<File[]>([]);
 
-  // Filter out empty/invalid additional images
   const validAddiImgs = React.useMemo(() => {
     if (!Array.isArray(product.addi_imgs)) return [];
     return product.addi_imgs.filter((img) => img && img.trim() !== "");
@@ -159,32 +158,36 @@ function UpdateProductForm({
   };
 
   const handleAddiImages = (e: React.ChangeEvent<HTMLInputElement>) => {
-  const files = Array.from(e.target.files || []).filter(validateFile);
-  if (!files.length) return;
+    const files = Array.from(e.target.files || []).filter(validateFile);
+    if (!files.length) return;
 
-  const currentCount = existingAddiImages.length + addiImages.length;
-  const remainingSlots = MAX_ADDITIONAL_IMAGES - currentCount;
+    const currentCount = existingAddiImages.length + addiImages.length;
+    const remainingSlots = MAX_ADDITIONAL_IMAGES - currentCount;
 
-  if (remainingSlots <= 0) {
-    toast.error(`Хамгийн ихдээ ${MAX_ADDITIONAL_IMAGES} нэмэлт зураг байж болно`);
+    if (remainingSlots <= 0) {
+      toast.error(`Хамгийн ихдээ ${MAX_ADDITIONAL_IMAGES} нэмэлт зураг байж болно`, {
+        richColors: true,
+      });
+      e.target.value = "";
+      return;
+    }
+
+    const filesToAdd = files.slice(0, remainingSlots);
+
+    if (files.length > remainingSlots) {
+      toast.error(`Зөвхөн ${remainingSlots} зураг нэмж болно`, {
+        richColors: true,
+      });
+    }
+
+    setAddiImages((prev) => [...prev, ...filesToAdd]);
+    setPreviewAddi((prev) => [
+      ...prev,
+      ...filesToAdd.map((f) => URL.createObjectURL(f)),
+    ]);
+
     e.target.value = "";
-    return;
-  }
-
-  const filesToAdd = files.slice(0, remainingSlots);
-
-  if (files.length > remainingSlots) {
-    toast.error(`Зөвхөн ${remainingSlots} зураг нэмж болно`);
-  }
-
-  setAddiImages((prev) => [...prev, ...filesToAdd]);
-  setPreviewAddi((prev) => [
-    ...prev,
-    ...filesToAdd.map((f) => URL.createObjectURL(f)),
-  ]);
-
-  e.target.value = "";
-};
+  };
 
 
   const removeAddiImage = (index: number) => {
@@ -231,6 +234,7 @@ function UpdateProductForm({
       };
 
       await toast.promise(updateProduct(payload), {
+        richColors: true,
         loading: "Шинэчилж байна...",
         success: async (res) => {
           if (!res.success) {
@@ -275,7 +279,7 @@ function UpdateProductForm({
           render={({ field }) => (
             <FormItem>
               <FormLabel>
-                Үнэ <span className="text-destructive">*</span>
+                Үнэ (¥)<span className="text-destructive">*</span>
               </FormLabel>
               <FormControl>
                 <Input

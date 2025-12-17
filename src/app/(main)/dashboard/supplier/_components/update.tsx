@@ -32,8 +32,8 @@ import type { SupplierType } from "@/types/supplier";
 
 
 const SupplierFormSchema = z.object({
-  name: z.string().min(1, "Нэр заавал шаардлагатай"),
-  wechat: z.string().min(1, "WeChat заавал шаардлагатай"),
+  name: z.string().min(1, ""),
+  wechat: z.string().min(1, ""),
   contact: z
     .string()
     .optional()
@@ -143,7 +143,7 @@ function SupplierForm({
     setIsSubmitting(true);
 
     try {
-        console.log("payliad", payload)
+      console.log("payliad", payload)
 
       await toast.promise(
         updateSupplier(payload),

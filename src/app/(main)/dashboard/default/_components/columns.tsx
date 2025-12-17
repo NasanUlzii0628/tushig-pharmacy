@@ -59,106 +59,113 @@ export const productColumns = (
   onDelete: () => Promise<void>,
   supplierData: SupplierType[],
 ): ColumnDef<ProductType>[] => [
-  {
-    id: "index",
-    header: () => <span>#</span>,
-    cell: ({ row }) => <span>{row.index + 1}</span>,
-    enableSorting: false,
-  },
-  {
-    accessorKey: "img",
-    header: ({ column }) => <DataTableColumnHeader column={column} title="Бүтээгдэхүүний зураг" />,
-    cell: ({ row }) => {
-      const imageUrl = getImageUrl(row.original.img);
+    {
+      id: "index",
+      header: () => <span>#</span>,
+      cell: ({ row }) => <span>{row.index + 1}</span>,
+      enableSorting: false,
+    },
+    {
+      accessorKey: "img",
+      header: ({ column }) => <DataTableColumnHeader column={column} title="Бүтээгдэхүүний зураг" />,
+      cell: ({ row }) => {
+        const imageUrl = getImageUrl(row.original.img);
 
-      const addiImgs = row.original.addi_imgs;
-      const hasAdditional = Array.isArray(addiImgs) && addiImgs.length > 0 && addiImgs[0];
+        const addiImgs = row.original.addi_imgs;
+        const hasAdditional = Array.isArray(addiImgs) && addiImgs.length > 0 && addiImgs[0];
 
-      const additionalImageUrl = hasAdditional ? getImageUrl(addiImgs[0]) : null;
+        const additionalImageUrl = hasAdditional ? getImageUrl(addiImgs[0]) : null;
 
-      return (
-        <div className="flex flex-row gap-2">
-          {imageUrl ? (
-            <ImagePreview src={imageUrl} alt={row.original.name} />
-          ) : (
-            <div className="bg-muted flex h-10 w-10 items-center justify-center rounded-md border">
-              <span className="text-muted-foreground text-xs">No img</span>
-            </div>
-          )}
+        return (
+          <div className="flex flex-row gap-2">
+            {imageUrl ? (
+              <ImagePreview src={imageUrl} alt={row.original.name} />
+            ) : (
+              <div className="bg-muted flex h-10 w-10 items-center justify-center rounded-md border">
+                <span className="text-muted-foreground text-xs">No img</span>
+              </div>
+            )}
 
-          {additionalImageUrl && <ImagePreview src={additionalImageUrl} alt={`${row.original.name} - additional`} />}
-        </div>
-      );
+            {additionalImageUrl && <ImagePreview src={additionalImageUrl} alt={`${row.original.name} - additional`} />}
+          </div>
+        );
+      },
+
+      enableSorting: false,
     },
 
-    enableSorting: false,
-  },
-
-  {
-    accessorKey: "name",
-    header: ({ column }) => <DataTableColumnHeader column={column} title="Бүтээгдэхүүний нэр" />,
-    cell: ({ row }) => <span className="font-medium">{row.original.name}</span>,
-  },
-
-  {
-    accessorKey: "default_price",
-    header: ({ column }) => <DataTableColumnHeader column={column} title="Үнэ" />,
-    cell: ({ row }) => <span>{row.original.default_price} ¥</span>,
-  },
-
-  {
-    accessorKey: "default_supplier",
-    header: ({ column }) => <DataTableColumnHeader column={column} title="Нийлүүлэгч" />,
-    cell: ({ row }) => <span>{row.original.default_supplier.name}</span>,
-  },
-
-  {
-    accessorKey: "status",
-    header: ({ column }) => <DataTableColumnHeader column={column} title="Төлөв" />,
-    cell: ({ row }) => {
-      const status = row.original.status;
-      const color = status === "ACTIVE" ? "outline" : status === "INACTIVE" ? "destructive" : "secondary";
-      const text = status === "ACTIVE" ? "Идэвхтэй" : status === "INACTIVE" ? "Идэвхгүй" : status;
-
-      return <Badge variant={color}>{text}</Badge>;
-    },
-  },
-
-  {
-    id: "actions",
-    header: ({ column }) => <DataTableColumnHeader column={column} title="Үйлдэл" />,
-    cell: ({ row }) => {
-      const [open, setOpen] = React.useState(false);
-
-      return (
-        <>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="icon">
-                <EllipsisVertical className="h-4 w-4" />
-              </Button>
-            </DropdownMenuTrigger>
-
-            <DropdownMenuContent align="end">
-              <DropdownMenuItem onClick={() => setOpen(true)}>Шинэчлэх</DropdownMenuItem>
-
-              <DropdownMenuSeparator />
-
-              <DeleteProductDialog productId={row.original.id} productName={row.original.name} onDeleted={onDelete} />
-            </DropdownMenuContent>
-          </DropdownMenu>
-
-          <UpdateProductDrawer
-            open={open}
-            setOpen={setOpen}
-            product={row.original}
-            supplierData={supplierData}
-            refresh={onDelete}
-          />
-        </>
-      );
+    {
+      accessorKey: "name",
+      header: ({ column }) => <DataTableColumnHeader column={column} title="Бүтээгдэхүүний нэр" />,
+      cell: ({ row }) => <span className="font-medium">{row.original.name}</span>,
     },
 
-    enableSorting: false,
-  },
-];
+    {
+      accessorKey: "default_price",
+      header: ({ column }) => <DataTableColumnHeader column={column} title="Үнэ" />,
+      cell: ({ row }) => <span>{row.original.default_price} ¥</span>,
+    },
+
+    {
+      accessorKey: "default_supplier",
+      header: ({ column }) => <DataTableColumnHeader column={column} title="Нийлүүлэгч" />,
+      cell: ({ row }) => <span>{row.original.default_supplier.name}</span>,
+    },
+
+    {
+      accessorKey: "status",
+      header: ({ column }) => <DataTableColumnHeader column={column} title="Төлөв" />,
+      cell: ({ row }) => {
+        const status = row.original.status;
+        const color = status === "ACTIVE" ? "outline" : status === "INACTIVE" ? "destructive" : "secondary";
+        const text = status === "ACTIVE" ? "Идэвхтэй" : status === "INACTIVE" ? "Идэвхгүй" : status;
+
+        return <Badge variant={color}>{text}</Badge>;
+      },
+    },
+
+    {
+      id: "actions",
+      header: ({ column }) => <DataTableColumnHeader column={column} title="Үйлдэл" />,
+      cell: ({ row }) => {
+        const [open, setOpen] = React.useState(false);
+
+        return (
+          <>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="icon">
+                  <EllipsisVertical className="h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+
+
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem
+                  onClick={() => onOrder(row.original)}
+                >
+                  Захиалах
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={() => setOpen(true)}>Шинэчлэх</DropdownMenuItem>
+
+                <DropdownMenuSeparator />
+
+                <DeleteProductDialog productId={row.original.id} productName={row.original.name} onDeleted={onDelete} />
+              </DropdownMenuContent>
+            </DropdownMenu>
+
+            <UpdateProductDrawer
+              open={open}
+              setOpen={setOpen}
+              product={row.original}
+              supplierData={supplierData}
+              refresh={onDelete}
+            />
+          </>
+        );
+      },
+
+      enableSorting: false,
+    },
+  ];

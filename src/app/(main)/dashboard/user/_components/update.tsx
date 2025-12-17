@@ -32,7 +32,7 @@ import type { UserType } from "@/types/user";
 
 
 const UserUpdateSchema = z.object({
-  username: z.string().min(3, "Хэрэглэгчийн нэр заавал шаардлагатай"),
+  username: z.string().min(3, ""),
   password: z.string().optional(),
 });
 

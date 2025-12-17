@@ -21,41 +21,9 @@ import { usePreferencesStore } from "@/stores/preferences/preferences-provider";
 import { NavMain } from "./nav-main";
 import { NavUser } from "./nav-user";
 
-const data = {
-  navSecondary: [
-    {
-      title: "Settings",
-      url: "#",
-      icon: Settings,
-    },
-    {
-      title: "Get Help",
-      url: "#",
-      icon: CircleHelp,
-    },
-    {
-      title: "Search",
-      url: "#",
-      icon: Search,
-    },
-  ],
-  documents: [
-    {
-      name: "Data Library",
-      url: "#",
-      icon: Database,
-    },
-    {
-      name: "Reports",
-      url: "#",
-      icon: ClipboardList,
-    },
-    {
-      name: "Word Assistant",
-      url: "#",
-      icon: File,
-    },
-  ],
+const roleTranslations = {
+  MANAGER: "Менежер",
+  WORKER: "Ажилтан"
 };
 
 export function AppSidebar({
@@ -92,10 +60,10 @@ export function AppSidebar({
       </SidebarContent>
       <SidebarFooter>
         <NavUser user={{
-      name: user?.username ?? "Unknown",
-      email: user?.role ?? "No role",
-      avatar: "",
-    }} />
+          name: user?.username ?? "Unknown",
+          email: roleTranslations[user?.role as keyof typeof roleTranslations] ?? user?.role ?? "No role",
+          avatar: "",
+        }} />
       </SidebarFooter>
     </Sidebar>
   );
