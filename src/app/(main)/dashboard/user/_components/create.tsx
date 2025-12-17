@@ -27,75 +27,57 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 
-import { updateSupplier } from "@/services/actions/supplier";
-import type { SupplierType } from "@/types/supplier";
+import { createUser } from "@/services/actions/user";
 
 
-const SupplierFormSchema = z.object({
-  name: z.string().min(1, "Нэр заавал шаардлагатай"),
-  wechat: z.string().min(1, "WeChat заавал шаардлагатай"),
-  contact: z
+const UserCreateSchema = z.object({
+  username: z.string().min(3, "Хэрэглэгчийн нэр заавал шаардлагатай"),
+  password: z
     .string()
-    .optional()
-    .refine(
-      (val) =>
-        !val || val.length === 0 || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val),
-      { message: "Зөв имэйл оруулна уу" }
-    ),
+    .min(6, "Нууц үг хамгийн багадаа 6 тэмдэгт байх ёстой"),
 });
 
-type SupplierFormValues = z.infer<typeof SupplierFormSchema>;
+type UserCreateFormValues = z.infer<typeof UserCreateSchema>;
 
 type Props = {
-  supplier: SupplierType;
-  onUpdated: () => Promise<void>;
+  onCreated: () => Promise<void>;
 };
 
-/* =========================
-   DRAWER
-========================= */
-
-export function UpdateDrawer({ supplier, onUpdated }: Props) {
+export function CreateUserDrawer({ onCreated }: Props) {
   const [open, setOpen] = React.useState(false);
   const [isSubmitting, setIsSubmitting] = React.useState(false);
 
   return (
     <Drawer direction="right" open={open} onOpenChange={setOpen}>
       <DrawerTrigger asChild>
-        <Button variant="ghost" size="sm">
-          Засах
-        </Button>
+        <Button variant="outline">Шинэ хэрэглэгч үүсгэх +</Button>
       </DrawerTrigger>
 
       <DrawerContent className="w-[420px]">
         <DrawerHeader className="text-left">
-          <DrawerTitle>Нийлүүлэгч засах</DrawerTitle>
+          <DrawerTitle>Хэрэглэгч нэмэх</DrawerTitle>
         </DrawerHeader>
 
-        <SupplierForm
-          supplier={supplier}
+        <UserForm
           className="px-4"
           isSubmitting={isSubmitting}
           setIsSubmitting={setIsSubmitting}
           onSuccess={async () => {
             setOpen(false);
-            await onUpdated();
+            await onCreated();
           }}
         />
 
-        {/* FOOTER BUTTONS */}
         <DrawerFooter className="gap-2">
-          {/* SUBMIT */}
           <Button
             type="submit"
-            form="supplier-update-form"
+            form="user-create-form"
             className="w-full"
             disabled={isSubmitting}
           >
-            {isSubmitting ? "Шинэчилж байна..." : "Шинэчлэх"}
+            {isSubmitting ? "Хадгалж байна..." : "Нэмэх"}
           </Button>
 
-          {/* CANCEL */}
           <DrawerClose asChild>
             <Button variant="outline" className="w-full" disabled={isSubmitting}>
               Болих
@@ -107,55 +89,41 @@ export function UpdateDrawer({ supplier, onUpdated }: Props) {
   );
 }
 
-/* =========================
-   FORM
-========================= */
-
-function SupplierForm({
+function UserForm({
   className,
-  supplier,
   onSuccess,
   isSubmitting,
   setIsSubmitting,
 }: {
   className?: string;
-  supplier: SupplierType;
   onSuccess: () => Promise<void>;
   isSubmitting: boolean;
   setIsSubmitting: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
-  const form = useForm<SupplierFormValues>({
-    resolver: zodResolver(SupplierFormSchema),
+  const form = useForm<UserCreateFormValues>({
+    resolver: zodResolver(UserCreateSchema),
     defaultValues: {
-      name: supplier.name,
-      wechat: supplier.wechat ?? "",
-      contact: supplier.contact ?? "",
+      username: "",
+      password: "",
     },
   });
 
-  const onSubmit = async (data: SupplierFormValues) => {
-    const payload = {
-      id: supplier.id,
-      ...data,
-      contact: data.contact ?? "",
-    };
-
+  const onSubmit = async (data: UserCreateFormValues) => {
     setIsSubmitting(true);
 
     try {
-        console.log("payliad", payload)
-
       await toast.promise(
-        updateSupplier(payload),
+        createUser(data),
         {
-          loading: "Шинэчилж байна...",
+          loading: "Хадгалж байна...",
           success: async (res) => {
             if (!res.success) {
               throw new Error(res.message || "Алдаа гарлаа");
             }
 
             await onSuccess();
-            return "Нийлүүлэгч амжилттай шинэчлэгдлээ!";
+            form.reset();
+            return "Хэрэглэгч амжилттай үүслээ!";
           },
           error: (err) => err.message || "Серверийн алдаа",
         }
@@ -168,53 +136,43 @@ function SupplierForm({
   return (
     <Form {...form}>
       <form
-        id="supplier-update-form"
+        id="user-create-form"
         onSubmit={form.handleSubmit(onSubmit)}
         className={cn("grid gap-4", className)}
       >
-        {/* NAME */}
+        {/* USERNAME */}
         <FormField
           control={form.control}
-          name="name"
+          name="username"
           render={({ field }) => (
             <FormItem>
               <FormLabel>
-                Нэр <span className="text-destructive">*</span>
+                Хэрэглэгчийн нэр <span className="text-destructive">*</span>
               </FormLabel>
               <FormControl>
-                <Input {...field} />
+                <Input placeholder="username" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
           )}
         />
 
-        {/* WECHAT */}
+        {/* PASSWORD */}
         <FormField
           control={form.control}
-          name="wechat"
+          name="password"
           render={({ field }) => (
             <FormItem>
               <FormLabel>
-                WeChat <span className="text-destructive">*</span>
+                Нууц үг <span className="text-destructive">*</span>
               </FormLabel>
               <FormControl>
-                <Input {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        {/* CONTACT */}
-        <FormField
-          control={form.control}
-          name="contact"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Имэйл</FormLabel>
-              <FormControl>
-                <Input placeholder="Имэйл (заавал биш)" {...field} />
+                <Input
+                  type="password"
+                  placeholder="••••••••"
+                  autoComplete="new-password"
+                  {...field}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>

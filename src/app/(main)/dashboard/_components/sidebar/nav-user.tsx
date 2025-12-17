@@ -66,21 +66,7 @@ export function NavUser({
               </div>
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <DropdownMenuGroup>
-              <DropdownMenuItem>
-                <CircleUser />
-                Account
-              </DropdownMenuItem>
-              <DropdownMenuItem>
-                <CreditCard />
-                Billing
-              </DropdownMenuItem>
-              <DropdownMenuItem>
-                <MessageSquareDot />
-                Notifications
-              </DropdownMenuItem>
-            </DropdownMenuGroup>
-            <DropdownMenuSeparator />
+        
             <DropdownMenuItem
               onClick={async () => {
                 await logoutAction();
@@ -88,7 +74,7 @@ export function NavUser({
               }}
             >
               <LogOut />
-              Log out
+              Системээс гарах
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

@@ -2,7 +2,7 @@ import { ReactNode } from "react";
 
 import { cookies } from "next/headers";
 
-import { AppSidebar } from "@/app/(main)/dashboard/_components/sidebar/app-sidebar";
+import { AppSidebarWrapper } from "@/app/(main)/dashboard/_components/sidebar/app-sidebar-wrapper";
 import { Separator } from "@/components/ui/separator";
 import { SidebarInset, SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { cn } from "@/lib/utils";
@@ -17,7 +17,7 @@ export default async function Layout({ children }: Readonly<{ children: ReactNod
 
   return (
     <SidebarProvider defaultOpen={defaultOpen}>
-      <AppSidebar />
+      <AppSidebarWrapper />
       <SidebarInset
         className={cn(
           "[html[data-content-layout=centered]_&]:mx-auto! [html[data-content-layout=centered]_&]:max-w-screen-2xl!",

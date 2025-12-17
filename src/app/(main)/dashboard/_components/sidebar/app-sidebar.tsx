@@ -20,7 +20,6 @@ import { usePreferencesStore } from "@/stores/preferences/preferences-provider";
 
 import { NavMain } from "./nav-main";
 import { NavUser } from "./nav-user";
-import { getAuthUser } from "@/lib/auth-user";
 
 const data = {
   navSecondary: [
@@ -59,7 +58,16 @@ const data = {
   ],
 };
 
-export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+export function AppSidebar({
+  user,
+  ...props
+}: React.ComponentProps<typeof Sidebar> & {
+  user: {
+    username?: string;
+    role?: string;
+  } | null;
+}) {
+
   const sidebarVariant = usePreferencesStore((s) => s.sidebarVariant);
   const sidebarCollapsible = usePreferencesStore((s) => s.sidebarCollapsible);
 
@@ -84,10 +92,10 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       </SidebarContent>
       <SidebarFooter>
         <NavUser user={{
-          name: "Unknown",
-          email: "No role",
-          avatar: "",
-        }} />
+      name: user?.username ?? "Unknown",
+      email: user?.role ?? "No role",
+      avatar: "",
+    }} />
       </SidebarFooter>
     </Sidebar>
   );

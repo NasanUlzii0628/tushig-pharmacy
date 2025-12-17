@@ -3,6 +3,6 @@ import packageJson from "../../package.json";
 const currentYear = new Date().getFullYear();
 
 export const APP_CONFIG = {
-  name: "Tushig-Online",
+  name: "Захиалгын систем",
   version: packageJson.version,
 };

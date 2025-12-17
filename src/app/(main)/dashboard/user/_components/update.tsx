@@ -27,27 +27,19 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 
-import { updateSupplier } from "@/services/actions/supplier";
-import type { SupplierType } from "@/types/supplier";
+import { updateUser } from "@/services/actions/user";
+import type { UserType } from "@/types/user";
 
 
-const SupplierFormSchema = z.object({
-  name: z.string().min(1, "Нэр заавал шаардлагатай"),
-  wechat: z.string().min(1, "WeChat заавал шаардлагатай"),
-  contact: z
-    .string()
-    .optional()
-    .refine(
-      (val) =>
-        !val || val.length === 0 || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val),
-      { message: "Зөв имэйл оруулна уу" }
-    ),
+const UserUpdateSchema = z.object({
+  username: z.string().min(3, "Хэрэглэгчийн нэр заавал шаардлагатай"),
+  password: z.string().optional(),
 });
 
-type SupplierFormValues = z.infer<typeof SupplierFormSchema>;
+type UserUpdateFormValues = z.infer<typeof UserUpdateSchema>;
 
 type Props = {
-  supplier: SupplierType;
+  user: UserType;
   onUpdated: () => Promise<void>;
 };
 
@@ -55,7 +47,7 @@ type Props = {
    DRAWER
 ========================= */
 
-export function UpdateDrawer({ supplier, onUpdated }: Props) {
+export function UpdateUserDrawer({ user, onUpdated }: Props) {
   const [open, setOpen] = React.useState(false);
   const [isSubmitting, setIsSubmitting] = React.useState(false);
 
@@ -69,11 +61,11 @@ export function UpdateDrawer({ supplier, onUpdated }: Props) {
 
       <DrawerContent className="w-[420px]">
         <DrawerHeader className="text-left">
-          <DrawerTitle>Нийлүүлэгч засах</DrawerTitle>
+          <DrawerTitle>Хэрэглэгч засах</DrawerTitle>
         </DrawerHeader>
 
-        <SupplierForm
-          supplier={supplier}
+        <UserForm
+          user={user}
           className="px-4"
           isSubmitting={isSubmitting}
           setIsSubmitting={setIsSubmitting}
@@ -85,17 +77,15 @@ export function UpdateDrawer({ supplier, onUpdated }: Props) {
 
         {/* FOOTER BUTTONS */}
         <DrawerFooter className="gap-2">
-          {/* SUBMIT */}
           <Button
             type="submit"
-            form="supplier-update-form"
+            form="user-update-form"
             className="w-full"
             disabled={isSubmitting}
           >
             {isSubmitting ? "Шинэчилж байна..." : "Шинэчлэх"}
           </Button>
 
-          {/* CANCEL */}
           <DrawerClose asChild>
             <Button variant="outline" className="w-full" disabled={isSubmitting}>
               Болих
@@ -111,42 +101,41 @@ export function UpdateDrawer({ supplier, onUpdated }: Props) {
    FORM
 ========================= */
 
-function SupplierForm({
+function UserForm({
   className,
-  supplier,
+  user,
   onSuccess,
   isSubmitting,
   setIsSubmitting,
 }: {
   className?: string;
-  supplier: SupplierType;
+  user: UserType;
   onSuccess: () => Promise<void>;
   isSubmitting: boolean;
   setIsSubmitting: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
-  const form = useForm<SupplierFormValues>({
-    resolver: zodResolver(SupplierFormSchema),
+  const form = useForm<UserUpdateFormValues>({
+    resolver: zodResolver(UserUpdateSchema),
     defaultValues: {
-      name: supplier.name,
-      wechat: supplier.wechat ?? "",
-      contact: supplier.contact ?? "",
+      username: user.username,
+      password: "",
     },
   });
 
-  const onSubmit = async (data: SupplierFormValues) => {
+  const onSubmit = async (data: UserUpdateFormValues) => {
     const payload = {
-      id: supplier.id,
-      ...data,
-      contact: data.contact ?? "",
+      id: user.id,
+      username: data.username,
+      ...(data.password && data.password.length > 0
+        ? { password: data.password }
+        : {}),
     };
 
     setIsSubmitting(true);
 
     try {
-        console.log("payliad", payload)
-
       await toast.promise(
-        updateSupplier(payload),
+        updateUser(payload),
         {
           loading: "Шинэчилж байна...",
           success: async (res) => {
@@ -155,7 +144,7 @@ function SupplierForm({
             }
 
             await onSuccess();
-            return "Нийлүүлэгч амжилттай шинэчлэгдлээ!";
+            return "Хэрэглэгч амжилттай шинэчлэгдлээ!";
           },
           error: (err) => err.message || "Серверийн алдаа",
         }
@@ -168,18 +157,18 @@ function SupplierForm({
   return (
     <Form {...form}>
       <form
-        id="supplier-update-form"
+        id="user-update-form"
         onSubmit={form.handleSubmit(onSubmit)}
         className={cn("grid gap-4", className)}
       >
-        {/* NAME */}
+        {/* USERNAME */}
         <FormField
           control={form.control}
-          name="name"
+          name="username"
           render={({ field }) => (
             <FormItem>
               <FormLabel>
-                Нэр <span className="text-destructive">*</span>
+                Хэрэглэгчийн нэр <span className="text-destructive">*</span>
               </FormLabel>
               <FormControl>
                 <Input {...field} />
@@ -189,32 +178,20 @@ function SupplierForm({
           )}
         />
 
-        {/* WECHAT */}
+        {/* PASSWORD (OPTIONAL) */}
         <FormField
           control={form.control}
-          name="wechat"
+          name="password"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>
-                WeChat <span className="text-destructive">*</span>
-              </FormLabel>
+              <FormLabel>Шинэ нууц үг</FormLabel>
               <FormControl>
-                <Input {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        {/* CONTACT */}
-        <FormField
-          control={form.control}
-          name="contact"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Имэйл</FormLabel>
-              <FormControl>
-                <Input placeholder="Имэйл (заавал биш)" {...field} />
+                <Input
+                  type="password"
+                  placeholder="Хоосон орхивол өөрчлөгдөхгүй"
+                  autoComplete="new-password"
+                  {...field}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>

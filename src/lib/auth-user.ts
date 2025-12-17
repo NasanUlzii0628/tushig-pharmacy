@@ -1,7 +1,7 @@
 import { cookies } from "next/headers";
 
 export async function getAuthUser() {
-  const cookieStore = await cookies();   // ✔ FIX HERE
+  const cookieStore = await cookies();   
   const userCookie = cookieStore.get("user")?.value;
 
   if (!userCookie) return null;

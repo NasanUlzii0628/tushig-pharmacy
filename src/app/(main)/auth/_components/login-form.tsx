@@ -6,15 +6,18 @@ import { toast } from "sonner";
 import { z } from "zod";
 
 import { Button } from "@/components/ui/button";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Form, FormControl, FormField, FormItem, FormLabel } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 
 import { loginAction } from "@/lib/auth";
 import { useRouter } from "next/navigation";
+import { Checkbox } from "@/components/ui/checkbox";
+import { useEffect } from "react";
 
 const FormSchema = z.object({
   username: z.string().min(1, "Хэрэглэгчийн нэр шаардлагатай"),
-  password: z.string().min(6, "Нууц үг 6 тэмдэгтээс их байх ёстой"),
+  password: z.string().min(1, "Нууц үг шаардлагатай"),
+  remember: z.boolean().optional(),
 });
 
 export function LoginForm() {
@@ -25,8 +28,18 @@ export function LoginForm() {
     defaultValues: {
       username: "",
       password: "",
+      remember: false,
     },
   });
+
+  // Load saved username on mount
+  useEffect(() => {
+    const savedUsername = localStorage.getItem("rememberedUsername");
+    if (savedUsername) {
+      form.setValue("username", savedUsername);
+      form.setValue("remember", true);
+    }
+  }, [form]);
 
   const onSubmit = async (data: z.infer<typeof FormSchema>) => {
     const res = await loginAction(data.username, data.password);
@@ -34,6 +47,12 @@ export function LoginForm() {
     if (!res.success) {
       toast.error(res.message || "Нэвтрэхэд алдаа гарлаа");
       return;
+    }
+
+    if (data.remember) {
+      localStorage.setItem("rememberedUsername", data.username);
+    } else {
+      localStorage.removeItem("rememberedUsername");
     }
 
     toast.success("Амжилттай нэвтэрлээ!");
@@ -50,15 +69,8 @@ export function LoginForm() {
             <FormItem>
               <FormLabel>Хэрэглэгчийн нэр</FormLabel>
               <FormControl>
-                <Input
-                  id="username"
-                  type="text"
-                  placeholder="manager"
-                  autoComplete="username"
-                  {...field}
-                />
+                <Input id="username" type="text" autoComplete="username" {...field} />
               </FormControl>
-              <FormMessage />
             </FormItem>
           )}
         />
@@ -70,22 +82,36 @@ export function LoginForm() {
             <FormItem>
               <FormLabel>Нууц үг</FormLabel>
               <FormControl>
-                <Input
-                  id="password"
-                  type="password"
-                  placeholder="••••••••"
-                  autoComplete="current-password"
-                  {...field}
-                />
+                <Input id="password" type="password" autoComplete="current-password" {...field} />
               </FormControl>
-              <FormMessage />
             </FormItem>
           )}
         />
 
-        <Button className="w-full" type="submit">
-          Login
-        </Button>
+        <FormField
+          control={form.control}
+          name="remember"
+          render={({ field }) => (
+            <FormItem className="flex flex-row items-center">
+              <FormControl>
+                <Checkbox
+                  id="login-remember"
+                  checked={field.value}
+                  onCheckedChange={field.onChange}
+                  className="size-4"
+                />
+              </FormControl>
+              <FormLabel htmlFor="login-remember" className="text-muted-foreground ml-1 text-sm font-medium">
+                Намайг санах
+              </FormLabel>
+            </FormItem>
+          )}
+        />
+        <div className="pt-2">
+          <Button className="w-full" type="submit">
+            Нэвтрэх
+          </Button>
+        </div>
       </form>
     </Form>
   );

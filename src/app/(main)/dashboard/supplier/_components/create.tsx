@@ -1,10 +1,13 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import { toast } from "sonner"
+import * as React from "react";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { toast } from "sonner";
 
-import { cn } from "@/lib/utils"
-import { Button } from "@/components/ui/button"
+import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
 import {
   Drawer,
   DrawerClose,
@@ -13,18 +16,32 @@ import {
   DrawerHeader,
   DrawerTitle,
   DrawerTrigger,
-} from "@/components/ui/drawer"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { createSupplier } from "@/services/actions/supplier"
+} from "@/components/ui/drawer";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
 
+import { createSupplier } from "@/services/actions/supplier";
+
+const SupplierFormSchema = z.object({
+  name: z.string().min(1, "Нэр заавал шаардлагатай"),
+  wechat: z.string().min(1, "WeChat заавал шаардлагатай"),
+  contact: z
+    .string()
+    .optional()
+    .refine((val) => !val || val.length === 0 || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val), {
+      message: "Зөв имэйл оруулна уу",
+    }),
+});
+
+type SupplierFormValues = z.infer<typeof SupplierFormSchema>;
 
 type Props = {
-  onCreated: () => Promise<void>
-}
+  onCreated: () => Promise<void>;
+};
 
 export function CreateDrawer({ onCreated }: Props) {
-  const [open, setOpen] = React.useState(false)
+  const [open, setOpen] = React.useState(false);
+  const [isSubmitting, setIsSubmitting] = React.useState(false);
 
   return (
     <Drawer direction="right" open={open} onOpenChange={setOpen}>
@@ -39,87 +56,120 @@ export function CreateDrawer({ onCreated }: Props) {
 
         <SupplierForm
           className="px-4"
+          isSubmitting={isSubmitting}
+          setIsSubmitting={setIsSubmitting}
           onSuccess={async () => {
-            setOpen(false)
-            await onCreated()
+            setOpen(false);
+            await onCreated();
           }}
         />
 
-        <DrawerFooter>
+        <DrawerFooter className="gap-2">
+          <Button type="submit" form="supplier-create-form" className="w-full" disabled={isSubmitting}>
+            {isSubmitting ? "Хадгалж байна..." : "Нэмэх"}
+          </Button>
+
           <DrawerClose asChild>
-            <Button variant="outline">Cancel</Button>
+            <Button variant="outline" className="w-full" disabled={isSubmitting}>
+              Болих
+            </Button>
           </DrawerClose>
         </DrawerFooter>
       </DrawerContent>
     </Drawer>
-  )
+  );
 }
 
 function SupplierForm({
   className,
   onSuccess,
-}: React.ComponentProps<"form"> & { onSuccess: () => Promise<void> }) {
-  const [form, setForm] = React.useState({
-    name: "",
-    contact: "",
-    wechat: "",
-  })
+  isSubmitting,
+  setIsSubmitting,
+}: {
+  className?: string;
+  onSuccess: () => Promise<void>;
+  isSubmitting: boolean;
+  setIsSubmitting: React.Dispatch<React.SetStateAction<boolean>>;
+}) {
+  const form = useForm<SupplierFormValues>({
+    resolver: zodResolver(SupplierFormSchema),
+    defaultValues: {
+      name: "",
+      wechat: "",
+      contact: "",
+    },
+  });
 
-  const handleSubmit = async (e: React.FormEvent) => {
-  e.preventDefault()
+  const onSubmit = async (data: SupplierFormValues) => {
+    const payload = {
+      ...data,
+      contact: data.contact ?? "",
+    };
 
-  await toast.promise(
-    createSupplier(form),
-    {
+    await toast.promise(createSupplier(payload), {
       loading: "Хадгалж байна...",
       success: async (res) => {
         if (!res.success) {
-          throw new Error(res.message || "Алдаа гарлаа")
+          throw new Error(res.message || "Алдаа гарлаа");
         }
 
-        await onSuccess()
-        return "Нийлүүлэгч амжилттай нэмэгдлээ!"
+        await onSuccess();
+        form.reset();
+        return "Нийлүүлэгч амжилттай нэмэгдлээ!";
       },
       error: (err) => err.message || "Серверийн алдаа",
-    }
-  )
-}
-
+    });
+  };
 
   return (
-    <form onSubmit={handleSubmit} className={cn("grid gap-4", className)}>
-      <div className="grid gap-2">
-        <Label>Нэр</Label>
-        <Input
-          value={form.name}
-          onChange={(e) => setForm({ ...form, name: e.target.value })}
-          placeholder="Нэр"
-          required
+    <Form {...form}>
+      <form id="supplier-create-form" onSubmit={form.handleSubmit(onSubmit)} className={cn("grid gap-4", className)}>
+        <FormField
+          control={form.control}
+          name="name"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>
+                Нэр <span className="text-destructive">*</span>
+              </FormLabel>
+              <FormControl>
+                <Input placeholder="Нэр" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
         />
-      </div>
 
-      <div className="grid gap-2">
-        <Label>Имэйл</Label>
-        <Input
-          value={form.contact}
-          onChange={(e) => setForm({ ...form, contact: e.target.value })}
-          placeholder="Имэйл"
+        <FormField
+          control={form.control}
+          name="wechat"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>
+                WeChat <span className="text-destructive">*</span>
+              </FormLabel>
+              <FormControl>
+                <Input placeholder="WeChat дугаар" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
         />
-      </div>
 
-      <div className="grid gap-2">
-        <Label>Wechat</Label>
-        <Input
-          value={form.wechat}
-          onChange={(e) => setForm({ ...form, wechat: e.target.value })}
-          placeholder="WeChat дугаар"
+        <FormField
+          control={form.control}
+          name="contact"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Имэйл</FormLabel>
+              <FormControl>
+                <Input placeholder="Имэйл" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
         />
-      </div>
-
-      <Button type="submit" className="w-full">
-        Нэмэх
-      </Button>
-    </form>
-  )
+      </form>
+    </Form>
+  );
 }
-

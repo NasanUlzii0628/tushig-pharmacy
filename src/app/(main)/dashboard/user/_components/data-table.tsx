@@ -11,19 +11,19 @@ import { DataTable as DataTableNew } from "@/components/data-table/data-table";
 import { DataTablePagination } from "@/components/data-table/data-table-pagination";
 import { withDndColumn } from "@/components/data-table/table-utils";
 
-import { supplierColumns } from "./columns";
-import type { SupplierType } from "@/types/supplier";
-import { FetchSupplier } from "@/services/actions/supplier";
+import { userColumns } from "./columns";
+import type { UserType } from "@/types/user";
+import { fetchUser } from "@/services/actions/user";
 import { useState } from "react";
-import { CreateDrawer } from "./create";
+import { CreateUserDrawer } from "./create";
 
 export function DataTable() {
-  const [data, setData] = useState<SupplierType[]>([]);
+  const [data, setData] = useState<UserType[]>([]);
   const [loading, setLoading] = useState(true);
 
   const loadSuppliers = async () => {
     setLoading(true);
-    const res = await FetchSupplier({ page: 1, size: 10 });
+    const res = await fetchUser({ page: 1, size: 10 });
     setData(res.data ?? []);
     setLoading(false);
   };
@@ -32,7 +32,7 @@ export function DataTable() {
     loadSuppliers();
   }, []);
 
- const columns = withDndColumn(supplierColumns(loadSuppliers))
+ const columns = withDndColumn(userColumns(loadSuppliers))
 
 
   const table = useDataTableInstance({
@@ -52,7 +52,8 @@ export function DataTable() {
           </Label>
 
           <div className="flex items-center gap-2">
-            <CreateDrawer onCreated={loadSuppliers} />
+            <CreateUserDrawer onCreated={loadSuppliers} />
+            
           </div>
         </div>
 

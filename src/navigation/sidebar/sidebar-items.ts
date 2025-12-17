@@ -5,6 +5,7 @@ import {
   Banknote,
   PackageSearch,
   ListOrdered,
+  User,
   ShoppingBasket,
   type LucideIcon,
 } from "lucide-react";
@@ -37,12 +38,16 @@ export interface NavGroup {
 export const sidebarItems: NavGroup[] = [
   {
     id: 1,
-    label: "Dashboards",
     items: [
       {
         title: "Бүтээгдэхүүн",
         url: "/dashboard/default",
         icon: PackageSearch,
+      },
+       {
+        title: "Хэрэглэгч",
+        url: "/dashboard/user",
+        icon: User,
       },
       {
         title: "Нийлүүлэгч",
@@ -69,18 +74,6 @@ export const sidebarItems: NavGroup[] = [
       //   url: "/dashboard/finance",
       //   icon: Banknote,
       // },
-    ],
-  },
-  {
-    id: 2,
-    label: "Pages",
-    items: [
-      {
-        title: "Email",
-        url: "/dashboard/coming-soon",
-        icon: Mail,
-        comingSoon: true,
-      },
     ],
   },
 ];

@@ -9,7 +9,6 @@ import { useDataTableInstance } from "@/hooks/use-data-table-instance";
 
 import { DataTable as DataTableNew } from "../../../../../components/data-table/data-table";
 import { DataTablePagination } from "../../../../../components/data-table/data-table-pagination";
-import { DataTableViewOptions } from "../../../../../components/data-table/data-table-view-options";
 import { withDndColumn } from "../../../../../components/data-table/table-utils";
 
 import { productColumns } from "./columns";
@@ -38,9 +37,9 @@ export function DataTable({ data: initialData, supplier: supplierData }: {
     setOrderOpen(true);
   };
 
-  const columns = withDndColumn(
-    productColumns(openOrder, refreshProducts)
-  );
+const columns = withDndColumn(
+  productColumns(openOrder, refreshProducts, supplierData)
+);
 
   const table = useDataTableInstance({
     data,
@@ -63,7 +62,6 @@ export function DataTable({ data: initialData, supplier: supplierData }: {
             View
           </Label>
           <div className="flex items-center gap-2">
-            <DataTableViewOptions table={table} />
             <CreateDrawer
               supplierData={supplierData}
               open={openDrawer}

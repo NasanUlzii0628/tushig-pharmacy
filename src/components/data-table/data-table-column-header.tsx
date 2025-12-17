@@ -43,10 +43,10 @@ export function DataTableColumnHeader<TData, TValue>({
         <DropdownMenuTrigger asChild>
           <Button variant="ghost" size="sm" className="data-[state=open]:bg-accent -ml-3 h-8">
             <span>{title}</span>
-            {getSortIcon(column.getIsSorted())}
+            {/* {getSortIcon(column.getIsSorted())} */}
           </Button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent align="start">
+        {/* <DropdownMenuContent align="start">
           <DropdownMenuItem onClick={() => column.toggleSorting(false)}>
             <ArrowUp className="text-muted-foreground/70 h-3.5 w-3.5" />
             Asc
@@ -64,7 +64,7 @@ export function DataTableColumnHeader<TData, TValue>({
               </DropdownMenuItem>
             </>
           )}
-        </DropdownMenuContent>
+        </DropdownMenuContent> */}
       </DropdownMenu>
     </div>
   );

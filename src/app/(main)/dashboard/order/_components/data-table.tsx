@@ -10,7 +10,6 @@ import { useDataTableInstance } from "@/hooks/use-data-table-instance";
 
 import { DataTable as DataTableNew } from "@/components/data-table/data-table";
 import { DataTablePagination } from "@/components/data-table/data-table-pagination";
-import { DataTableViewOptions } from "@/components/data-table/data-table-view-options";
 import { withDndColumn } from "@/components/data-table/table-utils";
 
 import { orderColumns } from "./columns";
@@ -62,7 +61,6 @@ export function DataTable({ initialData }: DataTableProps) {
                 </Label>
 
                 <div className="flex items-center gap-2">
-                    <DataTableViewOptions table={table} />
                 </div>
             </div>
 
