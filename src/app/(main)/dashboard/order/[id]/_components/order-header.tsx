@@ -155,7 +155,6 @@ export function OrderHeader({ orderId, orderDate, orderData }: OrderHeaderProps)
                 currentRow++;
             }
 
-            // Add empty rows if needed
             const emptyRows = Math.max(3 - (orderData.details?.length || 0), 0);
             for (let i = 0; i < emptyRows; i++) {
                 const row = worksheet.getRow(currentRow);
@@ -177,7 +176,6 @@ export function OrderHeader({ orderId, orderDate, orderData }: OrderHeaderProps)
                 currentRow++;
             }
 
-            // Add total row
             const totalRow = worksheet.getRow(currentRow);
             totalRow.values = ["Нийт", "", "", "", "", parseFloat(orderData.amount || "0")];
             totalRow.eachCell((cell, colNumber) => {

@@ -5,7 +5,14 @@ import { GET, POST, PUT, DELETE } from '@/services/handler'
 import { getQueryString } from '@/utils'
 import { SupplierType, SupplierCreateForm, SupplierUpdateForm } from '@/types/supplier'
 
-type FetchSupplierParams = Record<string, string | number>
+type FetchSupplierParams = {
+  page?: number;
+  size?: number;
+  name?: string;
+  wechat?: string;
+  contact?: string;
+  [key: string]: string | number | undefined;
+}
 
 type PaginatedCustomers = {
   data: SupplierType[]
@@ -15,10 +22,22 @@ type PaginatedCustomers = {
 }
 
 export async function FetchSupplier(params: FetchSupplierParams) {
-  const filters = {
-    // ...params,
+  const filters: Record<string, string | number> = {
     page: params.page || DEFAULT_PAGE,
     limit: params.size || DEFAULT_SIZE,
+  }
+
+  // Add optional filters only if they exist
+  if (params.name) {
+    filters.name = params.name;
+  }
+
+  if (params.wechat) {
+    filters.wechat = params.wechat;
+  }
+
+  if (params.contact) {
+    filters.contact = params.contact;
   }
 
   const queryString = getQueryString(filters)
@@ -56,5 +75,3 @@ export async function deleteSupplier(id: number) {
   const path = `/supplier/delete/${id}`
   return DELETE({ path })
 }
-
-

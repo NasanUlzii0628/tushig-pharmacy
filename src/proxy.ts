@@ -1,17 +1,24 @@
 import { NextRequest, NextResponse } from "next/server";
 import logger from "./lib/logger";
+import { hasRouteAccess } from "./lib/permissions";
 
-/**
- * Admin panel authentication middleware using Next.js proxy (Next 16+)
- */
+
+function getUserRoleFromToken(token: string): string | null {
+  try {
+    const payload = JSON.parse(Buffer.from(token.split('.')[1], 'base64').toString());
+    return payload.role || null;
+  } catch (error) {
+    logger.error("Failed to decode token", error);
+    return null;
+  }
+}
 
 export function proxy(req: NextRequest) {
   const { pathname } = req.nextUrl;
 
-  // Read token from cookies
   const token = req.cookies.get("token")?.value;
+  const userRole = req.cookies.get("userRole")?.value;
 
-  // Public routes (no auth required)
   const publicRoutes = [
     "/auth/login",
   ];
@@ -22,24 +29,30 @@ export function proxy(req: NextRequest) {
     return NextResponse.redirect(new URL("/dashboard", req.url));
   }
 
-  // 2️⃣ Allow public routes without token
   if (isPublic) {
     return NextResponse.next();
   }
 
-  console.log("asdasd123", token)
-
-  // 3️⃣ Protect everything inside /dashboard or other protected areas
   if (!token && pathname.startsWith("/dashboard")) {
     return NextResponse.redirect(new URL("/auth/login", req.url));
+  }
+
+  if (token && pathname.startsWith("/dashboard")) {
+    let role: string | undefined = userRole;
+
+    if (!role) {
+      role = getUserRoleFromToken(token) ?? undefined;
+    }
+
+    if (!hasRouteAccess(pathname, role)) {
+      logger.warn(`Unauthorized access attempt to ${pathname} by role: ${role}`);
+      return NextResponse.rewrite(new URL("/dashboard/not-found", req.url));
+    }
   }
 
   return NextResponse.next();
 }
 
-/**
- * Matcher — runs ONLY on page routes, NOT static files or _next assets.
- */
 export const config = {
   matcher: [
     // Run proxy on all routes EXCEPT static assets

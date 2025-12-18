@@ -6,7 +6,13 @@ import { DEFAULT_PAGE, DEFAULT_SIZE } from '@/constants'
 import { GET, POST, PUT, DELETE } from '@/services/handler'
 import { getQueryString } from '@/utils'
 
-type FetchCustomerParams = Record<string, string | number>
+type FetchCustomerParams = {
+  page?: number;
+  size?: number;
+  name?: string;
+  supplier_id?: string;
+  [key: string]: string | number | undefined;
+}
 
 type PaginatedCustomers = {
   data: ProductType[]
@@ -16,10 +22,18 @@ type PaginatedCustomers = {
 }
 
 export async function fetchCustomers(params: FetchCustomerParams) {
-  const filters = {
-    // ...params,
+  const filters: Record<string, string | number> = {
     page: params.page || DEFAULT_PAGE,
     limit: params.size || DEFAULT_SIZE,
+  }
+
+  // Add optional filters only if they exist
+  if (params.name) {
+    filters.name = params.name;
+  }
+
+  if (params.supplier_id) {
+    filters.supplier_id = params.supplier_id;
   }
 
   const queryString = getQueryString(filters)
@@ -56,5 +70,3 @@ export async function deleteProduct(id: number) {
   const path = `/product/delete/${id}`
   return DELETE({ path })
 }
-
-

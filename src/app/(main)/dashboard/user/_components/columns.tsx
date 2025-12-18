@@ -40,24 +40,10 @@ export const userColumns = (onUpdated: () => Promise<void>): ColumnDef<UserType>
     header: ({ column }) => <DataTableColumnHeader column={column} title="Төлөв" />,
     cell: ({ row }) => {
       const status = row.original.status;
+      const color = status === "ACTIVE" ? "default" : status === "INACTIVE" ? "disabled" : "secondary";
+      const text = status === "ACTIVE" ? "Идэвхтэй" : status === "INACTIVE" ? "Идэвхгүй" : status;
 
-      const statusMap: Record<string, { label: string; variant: "outline" | "destructive" | "secondary" }> = {
-        ACTIVE: {
-          label: "Идэвхтэй",
-          variant: "outline",
-        },
-        INACTIVE: {
-          label: "Идэвхгүй",
-          variant: "destructive",
-        },
-      };
-
-      const mapped = statusMap[status] ?? {
-        label: status,
-        variant: "secondary",
-      };
-
-      return <Badge variant={mapped.variant}>{mapped.label}</Badge>;
+      return <Badge variant={color}>{text}</Badge>;
     },
   },
 

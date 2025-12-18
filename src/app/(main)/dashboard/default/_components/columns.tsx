@@ -117,7 +117,7 @@ export const productColumns = (
       header: ({ column }) => <DataTableColumnHeader column={column} title="Төлөв" />,
       cell: ({ row }) => {
         const status = row.original.status;
-        const color = status === "ACTIVE" ? "outline" : status === "INACTIVE" ? "destructive" : "secondary";
+        const color = status === "ACTIVE" ? "default" : status === "INACTIVE" ? "disabled" : "secondary";
         const text = status === "ACTIVE" ? "Идэвхтэй" : status === "INACTIVE" ? "Идэвхгүй" : status;
 
         return <Badge variant={color}>{text}</Badge>;
