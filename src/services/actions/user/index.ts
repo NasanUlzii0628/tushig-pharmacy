@@ -16,7 +16,7 @@ type PaginatedCustomers = {
 
 export async function fetchUser(params: FetchUserParams) {
   const filters = {
-    // ...params,
+    ...params,
     page: params.page || DEFAULT_PAGE,
     limit: params.size || DEFAULT_SIZE,
   }

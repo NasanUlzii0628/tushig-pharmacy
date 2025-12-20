@@ -50,7 +50,7 @@ export function CreateUserDrawer({ onCreated }: Props) {
   return (
     <Drawer direction="right" open={open} onOpenChange={setOpen}>
       <DrawerTrigger asChild>
-        <Button variant="outline">Шинэ хэрэглэгч үүсгэх +</Button>
+        <Button>Шинэ хэрэглэгч үүсгэх +</Button>
       </DrawerTrigger>
 
       <DrawerContent className="w-[420px]">

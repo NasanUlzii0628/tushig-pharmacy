@@ -143,7 +143,6 @@ function SupplierForm({
     setIsSubmitting(true);
 
     try {
-      console.log("payliad", payload)
 
       await toast.promise(
         updateSupplier(payload),

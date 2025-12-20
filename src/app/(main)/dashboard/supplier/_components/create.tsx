@@ -46,7 +46,7 @@ export function CreateDrawer({ onCreated }: Props) {
   return (
     <Drawer direction="right" open={open} onOpenChange={setOpen}>
       <DrawerTrigger asChild>
-        <Button variant="outline">Нийлүүлэгч нэмэх +</Button>
+        <Button>Нийлүүлэгч нэмэх +</Button>
       </DrawerTrigger>
 
       <DrawerContent className="w-[420px]">
@@ -118,6 +118,11 @@ function SupplierForm({
         return "Нийлүүлэгч амжилттай нэмэгдлээ!";
       },
       error: (err) => err.message || "Серверийн алдаа",
+      classNames: {
+        success: 'bg-green-500 text-white border-green-600',  // Green for success
+        error: 'bg-red-500 text-white border-red-600',        // Red for error
+        loading: 'bg-blue-500 text-white border-blue-600',    // Blue for loading
+      },
     });
   };
 

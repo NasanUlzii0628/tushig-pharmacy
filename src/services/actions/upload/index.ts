@@ -32,7 +32,6 @@ export async function uploadProductImages(files: File[]): Promise<UploadImagesRe
         formData.append("images", file);
     });
 
-    console.log("📤 Uploading images to backend...", files);
 
     const response = await POST<BackendUploadResponse>({
         path: "/product/upload",
@@ -40,12 +39,10 @@ export async function uploadProductImages(files: File[]): Promise<UploadImagesRe
         plainRequest: false,
     });
 
-    console.log("📥 Upload response from backend:", response);
 
     // ✅ Extract just the filenames from the response
     if (response.success && response.data?.files) {
         const filenames = response.data.files.map((file) => file.fileName);
-        console.log("✅ Extracted filenames:", filenames);
 
         return {
             success: true,

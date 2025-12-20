@@ -84,11 +84,8 @@ export function LayoutControls() {
       <PopoverContent align="end">
         <div className="flex flex-col gap-5">
           <div className="space-y-1.5">
-            <h4 className="text-sm leading-none font-medium">Preferences</h4>
-            <p className="text-muted-foreground text-xs">Customize your dashboard layout preferences.</p>
-            <p className="text-muted-foreground text-xs font-medium">
-              *Preferences use cookies by default. You can switch between cookies, localStorage, or no storage in code.
-            </p>
+            <h4 className="text-sm leading-none font-medium">Тохиргоо</h4>
+            <p className="text-muted-foreground text-xs">Хяналтын самбарын харагдах байдлыг тохируулах.</p>
           </div>
           <div className="space-y-3 **:data-[slot=toggle-group]:w-full **:data-[slot=toggle-group-item]:flex-1 **:data-[slot=toggle-group-item]:text-xs">
             <div className="space-y-1">
@@ -132,7 +129,7 @@ export function LayoutControls() {
             </div>
 
             <div className="space-y-1">
-              <Label className="text-xs font-medium">Page Layout</Label>
+              <Label className="text-xs font-medium">Хуудасны зохион байгуулалт</Label>
               <ToggleGroup
                 size="sm"
                 variant="outline"
@@ -145,63 +142,6 @@ export function LayoutControls() {
                 </ToggleGroupItem>
                 <ToggleGroupItem value="full-width" aria-label="Toggle full-width">
                   Full Width
-                </ToggleGroupItem>
-              </ToggleGroup>
-            </div>
-
-            <div className="space-y-1">
-              <Label className="text-xs font-medium">Navbar Behavior</Label>
-              <ToggleGroup
-                size="sm"
-                variant="outline"
-                type="single"
-                value={navbarStyle}
-                onValueChange={onNavbarStyleChange}
-              >
-                <ToggleGroupItem value="sticky" aria-label="Toggle sticky">
-                  Sticky
-                </ToggleGroupItem>
-                <ToggleGroupItem value="scroll" aria-label="Toggle scroll">
-                  Scroll
-                </ToggleGroupItem>
-              </ToggleGroup>
-            </div>
-
-            <div className="space-y-1">
-              <Label className="text-xs font-medium">Sidebar Style</Label>
-              <ToggleGroup
-                size="sm"
-                variant="outline"
-                type="single"
-                value={variant}
-                onValueChange={onSidebarStyleChange}
-              >
-                <ToggleGroupItem value="inset" aria-label="Toggle inset">
-                  Inset
-                </ToggleGroupItem>
-                <ToggleGroupItem value="sidebar" aria-label="Toggle sidebar">
-                  Sidebar
-                </ToggleGroupItem>
-                <ToggleGroupItem value="floating" aria-label="Toggle floating">
-                  Floating
-                </ToggleGroupItem>
-              </ToggleGroup>
-            </div>
-
-            <div className="space-y-1">
-              <Label className="text-xs font-medium">Sidebar Collapse Mode</Label>
-              <ToggleGroup
-                size="sm"
-                variant="outline"
-                type="single"
-                value={collapsible}
-                onValueChange={onSidebarCollapseModeChange}
-              >
-                <ToggleGroupItem value="icon" aria-label="Toggle icon">
-                  Icon
-                </ToggleGroupItem>
-                <ToggleGroupItem value="offcanvas" aria-label="Toggle offcanvas">
-                  OffCanvas
                 </ToggleGroupItem>
               </ToggleGroup>
             </div>

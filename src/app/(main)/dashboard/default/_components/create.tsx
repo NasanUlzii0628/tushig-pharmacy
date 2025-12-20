@@ -41,7 +41,7 @@ export function CreateDrawer({
   return (
     <Drawer direction="right" open={open} onOpenChange={setOpen}>
       <DrawerTrigger asChild>
-        <Button variant="outline">Бүтээгдэхүүн нэмэх +</Button>
+        <Button>Бүтээгдэхүүн нэмэх +</Button>
       </DrawerTrigger>
 
       <DrawerContent className="w-[420px] sm:w-[520px] md:w-[620px]">
@@ -109,7 +109,7 @@ export function ProductForm({
   const [previewAddi, setPreviewAddi] = React.useState<string[]>([]);
 
   const validateFile = (file: File): boolean => {
- 
+
 
     if (!ACCEPTED_IMAGE_TYPES.includes(file.type)) {
       toast.error(`${file.name}: Зөвхөн зураг файл байх ёстой (JPG, PNG, WEBP)`);
@@ -138,32 +138,32 @@ export function ProductForm({
   };
 
   const handleAddiImages = (e: React.ChangeEvent<HTMLInputElement>) => {
-  const files = Array.from(e.target.files || []).filter(validateFile);
+    const files = Array.from(e.target.files || []).filter(validateFile);
 
-  if (!files.length) return;
+    if (!files.length) return;
 
-  const remainingSlots = MAX_ADDITIONAL_IMAGES - addiImages.length;
+    const remainingSlots = MAX_ADDITIONAL_IMAGES - addiImages.length;
 
-  if (remainingSlots <= 0) {
-    toast.error(`Хамгийн ихдээ ${MAX_ADDITIONAL_IMAGES} нэмэлт зураг оруулах боломжтой`);
+    if (remainingSlots <= 0) {
+      toast.error(`Хамгийн ихдээ ${MAX_ADDITIONAL_IMAGES} нэмэлт зураг оруулах боломжтой`);
+      e.target.value = "";
+      return;
+    }
+
+    const filesToAdd = files.slice(0, remainingSlots);
+
+    if (files.length > remainingSlots) {
+      toast.error(`Зөвхөн ${remainingSlots} зураг нэмж болно`);
+    }
+
+    setAddiImages((prev) => [...prev, ...filesToAdd]);
+    setPreviewAddi((prev) => [
+      ...prev,
+      ...filesToAdd.map((f) => URL.createObjectURL(f)),
+    ]);
+
     e.target.value = "";
-    return;
-  }
-
-  const filesToAdd = files.slice(0, remainingSlots);
-
-  if (files.length > remainingSlots) {
-    toast.error(`Зөвхөн ${remainingSlots} зураг нэмж болно`);
-  }
-
-  setAddiImages((prev) => [...prev, ...filesToAdd]);
-  setPreviewAddi((prev) => [
-    ...prev,
-    ...filesToAdd.map((f) => URL.createObjectURL(f)),
-  ]);
-
-  e.target.value = "";
-};
+  };
 
   const removeMainImage = () => {
     if (previewMain) {

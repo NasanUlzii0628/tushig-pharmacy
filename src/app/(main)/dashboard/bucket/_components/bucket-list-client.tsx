@@ -74,7 +74,7 @@ export function BucketListClient({ items }: BucketListClientProps) {
                     <CardTitle>Захиалгын хүсэлт</CardTitle>
                     <AlertDialog>
                         <AlertDialogTrigger asChild>
-                            <Button variant="outline" disabled={selectedIds.length === 0 || isLoading}>
+                            <Button disabled={selectedIds.length === 0 || isLoading}>
                                 {isLoading ? "Уншиж байна..." : "Захиалах"}
                             </Button>
                         </AlertDialogTrigger>

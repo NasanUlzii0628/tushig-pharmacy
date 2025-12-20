@@ -13,7 +13,6 @@ export default async function OrderDetailPage({
     const targetId = (await params).id;
     const { data } = await fetchOrderDetail(targetId);
 
-    console.log(data);
 
     if (!data) {
         return (

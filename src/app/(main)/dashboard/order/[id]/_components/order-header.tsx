@@ -2,10 +2,18 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { ArrowLeft, Printer, Download, Loader2 } from "lucide-react";
+import { ArrowLeft, Printer, Download, Loader2, FileSpreadsheet, FileText } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { useState } from "react";
 import ExcelJS from "exceljs";
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
 import type { OrderDetailTypes } from "@/types/order";
 import { getImageUrl } from "@/utils/image";
 
@@ -19,7 +27,7 @@ export function OrderHeader({ orderId, orderDate, orderData }: OrderHeaderProps)
     const router = useRouter();
     const [isDownloading, setIsDownloading] = useState(false);
 
-    const handleDownload = async () => {
+    const handleDownloadExcel = async () => {
         setIsDownloading(true);
 
         try {
@@ -36,17 +44,15 @@ export function OrderHeader({ orderId, orderDate, orderData }: OrderHeaderProps)
                 }
             };
 
-            // Set column widths
             worksheet.columns = [
-                { width: 10 },  // Д/дугаар
-                { width: 30 },  // Барааны нэр
-                { width: 15 },  // Зураг
-                { width: 12 },  // Тоо ширхэг
-                { width: 18 },  // Нэгжийн үнэ
-                { width: 18 }   // Нийт үнэ
+                { width: 10 },
+                { width: 30 },
+                { width: 15 },
+                { width: 12 },
+                { width: 18 },
+                { width: 18 }
             ];
 
-            // Add header information
             worksheet.mergeCells('A1:F1');
             worksheet.getCell('A1').value = `Захиалгын дугаар: ${orderData.order_number}`;
             worksheet.getCell('A1').alignment = { vertical: 'middle', horizontal: 'left' };
@@ -60,7 +66,6 @@ export function OrderHeader({ orderId, orderDate, orderData }: OrderHeaderProps)
             worksheet.getCell('A3').value = `Огноо: ${formatDate(orderDate)}`;
             worksheet.getCell('A3').alignment = { vertical: 'middle', horizontal: 'left' };
 
-            // Add table headers (row 6)
             const headerRow = worksheet.getRow(6);
             headerRow.values = ["Д/дугаар", "Барааны нэр", "Зураг", "Тоо ширхэг", "Нэгжийн үнэ /¥/", "Нийт үнэ /¥/"];
             headerRow.height = 30;
@@ -81,23 +86,21 @@ export function OrderHeader({ orderId, orderDate, orderData }: OrderHeaderProps)
                 };
             });
 
-            // Add data rows with images
             let currentRow = 7;
             for (let index = 0; index < (orderData.details?.length || 0); index++) {
                 const item = orderData.details[index];
                 const row = worksheet.getRow(currentRow);
-                row.height = 60; // Increased height for images
+                row.height = 60;
 
                 row.values = [
                     index + 1,
                     item.product_name || "",
-                    "", // Image placeholder
+                    "",
                     item.quantity || 0,
                     parseFloat(item.unit_price || "0"),
                     parseFloat(item.total_price || "0")
                 ];
 
-                // Style data cells
                 row.eachCell((cell, colNumber) => {
                     cell.alignment = {
                         vertical: 'middle',
@@ -111,88 +114,88 @@ export function OrderHeader({ orderId, orderDate, orderData }: OrderHeaderProps)
                     };
                 });
 
-                // Add image if available
                 if (item.product_image) {
                     try {
                         const imageUrl = getImageUrl(item.product_image);
-
-                        // 1. fetch image
                         const response = await fetch(imageUrl);
                         if (!response.ok) throw new Error("Image fetch failed");
 
                         const blob = await response.blob();
-
-                        // 2. blob → base64
                         const base64 = await new Promise<string>((resolve, reject) => {
                             const reader = new FileReader();
                             reader.onloadend = () => {
                                 const result = reader.result as string;
-                                resolve(result.split(",")[1]); // remove data:image/...;base64,
+                                resolve(result.split(",")[1]);
                             };
                             reader.onerror = reject;
                             reader.readAsDataURL(blob);
                         });
 
-                        // 3. add image to workbook
                         const imageId = workbook.addImage({
                             base64,
-                            extension: "jpeg", // эсвэл png
+                            extension: "jpeg",
                         });
 
-                        // 4. add image to worksheet (C column)
                         worksheet.addImage(imageId, {
-                            tl: { col: 2, row: currentRow - 1 }, // C column (0-based)
+                            tl: { col: 2, row: currentRow - 1 },
                             ext: { width: 80, height: 80 },
                         });
-
-                        console.log(`✓ Image added: ${item.product_name}`);
                     } catch (err) {
                         console.error(`✗ Image error (${item.product_name})`, err);
                     }
                 }
 
-
                 currentRow++;
             }
 
-            const emptyRows = Math.max(3 - (orderData.details?.length || 0), 0);
-            for (let i = 0; i < emptyRows; i++) {
+            // Minimum visible rows INCLUDING items (Excel look)
+            const MIN_TABLE_ROWS = 3;
+
+            const itemCount = orderData.details?.length || 0;
+            const rowsToFill = Math.max(MIN_TABLE_ROWS - itemCount, 0);
+
+            // Add only needed empty rows
+            for (let i = 0; i < rowsToFill; i++) {
                 const row = worksheet.getRow(currentRow);
                 row.values = [
-                    (orderData.details?.length || 0) + i + 1,
+                    itemCount + i + 1,
                     "", "", "", "", ""
                 ];
 
                 row.eachCell((cell) => {
-                    cell.alignment = { vertical: 'middle', horizontal: 'center' };
+                    cell.alignment = { vertical: "middle", horizontal: "center" };
                     cell.border = {
-                        top: { style: 'thin' },
-                        left: { style: 'thin' },
-                        bottom: { style: 'thin' },
-                        right: { style: 'thin' }
+                        top: { style: "thin" },
+                        left: { style: "thin" },
+                        bottom: { style: "thin" },
+                        right: { style: "thin" },
                     };
                 });
 
                 currentRow++;
             }
 
+            // TOTAL ROW (immediately after table)
             const totalRow = worksheet.getRow(currentRow);
-            totalRow.values = ["Нийт", "", "", "", "", parseFloat(orderData.amount || "0")];
+            totalRow.values = ["Нийт", "", "", "", "", Number(orderData.amount || 0)];
+
+            worksheet.mergeCells(`A${currentRow}:E${currentRow}`);
+
             totalRow.eachCell((cell, colNumber) => {
                 cell.font = { bold: true };
                 cell.alignment = {
-                    vertical: 'middle',
-                    horizontal: colNumber === 1 ? 'left' : 'center'
+                    vertical: "middle",
+                    horizontal: colNumber === 1 ? "right" : "center",
                 };
                 cell.border = {
-                    top: { style: 'thin' },
-                    left: { style: 'thin' },
-                    bottom: { style: 'thin' },
-                    right: { style: 'thin' }
+                    top: { style: "thin" },
+                    left: { style: "thin" },
+                    bottom: { style: "thin" },
+                    right: { style: "thin" },
                 };
             });
 
-            // Generate and download file
+
             const buffer = await workbook.xlsx.writeBuffer();
             const blob = new Blob([buffer], {
                 type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
@@ -212,6 +215,190 @@ export function OrderHeader({ orderId, orderDate, orderData }: OrderHeaderProps)
             setIsDownloading(false);
         }
     };
+
+    const handleDownloadPDF = async () => {
+        setIsDownloading(true);
+
+        try {
+            const doc = new jsPDF({
+                orientation: "portrait",
+                unit: "mm",
+                format: "a4",
+            });
+
+            /* ================= FONT LOADER ================= */
+            const loadFont = async () => {
+                const load = async (name: string, path: string) => {
+                    const res = await fetch(path);
+                    if (!res.ok) throw new Error(`${path} not found`);
+
+                    const blob = await res.blob();
+                    const base64 = await new Promise<string>((resolve, reject) => {
+                        const reader = new FileReader();
+                        reader.onloadend = () =>
+                            resolve((reader.result as string).split(",")[1]);
+                        reader.onerror = reject;
+                        reader.readAsDataURL(blob);
+                    });
+
+                    doc.addFileToVFS(name, base64);
+                };
+
+                await load("Roboto-Regular.ttf", "/fonts/Roboto-Regular.ttf");
+                await load("Roboto-Bold.ttf", "/fonts/Roboto-Bold.ttf");
+
+                doc.addFont("Roboto-Regular.ttf", "Roboto", "normal");
+                doc.addFont("Roboto-Bold.ttf", "Roboto", "bold");
+                doc.setFont("Roboto", "normal");
+            };
+
+            await loadFont();
+
+            /* ================= HEADER ================= */
+            const formatDate = (dateString: string) => {
+                const d = new Date(dateString);
+                return isNaN(d.getTime()) ? dateString : d.toLocaleDateString("mn-MN");
+            };
+
+            doc.setFontSize(13);
+            doc.text(`Захиалгын дугаар: ${orderData.order_number}`, 14, 15);
+
+            doc.setFontSize(10);
+            doc.text(`Захиалагчийн нэр: Түшиг барилгын материал`, 14, 22);
+            doc.text(`Огноо: ${formatDate(orderDate)}`, 14, 28);
+
+            /* ================= TABLE DATA ================= */
+            const tableData: any[] = [];
+            const rowImages: Record<number, string> = {};
+
+            for (let i = 0; i < (orderData.details?.length || 0); i++) {
+                const item = orderData.details[i];
+                let imageData: string | null = null;
+
+                if (item.product_image) {
+                    try {
+                        const res = await fetch(getImageUrl(item.product_image));
+                        if (res.ok) {
+                            const blob = await res.blob();
+                            imageData = await new Promise<string>((resolve) => {
+                                const r = new FileReader();
+                                r.onloadend = () => resolve(r.result as string);
+                                r.readAsDataURL(blob);
+                            });
+                        }
+                    } catch (err) {
+                        console.warn("Image load failed:", err);
+                    }
+                }
+
+                if (imageData) rowImages[i] = imageData;
+
+                tableData.push([
+                    i + 1,
+                    item.product_name || "",
+                    "", // image column placeholder
+                    item.quantity || 0,
+                    Number(item.unit_price || 0).toFixed(2),
+                    Number(item.total_price || 0).toFixed(2),
+                ]);
+            }
+
+            /* ================= MINIMUM EMPTY ROWS ================= */
+            while (tableData.length < 3) {
+                tableData.push([tableData.length + 1, "", "", "", "", ""]);
+            }
+
+            /* ================= TOTAL ROW (INSIDE TABLE) ================= */
+            tableData.push([
+                {
+                    content: "Нийт",
+                    colSpan: 5,
+                    styles: {
+                        halign: "right",
+                        fontStyle: "bold",
+                    },
+                },
+                {
+                    content: Number(orderData.amount || 0).toFixed(2),
+                    styles: {
+                        halign: "right",
+                        fontStyle: "bold",
+                    },
+                },
+            ]);
+
+            /* ================= TABLE ================= */
+            autoTable(doc, {
+                startY: 35,
+                margin: { left: 14, right: 14 },
+                tableWidth: "auto",
+
+                head: [[
+                    "#",
+                    "Барааны нэр",
+                    "Зураг",
+                    "Тоо ширхэг",
+                    "Нэгжийн үнэ /¥/",
+                    "Нийт үнэ /¥/",
+                ]],
+
+                body: tableData,
+
+                theme: "grid",
+
+                styles: {
+                    font: "Roboto",
+                    fontSize: 9,
+                    valign: "middle",
+                    cellPadding: 3,
+                    minCellHeight: 26,
+                },
+
+                headStyles: {
+                    fillColor: [211, 211, 211],
+                    textColor: [0, 0, 0],
+                    halign: "center",
+                    fontStyle: "bold",
+                },
+
+                columnStyles: {
+                    0: { cellWidth: 12, halign: "center" },
+                    1: { cellWidth: 48, halign: "left" },
+                    2: { cellWidth: 28, halign: "center" },
+                    3: { cellWidth: 22, halign: "center" },
+                    4: { cellWidth: 36, halign: "center" },
+                    5: { cellWidth: 36, halign: "right" },
+                },
+
+                didDrawCell: (data) => {
+                    if (data.cell.section !== "body") return;
+                    if (data.column.index !== 2) return;
+
+                    const img = rowImages[data.row.index];
+                    if (!img) return;
+
+                    const size = Math.min(data.cell.width, data.cell.height) - 4;
+
+                    doc.addImage(
+                        img,
+                        "JPEG",
+                        data.cell.x + (data.cell.width - size) / 2,
+                        data.cell.y + (data.cell.height - size) / 2,
+                        size,
+                        size
+                    );
+                },
+            });
+
+            doc.save(`order_${orderData.order_number}.pdf`);
+        } catch (err) {
+            console.error("PDF generation error:", err);
+            alert("PDF үүсгэхэд алдаа гарлаа");
+        } finally {
+            setIsDownloading(false);
+        }
+    };
+
 
     const formatDate = (dateString: string) => {
         try {
@@ -246,19 +433,34 @@ export function OrderHeader({ orderId, orderDate, orderData }: OrderHeaderProps)
                     <Printer className="h-4 w-4 mr-2" />
                     Хэвлэх
                 </Button>
-                <Button variant="outline" size="sm" onClick={handleDownload} disabled={isDownloading}>
-                    {isDownloading ? (
-                        <>
-                            <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                            Татаж байна...
-                        </>
-                    ) : (
-                        <>
-                            <Download className="h-4 w-4 mr-2" />
-                            Татах
-                        </>
-                    )}
-                </Button>
+
+                <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                        <Button variant="outline" size="sm" disabled={isDownloading}>
+                            {isDownloading ? (
+                                <>
+                                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                                    Татаж байна...
+                                </>
+                            ) : (
+                                <>
+                                    <Download className="h-4 w-4 mr-2" />
+                                    Татах
+                                </>
+                            )}
+                        </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                        <DropdownMenuItem onClick={handleDownloadExcel} disabled={isDownloading}>
+                            <FileSpreadsheet className="h-4 w-4 mr-2" />
+                            Excel файл татах
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={handleDownloadPDF} disabled={isDownloading}>
+                            <FileText className="h-4 w-4 mr-2" />
+                            PDF файл татах
+                        </DropdownMenuItem>
+                    </DropdownMenuContent>
+                </DropdownMenu>
             </div>
         </div>
     );

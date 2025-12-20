@@ -118,7 +118,6 @@ async function main() {
   const formatted = await prettier.format(updated, { parser: "typescript" });
 
   if (formatted === fileContent) {
-    console.log("ℹ️  No changes in theme.ts");
     return;
   }
 
