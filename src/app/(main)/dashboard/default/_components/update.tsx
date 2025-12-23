@@ -340,7 +340,7 @@ function UpdateProductForm({
           <FormLabel>Нэмэлт зургууд</FormLabel>
           <label className="hover:bg-accent mt-2 flex h-24 cursor-pointer flex-col items-center justify-center rounded-md border-2 border-dashed">
             <Upload className="text-muted-foreground mb-1 h-5 w-5" />
-            <span className="text-muted-foreground text-xs">Нэмэлт зургууд нэмэх</span>
+            <span className="text-muted-foreground text-xs">Нэмэлт зураг оруулах</span>
             <span className="text-muted-foreground text-xs">JPG, PNG, WEBP (max 5MB)</span>
             <input type="file" multiple hidden onChange={handleAddiImages} accept="image/*" />
           </label>

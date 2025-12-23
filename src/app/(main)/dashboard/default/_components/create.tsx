@@ -352,7 +352,7 @@ export function ProductForm({
         <label className="text-sm font-medium">Нэмэлт зургууд</label>
         <label className="hover:bg-accent flex h-24 cursor-pointer flex-col items-center justify-center rounded-md border-2 border-dashed transition-colors">
           <Upload className="text-muted-foreground mb-1 h-5 w-5" />
-          <span className="text-muted-foreground text-xs">Файлууд нэмэх</span>
+          <span className="text-muted-foreground text-xs">Нэмэлт зураг оруулах</span>
           <span className="text-muted-foreground text-xs">JPG, PNG эсвэл WEBP (max 5MB)</span>
           <input
             type="file"

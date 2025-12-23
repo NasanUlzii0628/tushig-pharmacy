@@ -12,3 +12,24 @@ export async function getAuthUser() {
     return null;
   }
 }
+
+export async function getCurrentUserRole(): Promise<string | null> {
+  const cookieStore = await cookies();
+  const userRole = cookieStore.get("userRole")?.value;
+  
+  if (userRole) {
+    return userRole;
+  }
+
+  const token = cookieStore.get("token")?.value;
+  if (token) {
+    try {
+      const payload = JSON.parse(Buffer.from(token.split('.')[1], 'base64').toString());
+      return payload.role || null;
+    } catch (error) {
+      return null;
+    }
+  }
+
+  return null;
+}

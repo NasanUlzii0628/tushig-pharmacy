@@ -44,23 +44,35 @@ export async function checkOrder(product_id: number) {
     }
 }
 
-export async function fetchBucketList(product_id?: number) {
-    const filters = product_id ? { product_id } : {}
+export async function fetchBucketList(params?: {
+    product_id?: number;
+    name?: string;
+    supplier_id?: string;
+}) {
+    const filters: Record<string, any> = {};
+    
+    if (params?.product_id) {
+        filters.product_id = params.product_id;
+    }
+    if (params?.name) {
+        filters.name = params.name;
+    }
+    if (params?.supplier_id) {
+        filters.supplier_id = params.supplier_id;
+    }
 
-    const queryString = getQueryString(filters)
+    const queryString = getQueryString(filters);
+    const path = `/order/bucket/list${queryString}`;
 
-    const path = `/order/bucket/list${queryString}`
-
-    const { data, message, success, httpStatus } = await GET<{ data: BucketList }>({ path })
+    const { data, message, success, httpStatus } = await GET<{ data: BucketList }>({ path });
 
     return {
         data,
         httpStatus,
         message,
         success,
-    }
+    };
 }
-
 
 
 

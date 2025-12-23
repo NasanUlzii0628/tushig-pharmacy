@@ -26,7 +26,6 @@ export function DataTable({ initialData }: DataTableProps) {
     const [loadingMap, setLoadingMap] = React.useState<Record<number, boolean>>({});
     const [isRefreshing, setIsRefreshing] = React.useState(false);
 
-    // ✅ Refresh function without useEffect
     const handleRefresh = React.useCallback(async () => {
         setIsRefreshing(true);
         const res = await FetchOrderList({ page: 1, size: 10 });
@@ -34,7 +33,6 @@ export function DataTable({ initialData }: DataTableProps) {
         setIsRefreshing(false);
     }, []);
 
-    // ✅ Navigation handler
     const handleNavigate = React.useCallback((orderId: number) => {
         setLoadingMap((prev) => ({ ...prev, [orderId]: true }));
         router.push(`/dashboard/order/${orderId}`);
@@ -54,7 +52,7 @@ export function DataTable({ initialData }: DataTableProps) {
     return (
         <Tabs defaultValue="outline" className="w-full flex-col justify-start gap-6">
             <div className="flex items-center justify-between">
-                <h4>Захиалгууд</h4>
+                <h4>Захиалгын жагсаалт</h4>
 
                 <Label htmlFor="view-selector" className="sr-only">
                     View

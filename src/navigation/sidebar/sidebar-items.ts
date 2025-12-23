@@ -48,12 +48,14 @@ export const sidebarItems: NavGroup[] = [
         title: "Хэрэглэгч",
         url: "/dashboard/user",
         icon: User,
-        allowedRoles: ROUTE_PERMISSIONS['/dashboard/user'], // Use centralized config
+        allowedRoles: ROUTE_PERMISSIONS['/dashboard/user'],
       },
       {
         title: "Нийлүүлэгч",
         url: "/dashboard/supplier",
         icon: PackagePlus,
+        allowedRoles: ROUTE_PERMISSIONS['/dashboard/user'],
+
       },
       {
         title: "Захиалгын хүсэлт",
@@ -64,6 +66,8 @@ export const sidebarItems: NavGroup[] = [
         title: "Захиалга",
         url: "/dashboard/order",
         icon: ListOrdered,
+        allowedRoles: ROUTE_PERMISSIONS['/dashboard/user'],
+
       },
     ],
   },

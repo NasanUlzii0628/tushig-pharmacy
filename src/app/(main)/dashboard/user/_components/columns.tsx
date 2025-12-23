@@ -15,6 +15,11 @@ import type { UserType } from "@/types/user";
 import { UpdateUserDrawer } from "./update";
 import { DeleteUserDialog } from "./delete";
 
+const roleTranslations = {
+  MANAGER: "Менежер",
+  STAFF: "Ажилтан"
+};
+
 export const userColumns = (onUpdated: () => Promise<void>): ColumnDef<UserType>[] => [
   {
     id: "index",
@@ -28,11 +33,10 @@ export const userColumns = (onUpdated: () => Promise<void>): ColumnDef<UserType>
     header: ({ column }) => <DataTableColumnHeader column={column} title="Нэр" />,
     cell: ({ row }) => <span className="font-medium">{row.original.username}</span>,
   },
-
   {
     accessorKey: "role",
     header: ({ column }) => <DataTableColumnHeader column={column} title="Эрх" />,
-    cell: ({ row }) => <span>{row.original.role}</span>,
+    cell: ({ row }) => <span>{roleTranslations[row.original.role as keyof typeof roleTranslations] || row.original.role}</span>,
   },
 
   {

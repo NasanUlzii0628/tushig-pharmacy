@@ -61,10 +61,13 @@ export function OrderHeader({ orderId, orderDate, orderData }: OrderHeaderProps)
             worksheet.mergeCells('A2:F2');
             worksheet.getCell('A2').value = `Захиалагчийн нэр: Түшиг барилгын материал`;
             worksheet.getCell('A2').alignment = { vertical: 'middle', horizontal: 'left' };
+            worksheet.getCell('A2').font = { bold: true, size: 12 };
+
 
             worksheet.mergeCells('A3:F3');
             worksheet.getCell('A3').value = `Огноо: ${formatDate(orderDate)}`;
             worksheet.getCell('A3').alignment = { vertical: 'middle', horizontal: 'left' };
+            worksheet.getCell('A3').font = { bold: true, size: 12 };
 
             const headerRow = worksheet.getRow(6);
             headerRow.values = ["Д/дугаар", "Барааны нэр", "Зураг", "Тоо ширхэг", "Нэгжийн үнэ /¥/", "Нийт үнэ /¥/"];
@@ -260,10 +263,10 @@ export function OrderHeader({ orderId, orderDate, orderData }: OrderHeaderProps)
                 return isNaN(d.getTime()) ? dateString : d.toLocaleDateString("mn-MN");
             };
 
-            doc.setFontSize(13);
+            doc.setFontSize(12);
             doc.text(`Захиалгын дугаар: ${orderData.order_number}`, 14, 15);
 
-            doc.setFontSize(10);
+            doc.setFontSize(12);
             doc.text(`Захиалагчийн нэр: Түшиг барилгын материал`, 14, 22);
             doc.text(`Огноо: ${formatDate(orderDate)}`, 14, 28);
 
@@ -429,11 +432,6 @@ export function OrderHeader({ orderId, orderDate, orderData }: OrderHeaderProps)
             </div>
 
             <div className="flex items-center gap-2">
-                <Button variant="outline" size="sm" onClick={() => window.print()}>
-                    <Printer className="h-4 w-4 mr-2" />
-                    Хэвлэх
-                </Button>
-
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                         <Button variant="outline" size="sm" disabled={isDownloading}>

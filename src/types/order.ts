@@ -16,6 +16,7 @@ export interface BucketList {
   createdAt: string
   updatedAt: string
   product_name: string
+  product_img: string
   supplier_name: string
   supplier_id: number
 }

@@ -32,8 +32,9 @@ export function OrderDialog({ open, onOpenChange, product }: Props) {
       if (open && product) {
         const result = await checkOrder(product.id)
         const data = result.data?.data
+        setQuantity(data?.quantity || 0)
         if (result.success && data?.exists) {
-          setExistsMessage(`Энэ бүтээгдэхүүн аль хэдийн захиалга дээр нэмэгдсэн байна! ${data.quantity} ширхэг бараа байна.`)
+          setExistsMessage(`Энэ бүтээгдэхүүн аль хэдийн захиалгын хүсэлтэд ${data.quantity} ширхэг нэмэгдсэн байна.`)
         } else {
           setExistsMessage(null)
         }
@@ -100,7 +101,7 @@ export function OrderDialog({ open, onOpenChange, product }: Props) {
             <Input
               type="number"
               placeholder="Тоо ширхэг"
-              value={quantity === 0 ? "" : quantity}
+              value={quantity === 0 ? '' : quantity}
               onChange={(e) => {
                 setQuantity(parseInt(e.target.value, 10) || 0)
                 setQuantityError(null)

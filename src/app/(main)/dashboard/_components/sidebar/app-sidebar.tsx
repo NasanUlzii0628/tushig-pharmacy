@@ -22,7 +22,7 @@ import { NavUser } from "./nav-user";
 
 const roleTranslations = {
   MANAGER: "Менежер",
-  WORKER: "Ажилтан"
+  STAFF: "Ажилтан"
 };
 
 export function AppSidebar({

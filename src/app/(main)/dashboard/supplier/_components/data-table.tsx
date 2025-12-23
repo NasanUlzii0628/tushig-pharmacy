@@ -18,7 +18,7 @@ import { useState } from "react";
 import { CreateDrawer } from "./create";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Search, X } from "lucide-react";
+import { Search, RefreshCcwIcon } from "lucide-react";
 
 export function DataTable() {
   const [data, setData] = useState<SupplierType[]>([]);
@@ -28,11 +28,7 @@ export function DataTable() {
   const [wechatQuery, setWechatQuery] = useState("");
   const [contactQuery, setContactQuery] = useState("");
 
-  const loadSuppliers = async (filters?: {
-    name?: string;
-    wechat?: string;
-    contact?: string;
-  }) => {
+  const loadSuppliers = async (filters?: { name?: string; wechat?: string; contact?: string }) => {
     setLoading(true);
     try {
       const res = await FetchSupplier({
@@ -92,86 +88,75 @@ export function DataTable() {
           </div>
         </div>
 
-        <div className="grid grid-cols-[300px_300px_300px_80px_80px] gap-4 items-end">
-          {/* Name */}
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
-            <Input
-              placeholder="Нэрээр хайх"
-              className="pl-9 w-[300px]"
-              value={nameQuery}
-              onChange={(e) => setNameQuery(e.target.value)}
-              disabled={loading}
-              onKeyDown={(e) => e.key === "Enter" && handleSearch()}
-            />
+        <div className="flex flex-col gap-4">
+          {/* Search Inputs */}
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+            {/* Name */}
+            <div className="relative">
+              <Search className="text-muted-foreground pointer-events-none absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
+              <Input
+                placeholder="Нэрээр хайх"
+                className="w-full pl-9"
+                value={nameQuery}
+                onChange={(e) => setNameQuery(e.target.value)}
+                disabled={loading}
+                onKeyDown={(e) => e.key === "Enter" && handleSearch()}
+              />
+            </div>
+
+            {/* WeChat */}
+            <div className="relative">
+              <Search className="text-muted-foreground pointer-events-none absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
+              <Input
+                placeholder="WeChat-ээр хайх"
+                className="w-full pl-9"
+                value={wechatQuery}
+                onChange={(e) => setWechatQuery(e.target.value)}
+                disabled={loading}
+                onKeyDown={(e) => e.key === "Enter" && handleSearch()}
+              />
+            </div>
+
+            {/* Contact */}
+            <div className="relative">
+              <Search className="text-muted-foreground pointer-events-none absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
+              <Input
+                placeholder="Имэйл-ээр хайх"
+                className="w-full pl-9"
+                value={contactQuery}
+                onChange={(e) => setContactQuery(e.target.value)}
+                disabled={loading}
+                onKeyDown={(e) => e.key === "Enter" && handleSearch()}
+              />
+            </div>
           </div>
 
-          {/* WeChat */}
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
-            <Input
-              placeholder="WeChat-ээр хайх"
-              className="pl-9 w-[300px]"
-              value={wechatQuery}
-              onChange={(e) => setWechatQuery(e.target.value)}
-              disabled={loading}
-              onKeyDown={(e) => e.key === "Enter" && handleSearch()}
-            />
-          </div>
-
-          {/* Contact */}
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
-            <Input
-              placeholder="Имэйл-ээр хайх"
-              className="pl-9 w-[300px]"
-              value={contactQuery}
-              onChange={(e) => setContactQuery(e.target.value)}
-              disabled={loading}
-              onKeyDown={(e) => e.key === "Enter" && handleSearch()}
-            />
-          </div>
-
-          {/* Search button */}
-          <Button
-            onClick={handleSearch}
-            disabled={loading}
-            size="sm"
-            className="w-[80px]"
-          >
-            <Search className="h-4 w-4 mr-1" />
-            Хайх
-          </Button>
-
-          {/* Clear button */}
-          {hasActiveFilters && (
-            <Button
-              onClick={handleClearFilters}
-              disabled={loading}
-              variant="outline"
-              size="sm"
-              className="w-[120px]"
-            >
-              <X className="h-4 w-4 mr-1" />
-              Цэвэрлэх
+          {/* Action Buttons */}
+          <div className="flex gap-2">
+            <Button onClick={handleSearch} disabled={loading} size="sm" className="flex-1 sm:w-[120px] sm:flex-none">
+              <Search className="mr-2 h-4 w-4" />
+              Хайх
             </Button>
-          )}
+
+            {hasActiveFilters && (
+              <Button
+                onClick={handleClearFilters}
+                disabled={loading}
+                variant="outline"
+                size="sm"
+                className="flex-1 sm:w-[50px] sm:flex-none"
+              >
+                <RefreshCcwIcon className="h-4 w-4" />
+              </Button>
+            )}
+          </div>
         </div>
-
-
-
-
         <TabsContent value="outline" className="relative flex flex-col gap-4 overflow-auto">
           <div className="overflow-hidden rounded-lg border">
             {loading ? (
-              <div className="p-6 text-center text-muted-foreground">Loading...</div>
+              <div className="text-muted-foreground p-6 text-center">Loading...</div>
             ) : (
-              <DataTableNew
-                dndEnabled
-                table={table}
-                columns={columns}
-                onReorder={setData}
-              />
+              <DataTableNew dndEnabled table={table} columns={columns} onReorder={setData} />
             )}
           </div>
 

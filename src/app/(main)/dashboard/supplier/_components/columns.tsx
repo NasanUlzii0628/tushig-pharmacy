@@ -39,7 +39,7 @@ export const supplierColumns = (
     {
       accessorKey: "contact",
       header: ({ column }) => (
-        <DataTableColumnHeader column={column} title="Холбогдох" />
+        <DataTableColumnHeader column={column} title="Имэйл" />
       ),
       cell: ({ row }) => <span>{row.original.contact}</span>,
     },

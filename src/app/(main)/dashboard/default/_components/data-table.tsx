@@ -18,12 +18,16 @@ import { SupplierType } from "@/types/supplier";
 import { fetchCustomers } from "@/services/actions/product";
 import { OrderDialog } from "./order";
 import { Input } from "@/components/ui/input";
-import { Search } from "lucide-react";
+import { Search, X } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { SelectTrigger, SelectValue, SelectContent, SelectItem, Select } from "@/components/ui/select";
 
-export function DataTable({ data: initialData, supplier: supplierData }: {
-  data: ProductType[],
-  supplier: SupplierType[]
+export function DataTable({
+  data: initialData,
+  supplier: supplierData,
+}: {
+  data: ProductType[];
+  supplier: SupplierType[];
 }) {
   const [data, setData] = React.useState<ProductType[]>(initialData);
   const [openDrawer, setOpenDrawer] = React.useState(false);
@@ -32,7 +36,7 @@ export function DataTable({ data: initialData, supplier: supplierData }: {
 
   // Filter states
   const [searchQuery, setSearchQuery] = React.useState("");
-  const [selectedSupplier, setSelectedSupplier] = React.useState<string>("all");
+  const [selectedSupplier, setSelectedSupplier] = React.useState<string>("");
   const [isLoading, setIsLoading] = React.useState(false);
 
   const refreshProducts = React.useCallback(async () => {
@@ -42,7 +46,7 @@ export function DataTable({ data: initialData, supplier: supplierData }: {
         page: 1,
         size: 10,
         name: searchQuery || undefined,
-        supplier_id: selectedSupplier !== "all" ? selectedSupplier : undefined,
+        supplier_id: selectedSupplier && selectedSupplier !== "" ? selectedSupplier : undefined,
       });
       setData(res.data ?? []);
     } finally {
@@ -77,9 +81,7 @@ export function DataTable({ data: initialData, supplier: supplierData }: {
     setSelectedSupplier("all");
   };
 
-  const columns = withDndColumn(
-    productColumns(openOrder, refreshProducts, supplierData)
-  );
+  const columns = withDndColumn(productColumns(openOrder, refreshProducts, supplierData));
 
   const table = useDataTableInstance({
     data,
@@ -89,11 +91,7 @@ export function DataTable({ data: initialData, supplier: supplierData }: {
 
   return (
     <>
-      <OrderDialog
-        open={orderOpen}
-        onOpenChange={setOrderOpen}
-        product={selectedProduct}
-      />
+      <OrderDialog open={orderOpen} onOpenChange={setOrderOpen} product={selectedProduct} />
 
       <Tabs defaultValue="outline" className="w-full flex-col justify-start gap-6">
         <div className="flex items-center justify-between">
@@ -113,10 +111,10 @@ export function DataTable({ data: initialData, supplier: supplierData }: {
 
         <div className="flex items-center gap-4">
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
+            <Search className="text-muted-foreground absolute top-1/2 left-3 size-4 -translate-y-1/2" />
             <Input
               placeholder="Бүтээгдэхүүн хайх..."
-              className="pl-9 w-[300px]"
+              className="w-[300px] pl-9"
               value={searchQuery}
               onChange={handleSearchChange}
               disabled={isLoading}
@@ -124,31 +122,27 @@ export function DataTable({ data: initialData, supplier: supplierData }: {
           </div>
 
           <Select
-            value={selectedSupplier}
-            onValueChange={handleSupplierChange}
-            disabled={isLoading}
-          >
-            <SelectTrigger className="w-[250px]">
-              <SelectValue placeholder="Нийлүүлэгч сонгох" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">Бүгд</SelectItem>
-              {supplierData.map((s) => (
-                <SelectItem key={s.id} value={s.id.toString()}>
-                  {s.name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+  value={selectedSupplier}
+  onValueChange={handleSupplierChange}
+  disabled={isLoading}
+>
+  <SelectTrigger className="w-[250px]">
+    <SelectValue placeholder="Нийлүүлэгч сонгох" />
+  </SelectTrigger>
+  <SelectContent>
+    {supplierData.map((s) => (
+      <SelectItem key={s.id} value={s.id.toString()}>
+        {s.name}
+      </SelectItem>
+    ))}
+  </SelectContent>
+</Select>
 
-          {(searchQuery || selectedSupplier !== "all") && (
-            <button
-              onClick={handleClearFilters}
-              className="text-sm text-muted-foreground hover:text-foreground underline"
-              disabled={isLoading}
-            >
+          {(searchQuery || selectedSupplier) && (
+            <Button onClick={handleClearFilters} disabled={isLoading} variant="outline" size="sm">
+              <X className="mr-2 h-4 w-4" />
               Цэвэрлэх
-            </button>
+            </Button>
           )}
         </div>
 
