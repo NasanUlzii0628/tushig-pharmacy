@@ -6,7 +6,18 @@ import { useRouter } from "next/navigation";
 
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent } from "@/components/ui/tabs";
-import { useDataTableInstance } from "@/hooks/use-data-table-instance";
+import {
+    ColumnFiltersState,
+    SortingState,
+    VisibilityState,
+    getCoreRowModel,
+    getFacetedRowModel,
+    getFacetedUniqueValues,
+    getFilteredRowModel,
+    getSortedRowModel,
+    useReactTable,
+    PaginationState,
+} from "@tanstack/react-table";
 
 import { DataTable as DataTableNew } from "@/components/data-table/data-table";
 import { DataTablePagination } from "@/components/data-table/data-table-pagination";
@@ -18,20 +29,49 @@ import { FetchOrderList } from "@/services/actions/order";
 
 type DataTableProps = {
     initialData: OrderTypes[];
+    initialTotalPages?: number;
 };
 
-export function DataTable({ initialData }: DataTableProps) {
+export function DataTable({ initialData, initialTotalPages = 1 }: DataTableProps) {
     const router = useRouter();
     const [data, setData] = React.useState<OrderTypes[]>(initialData);
     const [loadingMap, setLoadingMap] = React.useState<Record<number, boolean>>({});
     const [isRefreshing, setIsRefreshing] = React.useState(false);
+    const [totalPages, setTotalPages] = React.useState(initialTotalPages);
+
+    const [pagination, setPagination] = React.useState<PaginationState>({
+        pageIndex: 0,
+        pageSize: 5,
+    });
+
+    const [rowSelection, setRowSelection] = React.useState({});
+    const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({});
+    const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
+    const [sorting, setSorting] = React.useState<SortingState>([]);
+
+    const fetchData = React.useCallback(async (pageIndex: number, pageSize: number) => {
+        setIsRefreshing(true);
+        try {
+            const res = await FetchOrderList({
+                page: pageIndex + 1,
+                size: pageSize
+            });
+            setData(res.data ?? []);
+            const totalElements = res.totalElements ?? 0;
+            const calculatedTotalPages = Math.ceil(totalElements / pageSize) || 1;
+            setTotalPages(calculatedTotalPages);
+        } finally {
+            setIsRefreshing(false);
+        }
+    }, []);
+
+    React.useEffect(() => {
+        fetchData(pagination.pageIndex, pagination.pageSize);
+    }, [pagination.pageIndex, pagination.pageSize, fetchData]);
 
     const handleRefresh = React.useCallback(async () => {
-        setIsRefreshing(true);
-        const res = await FetchOrderList({ page: 1, size: 10 });
-        setData(res.data ?? []);
-        setIsRefreshing(false);
-    }, []);
+        await fetchData(pagination.pageIndex, pagination.pageSize);
+    }, [fetchData, pagination.pageIndex, pagination.pageSize]);
 
     const handleNavigate = React.useCallback((orderId: number) => {
         setLoadingMap((prev) => ({ ...prev, [orderId]: true }));
@@ -43,10 +83,30 @@ export function DataTable({ initialData }: DataTableProps) {
         [handleRefresh, handleNavigate]
     );
 
-    const table = useDataTableInstance({
+    const table = useReactTable({
         data,
         columns,
+        pageCount: totalPages,
+        state: {
+            sorting,
+            columnVisibility,
+            rowSelection,
+            columnFilters,
+            pagination,
+        },
+        manualPagination: true, // Enable server-side pagination
+        enableRowSelection: true,
         getRowId: (row) => row.id.toString(),
+        onRowSelectionChange: setRowSelection,
+        onSortingChange: setSorting,
+        onColumnFiltersChange: setColumnFilters,
+        onColumnVisibilityChange: setColumnVisibility,
+        onPaginationChange: setPagination,
+        getCoreRowModel: getCoreRowModel(),
+        getFilteredRowModel: getFilteredRowModel(),
+        getSortedRowModel: getSortedRowModel(),
+        getFacetedRowModel: getFacetedRowModel(),
+        getFacetedUniqueValues: getFacetedUniqueValues(),
     });
 
     return (

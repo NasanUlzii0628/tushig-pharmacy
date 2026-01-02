@@ -33,29 +33,28 @@ export function OrderInfoCard({ order, amount, itemCount }: OrderInfoCardProps) 
 
   return (
     <Card>
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <Package className="h-5 w-5" />
+      <CardHeader className="pb-3 sm:pb-6">
+        <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
+          <Package className="h-4 w-4 sm:h-5 sm:w-5 shrink-0" />
           Захиалгын мэдээлэл
         </CardTitle>
       </CardHeader>
-      <CardContent className="space-y-6">
-        {/* Supplier and Date Info */}
-        <div className="flex items-start justify-between gap-4">
+      <CardContent className="space-y-4 sm:space-y-6">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
           <div className="space-y-1">
-            <p className="text-muted-foreground flex items-center gap-2 text-sm">
-              <User className="h-4 w-4" />
+            <p className="text-muted-foreground flex items-center gap-2 text-xs sm:text-sm">
+              <User className="h-3 w-3 sm:h-4 sm:w-4 shrink-0" />
               Нийлүүлэгч
             </p>
-            <p className="font-medium">{order.supplier_name}</p>
+            <p className="font-medium text-sm sm:text-base break-words">{order.supplier_name}</p>
           </div>
 
-          <div className="space-y-1 text-right">
-            <p className="text-muted-foreground flex items-center justify-end gap-2 text-sm">
-              <Calendar className="h-4 w-4" />
+          <div className="space-y-1 sm:text-right">
+            <p className="text-muted-foreground flex items-center gap-2 text-xs sm:text-sm sm:justify-end">
+              <Calendar className="h-3 w-3 sm:h-4 sm:w-4 shrink-0" />
               Огноо
             </p>
-            <p className="font-medium">{formatDate(order.order_date)}</p>
+            <p className="font-medium text-sm sm:text-base">{formatDate(order.order_date)}</p>
           </div>
         </div>
 
@@ -63,9 +62,9 @@ export function OrderInfoCard({ order, amount, itemCount }: OrderInfoCardProps) 
 
         {/* Order Summary */}
         <div className="space-y-4">
-          <div className="flex items-center justify-between">
-            <span className="text-base font-semibold">Нийт дүн:</span>
-            <span className="text-primary text-xl font-bold">{totalAmount.toFixed(2)} ¥</span>
+          <div className="flex items-center gap-2 sm:justify-between">
+            <span className="text-sm sm:text-base font-semibold">Нийт дүн:</span>
+            <span className="text-primary text-lg sm:text-xl font-bold">{totalAmount.toFixed(2)} ¥</span>
           </div>
         </div>
       </CardContent>

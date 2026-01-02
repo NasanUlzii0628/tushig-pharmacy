@@ -21,7 +21,7 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ id
   }
 
   return (
-    <div className="@container/main flex flex-col gap-6">
+    <div className="@container/main flex flex-col gap-4 sm:gap-6 max-w-full">
       <OrderHeader orderId={data.data.id} orderDate={data.data.order_date} orderData={data.data} />
 
       <div className="grid gap-6 md:grid-cols-3">

@@ -5,7 +5,7 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { BucketList } from "@/types/order";
-import { Search, RefreshCcw } from "lucide-react";
+import { Search, RefreshCcw, Pencil } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -24,6 +24,9 @@ import {
   DialogContent,
   DialogTitle,
   DialogTrigger,
+  DialogHeader,
+  DialogDescription,
+  DialogFooter,
 } from "@/components/ui/dialog";
 import {
   Select,
@@ -32,7 +35,7 @@ import {
   SelectContent,
   SelectItem,
 } from "@/components/ui/select";
-import { orderBucketList, fetchBucketList } from "@/services/actions/order";
+import { orderBucketList, fetchBucketList, updateBucketItem } from "@/services/actions/order";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { SupplierType } from "@/types/supplier";
@@ -55,6 +58,13 @@ export function BucketListClient({
   const [selectedIds, setSelectedIds] = useState<number[]>([]);
   const [isLoading, setIsLoading] = useState(false);
 
+  // Edit modal state
+  const [editItem, setEditItem] = useState<BucketList | null>(null);
+  const [editUnitPrice, setEditUnitPrice] = useState("");
+  const [editSupplierId, setEditSupplierId] = useState("");
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [isUpdating, setIsUpdating] = useState(false);
+
   const router = useRouter();
   const canOrder = userRole !== "STAFF";
 
@@ -62,6 +72,39 @@ export function BucketListClient({
     setSelectedIds((prev) =>
       checked ? [...prev, id] : prev.filter((itemId) => itemId !== id)
     );
+  };
+
+  const openEditDialog = (item: BucketList) => {
+    setEditItem(item);
+    setEditUnitPrice(item.unit_price?.toString() || "");
+    setEditSupplierId(item.supplier_id?.toString() || "");
+    setIsEditDialogOpen(true);
+  };
+
+  const handleEditSubmit = async () => {
+    if (!editItem) return;
+
+    setIsUpdating(true);
+    try {
+      const result = await updateBucketItem(
+        editItem.product_id,
+        Number(editUnitPrice),
+        Number(editSupplierId)
+      );
+
+      if (result.success) {
+        toast.success("Амжилттай шинэчлэгдлээ");
+        setIsEditDialogOpen(false);
+        // Refresh the list
+        await handleSearch();
+      } else {
+        toast.error(result.message || "Шинэчлэхэд алдаа гарлаа");
+      }
+    } catch {
+      toast.error("Шинэчлэхэд алдаа гарлаа");
+    } finally {
+      setIsUpdating(false);
+    }
   };
 
   const handleSearch = async () => {
@@ -78,8 +121,8 @@ export function BucketListClient({
       const fetchedItems: BucketList[] = Array.isArray(result.data?.data)
         ? result.data.data
         : result.data?.data
-        ? [result.data.data]
-        : [];
+          ? [result.data.data]
+          : [];
 
       setItems(fetchedItems);
     } finally {
@@ -97,8 +140,8 @@ export function BucketListClient({
       const fetchedItems: BucketList[] = Array.isArray(result.data?.data)
         ? result.data.data
         : result.data?.data
-        ? [result.data.data]
-        : [];
+          ? [result.data.data]
+          : [];
 
       setItems(fetchedItems);
     } finally {
@@ -138,10 +181,10 @@ export function BucketListClient({
   );
 
   return (
-    <div className="space-y-4">
+    <>
       <Card>
         <CardHeader>
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <CardTitle>Захиалгын хүсэлт</CardTitle>
 
             {canOrder && (
@@ -186,11 +229,11 @@ export function BucketListClient({
           </div>
 
           {/* Filters */}
-          <div className="mt-4 flex items-center gap-4">
-            <div className="relative">
+          <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:gap-4">
+            <div className="relative w-full sm:w-auto">
               <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
               <Input
-                className="w-[300px] pl-9"
+                className="w-full pl-9 sm:w-[300px]"
                 placeholder="Бүтээгдэхүүн хайх..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
@@ -204,7 +247,7 @@ export function BucketListClient({
               onValueChange={setSelectedSupplier}
               disabled={isLoading}
             >
-              <SelectTrigger className="w-[250px]">
+              <SelectTrigger className="w-full sm:w-[250px]">
                 <SelectValue placeholder="Нийлүүлэгч сонгох" />
               </SelectTrigger>
               <SelectContent>
@@ -216,27 +259,32 @@ export function BucketListClient({
               </SelectContent>
             </Select>
 
-            <Button size="sm" onClick={handleSearch} disabled={isLoading}>
-              <Search className="mr-2 h-4 w-4" />
-              Хайх
-            </Button>
-
-            {hasActiveFilters && (
-              <Button
-                size="sm"
-                variant="outline"
-                onClick={handleClearFilters}
-                disabled={isLoading}
-              >
-                <RefreshCcw className="h-4 w-4" />
+            <div className="flex gap-2 w-full sm:w-auto">
+              <Button size="sm" onClick={handleSearch} disabled={isLoading} className="flex-1 sm:flex-none">
+                <Search className="mr-2 h-4 w-4" />
+                Хайх
               </Button>
-            )}
+
+              {hasActiveFilters && (
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={handleClearFilters}
+                  disabled={isLoading}
+                  className="flex-1 sm:flex-none"
+                >
+                  <RefreshCcw className="h-4 w-4" />
+                </Button>
+              )}
+            </div>
+
+
           </div>
 
           {/* Select All */}
-          <div className="mt-4 flex items-center justify-between">
-            <p className="text-md font-bold">
-              Нийт бүтээгдэхүүний үнэ: {totalPrice.toLocaleString()} ¥ 
+          <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <p className="text-sm font-bold sm:text-base">
+              Нийт: {totalPrice.toLocaleString()} ¥
             </p>
 
             <div className="flex items-center gap-2">
@@ -263,18 +311,17 @@ export function BucketListClient({
               {items.map((item) => (
                 <li
                   key={item.id}
-                  className={`group flex items-center gap-4 p-4 transition
+                  className={`group flex flex-col gap-3 p-3 transition sm:flex-row sm:items-center sm:gap-4 sm:p-4
                     hover:bg-muted/50
-                    ${
-                      selectedIds.includes(item.id)
-                        ? "bg-primary/5 border-l-4 border-primary"
-                        : ""
+                    ${selectedIds.includes(item.id)
+                      ? "bg-primary/5 border-l-4 border-primary"
+                      : ""
                     }`}
                 >
                   {item.product_img && (
                     <Dialog>
                       <DialogTrigger asChild>
-                        <div className="h-20 w-20 shrink-0 overflow-hidden rounded-lg border bg-muted cursor-pointer">
+                        <div className="h-16 w-16 shrink-0 overflow-hidden rounded-lg border bg-muted cursor-pointer sm:h-20 sm:w-20">
                           <img
                             src={getImageUrl(item.product_img)}
                             alt={item.product_name}
@@ -326,13 +373,23 @@ export function BucketListClient({
                     </div>
                   </div>
 
-                  <Checkbox
-                    className="size-6"
-                    checked={selectedIds.includes(item.id)}
-                    onCheckedChange={(checked) =>
-                      handleCheckboxChange(item.id, checked as boolean)
-                    }
-                  />
+                  <div className="flex items-center gap-2 self-end sm:self-auto">
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="size-8 text-muted-foreground hover:text-primary"
+                      onClick={() => openEditDialog(item)}
+                    >
+                      <Pencil className="size-4" />
+                    </Button>
+                    <Checkbox
+                      className="size-5 sm:size-6"
+                      checked={selectedIds.includes(item.id)}
+                      onCheckedChange={(checked) =>
+                        handleCheckboxChange(item.id, checked as boolean)
+                      }
+                    />
+                  </div>
                 </li>
               ))}
 
@@ -347,6 +404,67 @@ export function BucketListClient({
           </div>
         </CardContent>
       </Card>
-    </div>
+
+      {/* Edit Dialog */}
+      <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Бүтээгдэхүүн засах</DialogTitle>
+            <DialogDescription>
+              {editItem?.product_name}
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Нэгж үнэ (¥)</label>
+              <Input
+                type="number"
+                placeholder="Нэгж үнэ оруулах..."
+                value={editUnitPrice}
+                onChange={(e) => setEditUnitPrice(e.target.value)}
+                disabled={isUpdating}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Нийлүүлэгч</label>
+              <Select
+                value={editSupplierId}
+                onValueChange={setEditSupplierId}
+                disabled={isUpdating}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Нийлүүлэгч сонгох" />
+                </SelectTrigger>
+                <SelectContent>
+                  {suppliers.map((s) => (
+                    <SelectItem key={s.id} value={s.id.toString()}>
+                      {s.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+
+          <DialogFooter className="gap-2 sm:gap-0">
+            <Button
+              variant="outline"
+              onClick={() => setIsEditDialogOpen(false)}
+              disabled={isUpdating}
+            >
+              Болих
+            </Button>
+            <Button
+              onClick={handleEditSubmit}
+              disabled={isUpdating || !editUnitPrice || !editSupplierId}
+            >
+              {isUpdating ? "Хадгалж байна..." : "Хадгалах"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </>
   );
 }

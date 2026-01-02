@@ -94,7 +94,7 @@ export function DataTable({
       <OrderDialog open={orderOpen} onOpenChange={setOrderOpen} product={selectedProduct} />
 
       <Tabs defaultValue="outline" className="w-full flex-col justify-start gap-6">
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <h4>Бүтээгдэхүүн</h4>
           <Label htmlFor="view-selector" className="sr-only">
             View
@@ -109,12 +109,12 @@ export function DataTable({
           </div>
         </div>
 
-        <div className="flex items-center gap-4">
-          <div className="relative">
+        <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:gap-4">
+          <div className="relative w-full sm:w-auto">
             <Search className="text-muted-foreground absolute top-1/2 left-3 size-4 -translate-y-1/2" />
             <Input
               placeholder="Бүтээгдэхүүн хайх..."
-              className="w-[300px] pl-9"
+              className="w-full pl-9 sm:w-[300px]"
               value={searchQuery}
               onChange={handleSearchChange}
               disabled={isLoading}
@@ -122,24 +122,24 @@ export function DataTable({
           </div>
 
           <Select
-  value={selectedSupplier}
-  onValueChange={handleSupplierChange}
-  disabled={isLoading}
->
-  <SelectTrigger className="w-[250px]">
-    <SelectValue placeholder="Нийлүүлэгч сонгох" />
-  </SelectTrigger>
-  <SelectContent>
-    {supplierData.map((s) => (
-      <SelectItem key={s.id} value={s.id.toString()}>
-        {s.name}
-      </SelectItem>
-    ))}
-  </SelectContent>
-</Select>
+            value={selectedSupplier}
+            onValueChange={handleSupplierChange}
+            disabled={isLoading}
+          >
+            <SelectTrigger className="w-full sm:w-[250px]">
+              <SelectValue placeholder="Нийлүүлэгч сонгох" />
+            </SelectTrigger>
+            <SelectContent>
+              {supplierData.map((s) => (
+                <SelectItem key={s.id} value={s.id.toString()}>
+                  {s.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
 
           {(searchQuery || selectedSupplier) && (
-            <Button onClick={handleClearFilters} disabled={isLoading} variant="outline" size="sm">
+            <Button onClick={handleClearFilters} disabled={isLoading} variant="outline" size="sm" className="w-full sm:w-auto">
               <X className="mr-2 h-4 w-4" />
               Цэвэрлэх
             </Button>

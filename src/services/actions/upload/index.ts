@@ -17,10 +17,9 @@ type BackendUploadResponse = {
     files: UploadFileResponse[];
 };
 
-// ✅ Define the return type explicitly
 type UploadImagesResult = {
     success: boolean;
-    data: string[] | null; // Always return string[] of filenames or null
+    data: string[] | null;
     message?: string;
     httpStatus?: number;
 };
@@ -40,13 +39,12 @@ export async function uploadProductImages(files: File[]): Promise<UploadImagesRe
     });
 
 
-    // ✅ Extract just the filenames from the response
     if (response.success && response.data?.files) {
         const filenames = response.data.files.map((file) => file.fileName);
 
         return {
             success: true,
-            data: filenames, // Return array of filenames: ["1765717792307-86755504.jpg", ...]
+            data: filenames,
             message: response.data.message,
             httpStatus: response.httpStatus,
         };

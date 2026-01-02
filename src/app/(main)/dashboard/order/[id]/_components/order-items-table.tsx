@@ -34,8 +34,8 @@ export function OrderItemsTable({ items }: OrderItemsTableProps) {
                 </CardTitle>
             </CardHeader>
             <CardContent>
-                <div className="rounded-md border">
-                    <Table>
+                <div className="max-h-[400px] overflow-auto rounded-md border">
+                    <Table className="min-w-[600px]">
                         <TableHeader>
                             <TableRow>
                                 <TableHead className="w-[80px]">Зураг</TableHead>

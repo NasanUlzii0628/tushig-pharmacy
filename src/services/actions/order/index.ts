@@ -50,7 +50,7 @@ export async function fetchBucketList(params?: {
     supplier_id?: string;
 }) {
     const filters: Record<string, any> = {};
-    
+
     if (params?.product_id) {
         filters.product_id = params.product_id;
     }
@@ -78,16 +78,18 @@ export async function fetchBucketList(params?: {
 
 type FetchOrderParams = Record<string, string | number>
 
-type PaginatedCustomers = {
+type PaginatedOrdersResponse = {
     data: OrderTypes[]
-    content: OrderTypes[]
-    totalElements: number
-    totalPages: number
+    pagination: {
+        total: number
+        page: number
+        limit: number
+        totalPages: number
+    }
 }
 
 export async function FetchOrderList(params: FetchOrderParams) {
     const filters = {
-        // ...params,
         page: params.page || DEFAULT_PAGE,
         limit: params.size || DEFAULT_SIZE,
     }
@@ -96,10 +98,13 @@ export async function FetchOrderList(params: FetchOrderParams) {
 
     const path = `/order/list${queryString}`
 
-    const { data, message, success, httpStatus } = await GET<PaginatedCustomers>({ path })
+    const { data, message, success, httpStatus } = await GET<PaginatedOrdersResponse>({ path })
 
     return {
-        ...data,
+        data: data?.data ?? [],
+        totalElements: data?.pagination?.total ?? 0,
+        totalPages: data?.pagination?.totalPages ?? 1,
+        page: data?.pagination?.page ?? 1,
         httpStatus,
         message,
         success,
@@ -119,6 +124,16 @@ export const fetchOrderDetail = async (id: string) => {
     return {
         data,
     }
+}
+
+export async function updateBucketItem(product_id: number, unit_price: number, supplier_id: number) {
+    const body = {
+        product_id,
+        unit_price,
+        supplier_id,
+    }
+    const path = "/order/bucket/update"
+    return POST({ path, payload: body })
 }
 
 

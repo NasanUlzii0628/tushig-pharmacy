@@ -27,7 +27,7 @@ export function AccountSwitcher({
   }>;
 }) {
   const [activeUser, setActiveUser] = useState(users[0]);
-  const avatarSrc = activeUser.avatar || "/default.jpg";
+  const avatarSrc = activeUser.avatar || "/profile_pic.jpg";
 
   return (
     <DropdownMenu>

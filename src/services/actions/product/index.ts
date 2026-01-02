@@ -27,7 +27,6 @@ export async function fetchCustomers(params: FetchCustomerParams) {
     limit: params.size || DEFAULT_SIZE,
   }
 
-  // Add optional filters only if they exist
   if (params.name) {
     filters.name = params.name;
   }

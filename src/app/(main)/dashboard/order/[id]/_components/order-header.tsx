@@ -10,6 +10,8 @@ import {
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Label } from "@/components/ui/label";
 import { useState } from "react";
 import ExcelJS from "exceljs";
 import jsPDF from "jspdf";
@@ -26,6 +28,7 @@ type OrderHeaderProps = {
 export function OrderHeader({ orderId, orderDate, orderData }: OrderHeaderProps) {
     const router = useRouter();
     const [isDownloading, setIsDownloading] = useState(false);
+    const [hidePrices, setHidePrices] = useState(false);
 
     const handleDownloadExcel = async () => {
         setIsDownloading(true);
@@ -44,7 +47,12 @@ export function OrderHeader({ orderId, orderDate, orderData }: OrderHeaderProps)
                 }
             };
 
-            worksheet.columns = [
+            worksheet.columns = hidePrices ? [
+                { width: 10 },
+                { width: 30 },
+                { width: 15 },
+                { width: 12 },
+            ] : [
                 { width: 10 },
                 { width: 30 },
                 { width: 15 },
@@ -70,7 +78,9 @@ export function OrderHeader({ orderId, orderDate, orderData }: OrderHeaderProps)
             worksheet.getCell('A3').font = { bold: true, size: 12 };
 
             const headerRow = worksheet.getRow(6);
-            headerRow.values = ["Д/дугаар", "Барааны нэр", "Зураг", "Тоо ширхэг", "Нэгжийн үнэ /¥/", "Нийт үнэ /¥/"];
+            headerRow.values = hidePrices
+                ? ["Д/дугаар", "Барааны нэр", "Зураг", "Тоо ширхэг"]
+                : ["Д/дугаар", "Барааны нэр", "Зураг", "Тоо ширхэг", "Нэгжийн үнэ /¥/", "Нийт үнэ /¥/"];
             headerRow.height = 30;
 
             headerRow.eachCell((cell) => {
@@ -95,7 +105,12 @@ export function OrderHeader({ orderId, orderDate, orderData }: OrderHeaderProps)
                 const row = worksheet.getRow(currentRow);
                 row.height = 60;
 
-                row.values = [
+                row.values = hidePrices ? [
+                    index + 1,
+                    item.product_name || "",
+                    "",
+                    item.quantity || 0,
+                ] : [
                     index + 1,
                     item.product_name || "",
                     "",
@@ -151,7 +166,6 @@ export function OrderHeader({ orderId, orderDate, orderData }: OrderHeaderProps)
                 currentRow++;
             }
 
-            // Minimum visible rows INCLUDING items (Excel look)
             const MIN_TABLE_ROWS = 3;
 
             const itemCount = orderData.details?.length || 0;
@@ -160,10 +174,9 @@ export function OrderHeader({ orderId, orderDate, orderData }: OrderHeaderProps)
             // Add only needed empty rows
             for (let i = 0; i < rowsToFill; i++) {
                 const row = worksheet.getRow(currentRow);
-                row.values = [
-                    itemCount + i + 1,
-                    "", "", "", "", ""
-                ];
+                row.values = hidePrices
+                    ? [itemCount + i + 1, "", "", ""]
+                    : [itemCount + i + 1, "", "", "", "", ""];
 
                 row.eachCell((cell) => {
                     cell.alignment = { vertical: "middle", horizontal: "center" };
@@ -178,25 +191,26 @@ export function OrderHeader({ orderId, orderDate, orderData }: OrderHeaderProps)
                 currentRow++;
             }
 
-            // TOTAL ROW (immediately after table)
-            const totalRow = worksheet.getRow(currentRow);
-            totalRow.values = ["Нийт", "", "", "", "", Number(orderData.amount || 0)];
+            if (!hidePrices) {
+                const totalRow = worksheet.getRow(currentRow);
+                totalRow.values = ["Нийт", "", "", "", "", Number(orderData.amount || 0)];
 
-            worksheet.mergeCells(`A${currentRow}:E${currentRow}`);
+                worksheet.mergeCells(`A${currentRow}:E${currentRow}`);
 
-            totalRow.eachCell((cell, colNumber) => {
-                cell.font = { bold: true };
-                cell.alignment = {
-                    vertical: "middle",
-                    horizontal: colNumber === 1 ? "right" : "center",
-                };
-                cell.border = {
-                    top: { style: "thin" },
-                    left: { style: "thin" },
-                    bottom: { style: "thin" },
-                    right: { style: "thin" },
-                };
-            });
+                totalRow.eachCell((cell, colNumber) => {
+                    cell.font = { bold: true };
+                    cell.alignment = {
+                        vertical: "middle",
+                        horizontal: colNumber === 1 ? "right" : "center",
+                    };
+                    cell.border = {
+                        top: { style: "thin" },
+                        left: { style: "thin" },
+                        bottom: { style: "thin" },
+                        right: { style: "thin" },
+                    };
+                });
+            }
 
 
             const buffer = await workbook.xlsx.writeBuffer();
@@ -296,39 +310,49 @@ export function OrderHeader({ orderId, orderDate, orderData }: OrderHeaderProps)
 
                 if (imageData) rowImages[i] = imageData;
 
-                tableData.push([
+                const row = [
                     i + 1,
                     item.product_name || "",
                     "", // image column placeholder
                     item.quantity || 0,
-                    Number(item.unit_price || 0).toFixed(2),
-                    Number(item.total_price || 0).toFixed(2),
-                ]);
+                ];
+
+                if (!hidePrices) {
+                    row.push(
+                        Number(item.unit_price || 0).toFixed(2),
+                        Number(item.total_price || 0).toFixed(2)
+                    );
+                }
+                tableData.push(row);
             }
 
             /* ================= MINIMUM EMPTY ROWS ================= */
             while (tableData.length < 3) {
-                tableData.push([tableData.length + 1, "", "", "", "", ""]);
+                const emptyRow = [tableData.length + 1, "", "", ""];
+                if (!hidePrices) emptyRow.push("", "");
+                tableData.push(emptyRow);
             }
 
             /* ================= TOTAL ROW (INSIDE TABLE) ================= */
-            tableData.push([
-                {
-                    content: "Нийт",
-                    colSpan: 5,
-                    styles: {
-                        halign: "right",
-                        fontStyle: "bold",
+            if (!hidePrices) {
+                tableData.push([
+                    {
+                        content: "Нийт",
+                        colSpan: 5,
+                        styles: {
+                            halign: "right",
+                            fontStyle: "bold",
+                        },
                     },
-                },
-                {
-                    content: Number(orderData.amount || 0).toFixed(2),
-                    styles: {
-                        halign: "right",
-                        fontStyle: "bold",
+                    {
+                        content: Number(orderData.amount || 0).toFixed(2),
+                        styles: {
+                            halign: "right",
+                            fontStyle: "bold",
+                        },
                     },
-                },
-            ]);
+                ]);
+            }
 
             /* ================= TABLE ================= */
             autoTable(doc, {
@@ -336,7 +360,12 @@ export function OrderHeader({ orderId, orderDate, orderData }: OrderHeaderProps)
                 margin: { left: 14, right: 14 },
                 tableWidth: "auto",
 
-                head: [[
+                head: [hidePrices ? [
+                    "#",
+                    "Барааны нэр",
+                    "Зураг",
+                    "Тоо ширхэг",
+                ] : [
                     "#",
                     "Барааны нэр",
                     "Зураг",
@@ -364,7 +393,12 @@ export function OrderHeader({ orderId, orderDate, orderData }: OrderHeaderProps)
                     fontStyle: "bold",
                 },
 
-                columnStyles: {
+                columnStyles: hidePrices ? {
+                    0: { cellWidth: 15, halign: "center" },
+                    1: { cellWidth: 80, halign: "left" },
+                    2: { cellWidth: 40, halign: "center" },
+                    3: { cellWidth: 30, halign: "center" },
+                } : {
                     0: { cellWidth: 12, halign: "center" },
                     1: { cellWidth: 48, halign: "left" },
                     2: { cellWidth: 28, halign: "center" },
@@ -426,12 +460,25 @@ export function OrderHeader({ orderId, orderDate, orderData }: OrderHeaderProps)
                     <ArrowLeft className="h-4 w-4" />
                 </Button>
                 <div>
-                    <h1 className="text-2xl font-bold">Захиалга #{orderData.order_number}</h1>
+                    <h1 className="text-lg font-bold">Захиалга #{orderData.order_number}</h1>
                     <p className="text-sm text-muted-foreground">{formatDate(orderDate)}</p>
                 </div>
             </div>
 
             <div className="flex items-center gap-2">
+                <div className="flex items-center space-x-2 mr-2">
+                    <Checkbox
+                        id="hide-prices"
+                        checked={hidePrices}
+                        onCheckedChange={(checked) => setHidePrices(checked as boolean)}
+                    />
+                    <Label
+                        htmlFor="hide-prices"
+                        className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                    >
+                        Үнэ нуух
+                    </Label>
+                </div>
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                         <Button variant="outline" size="sm" disabled={isDownloading}>

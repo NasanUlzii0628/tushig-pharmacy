@@ -63,7 +63,7 @@ export function DataTable() {
   return (
     <>
       <Tabs defaultValue="outline" className="w-full flex-col justify-start gap-6">
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <h4>Хэрэглэгчид</h4>
 
           <Label htmlFor="view-selector" className="sr-only">
