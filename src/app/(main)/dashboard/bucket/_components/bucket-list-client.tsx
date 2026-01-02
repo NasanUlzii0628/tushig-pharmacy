@@ -205,14 +205,8 @@ export function BucketListClient({
                     <AlertDialogDescription asChild>
                       <div className="space-y-2">
                         <p>
-                          Та дараах {selectedIds.length} бүтээгдэхүүнийг
-                          захиалахдаа итгэлтэй байна уу?
+                          Та захиалга хийхдээ итгэлтэй байна уу?
                         </p>
-                        <div className="text-sm">
-                          {selectedItemNames.map((name, i) => (
-                            <div key={i}>• {name}</div>
-                          ))}
-                        </div>
                       </div>
                     </AlertDialogDescription>
                   </AlertDialogHeader>
@@ -228,7 +222,6 @@ export function BucketListClient({
             )}
           </div>
 
-          {/* Filters */}
           <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:gap-4">
             <div className="relative w-full sm:w-auto">
               <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
@@ -284,7 +277,7 @@ export function BucketListClient({
           {/* Select All */}
           <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <p className="text-sm font-bold sm:text-base">
-              Нийт: {totalPrice.toLocaleString()} ¥
+              Нийт: {selectedIds.reduce((total, id) => total + Number(items.find((i) => i.id === id)?.unit_price || 0) * Number(items.find((i) => i.id === id)?.quantity || 0), 0).toLocaleString()} ¥
             </p>
 
             <div className="flex items-center gap-2">
@@ -314,7 +307,7 @@ export function BucketListClient({
                   className={`group flex flex-col gap-3 p-3 transition sm:flex-row sm:items-center sm:gap-4 sm:p-4
                     hover:bg-muted/50
                     ${selectedIds.includes(item.id)
-                      ? "bg-primary/5 border-l-4 border-primary"
+                      ? "bg-primary/5 border-l-2 border-l-primary"
                       : ""
                     }`}
                 >
@@ -434,7 +427,7 @@ export function BucketListClient({
                 onValueChange={setEditSupplierId}
                 disabled={isUpdating}
               >
-                <SelectTrigger>
+                <SelectTrigger className="w-full">
                   <SelectValue placeholder="Нийлүүлэгч сонгох" />
                 </SelectTrigger>
                 <SelectContent>
@@ -448,7 +441,7 @@ export function BucketListClient({
             </div>
           </div>
 
-          <DialogFooter className="gap-2 sm:gap-0">
+          <DialogFooter className="gap-2">
             <Button
               variant="outline"
               onClick={() => setIsEditDialogOpen(false)}

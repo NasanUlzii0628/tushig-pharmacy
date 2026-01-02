@@ -396,8 +396,8 @@ export function OrderHeader({ orderId, orderDate, orderData }: OrderHeaderProps)
                 columnStyles: hidePrices ? {
                     0: { cellWidth: 15, halign: "center" },
                     1: { cellWidth: 80, halign: "left" },
-                    2: { cellWidth: 40, halign: "center" },
-                    3: { cellWidth: 30, halign: "center" },
+                    2: { cellWidth: 48, halign: "center" },
+                    3: { cellWidth: 38, halign: "center" },
                 } : {
                     0: { cellWidth: 12, halign: "center" },
                     1: { cellWidth: 48, halign: "left" },
@@ -476,7 +476,7 @@ export function OrderHeader({ orderId, orderDate, orderData }: OrderHeaderProps)
                         htmlFor="hide-prices"
                         className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
                     >
-                        Үнэ нуух
+                        Үнэ харуулахгүй байх
                     </Label>
                 </div>
                 <DropdownMenu>

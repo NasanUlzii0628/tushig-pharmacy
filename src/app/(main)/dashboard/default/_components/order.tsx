@@ -62,14 +62,14 @@ export function OrderDialog({ open, onOpenChange, product }: Props) {
         quantity: quantity || 1,
       })
       if (result.success) {
-        toast.success("Захиалга амжилттай үүсгэлээ")
+        toast.success("Захиалгын хүсэлтэд нэмэгдлээ")
         onOpenChange(false)
         setQuantity(0)
       } else {
-        toast.error(result.message || "Захиалга үүсгэхэд алдаа гарлаа")
+        toast.error(result.message || "Бараа захиалахад алдаа гарлаа")
       }
     } catch {
-      toast.error("Захиалга үүсгэхэд алдаа гарлаа")
+      toast.error("Бараа захиалахад алдаа гарлаа")
     } finally {
       setLoading(false)
     }
@@ -81,7 +81,7 @@ export function OrderDialog({ open, onOpenChange, product }: Props) {
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>Захиалга үүсгэх</DialogTitle>
+          <DialogTitle>Бараа захиалах</DialogTitle>
         </DialogHeader>
 
         {existsMessage && (

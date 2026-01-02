@@ -79,7 +79,7 @@ export function DataTable() {
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none c" />
             <Input
-              placeholder="Нэрээр хайх"
+              placeholder="Хэрэглэгчийн нэр..."
               className="pl-9 w-[300px]"
               value={usernameQuery}
               onChange={(e) => setUsernameQuery(e.target.value)}

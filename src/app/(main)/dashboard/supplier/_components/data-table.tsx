@@ -88,52 +88,54 @@ export function DataTable() {
           </div>
         </div>
 
-        <div className="flex flex-col gap-4">
+        <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:gap-4">
           {/* Search Inputs */}
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
-            {/* Name */}
-            <div className="relative">
-              <Search className="text-muted-foreground pointer-events-none absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
-              <Input
-                placeholder="Нэрээр хайх"
-                className="w-full pl-9"
-                value={nameQuery}
-                onChange={(e) => setNameQuery(e.target.value)}
-                disabled={loading}
-                onKeyDown={(e) => e.key === "Enter" && handleSearch()}
-              />
-            </div>
-
-            {/* WeChat */}
-            <div className="relative">
-              <Search className="text-muted-foreground pointer-events-none absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
-              <Input
-                placeholder="WeChat-ээр хайх"
-                className="w-full pl-9"
-                value={wechatQuery}
-                onChange={(e) => setWechatQuery(e.target.value)}
-                disabled={loading}
-                onKeyDown={(e) => e.key === "Enter" && handleSearch()}
-              />
-            </div>
-
-            {/* Contact */}
-            <div className="relative">
-              <Search className="text-muted-foreground pointer-events-none absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
-              <Input
-                placeholder="Имэйл-ээр хайх"
-                className="w-full pl-9"
-                value={contactQuery}
-                onChange={(e) => setContactQuery(e.target.value)}
-                disabled={loading}
-                onKeyDown={(e) => e.key === "Enter" && handleSearch()}
-              />
-            </div>
+          {/* Name */}
+          <div className="relative w-full sm:w-auto">
+            <Search className="text-muted-foreground pointer-events-none absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
+            <Input
+              placeholder="Нийлүүлэгчийн нэр..."
+              className="w-full pl-9 sm:w-[300px]"
+              value={nameQuery}
+              onChange={(e) => setNameQuery(e.target.value)}
+              disabled={loading}
+              onKeyDown={(e) => e.key === "Enter" && handleSearch()}
+            />
           </div>
+
+          {/* WeChat */}
+          <div className="relative w-full sm:w-auto">
+
+            <Search className="text-muted-foreground pointer-events-none absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
+            <Input
+              placeholder="WeChat..."
+              className="w-full pl-9 sm:w-[300px]"
+              value={wechatQuery}
+              onChange={(e) => setWechatQuery(e.target.value)}
+              disabled={loading}
+              onKeyDown={(e) => e.key === "Enter" && handleSearch()}
+            />
+          </div>
+
+
+          {/* Contact */}
+          <div className="relative w-full sm:w-auto">
+
+            <Search className="text-muted-foreground pointer-events-none absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
+            <Input
+              placeholder="Имэйл..."
+              className="w-full pl-9 sm:w-[300px]"
+              value={contactQuery}
+              onChange={(e) => setContactQuery(e.target.value)}
+              disabled={loading}
+              onKeyDown={(e) => e.key === "Enter" && handleSearch()}
+            />
+          </div>
+
 
           {/* Action Buttons */}
           <div className="flex gap-2">
-            <Button onClick={handleSearch} disabled={loading} size="sm" className="flex-1 sm:w-[120px] sm:flex-none">
+            <Button onClick={handleSearch} disabled={loading} size="sm" className="flex-1 sm:w-[100px] sm:flex-none">
               <Search className="mr-2 h-4 w-4" />
               Хайх
             </Button>
