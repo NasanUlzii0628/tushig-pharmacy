@@ -133,8 +133,9 @@ export function OrderHeader({ orderId, orderDate, orderData }: OrderHeaderProps)
 
                 if (item.product_image) {
                     try {
-                        const imageUrl = item.product_image;
-                        const response = await fetch(imageUrl);
+                        // Proxy the image through your API to avoid CORS
+                        const proxyUrl = `/api/proxy-image?url=${encodeURIComponent(item.product_image)}`;
+                        const response = await fetch(proxyUrl);
                         if (!response.ok) throw new Error("Image fetch failed");
 
                         const blob = await response.blob();
@@ -150,7 +151,7 @@ export function OrderHeader({ orderId, orderDate, orderData }: OrderHeaderProps)
 
                         const imageId = workbook.addImage({
                             base64,
-                            extension: "jpeg",
+                            extension: "png",
                         });
 
                         worksheet.addImage(imageId, {
@@ -289,25 +290,28 @@ export function OrderHeader({ orderId, orderDate, orderData }: OrderHeaderProps)
 
             for (let i = 0; i < (orderData.details?.length || 0); i++) {
                 const item = orderData.details[i];
-                let imageData: string | null = null;
 
                 if (item.product_image) {
                     try {
-                        const res = await fetch(item.product_image);
-                        if (res.ok) {
-                            const blob = await res.blob();
-                            imageData = await new Promise<string>((resolve) => {
-                                const r = new FileReader();
-                                r.onloadend = () => resolve(r.result as string);
-                                r.readAsDataURL(blob);
+                        // Proxy the image through your API to avoid CORS
+                        const proxyUrl = `/api/proxy-image?url=${encodeURIComponent(item.product_image)}`;
+                        const response = await fetch(proxyUrl);
+                        if (response.ok) {
+                            const blob = await response.blob();
+                            const base64 = await new Promise<string>((resolve, reject) => {
+                                const reader = new FileReader();
+                                reader.onloadend = () => {
+                                    resolve(reader.result as string);
+                                };
+                                reader.onerror = reject;
+                                reader.readAsDataURL(blob);
                             });
+                            rowImages[i] = base64;
                         }
                     } catch (err) {
-                        console.warn("Image load failed:", err);
+                        console.error(`✗ Image error for PDF (${item.product_name})`, err);
                     }
                 }
-
-                if (imageData) rowImages[i] = imageData;
 
                 const row = [
                     i + 1,
@@ -324,6 +328,7 @@ export function OrderHeader({ orderId, orderDate, orderData }: OrderHeaderProps)
                 }
                 tableData.push(row);
             }
+
 
             /* ================= MINIMUM EMPTY ROWS ================= */
             while (tableData.length < 3) {

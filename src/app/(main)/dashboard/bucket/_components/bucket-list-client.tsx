@@ -502,9 +502,9 @@ export function BucketListClient({
       <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Бүтээгдэхүүн устгах</DialogTitle>
+            <DialogTitle>Бүтээгдэхүүн хасах</DialogTitle>
             <DialogDescription>
-              {deleteItem?.product_name} Бүтээгдэхүүн устгахдаа итгэлтэй байна уу?
+              {deleteItem?.product_name} бүтээгдэхүүнийг хасахдаа итгэлтэй байна уу?
             </DialogDescription>
           </DialogHeader>
 
