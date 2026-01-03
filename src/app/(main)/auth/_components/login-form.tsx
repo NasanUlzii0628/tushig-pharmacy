@@ -69,7 +69,7 @@ export function LoginForm() {
             <FormItem>
               <FormLabel>Хэрэглэгчийн нэр</FormLabel>
               <FormControl>
-                <Input id="username" type="text" autoComplete="username" {...field} />
+                <Input id="username" type="text" autoComplete="username" className="text-base"  {...field} />
               </FormControl>
             </FormItem>
           )}
@@ -82,7 +82,7 @@ export function LoginForm() {
             <FormItem>
               <FormLabel>Нууц үг</FormLabel>
               <FormControl>
-                <Input id="password" type="password" autoComplete="current-password" {...field} />
+                <Input id="password" type="password" autoComplete="current-password" className="text-base"  {...field} />
               </FormControl>
             </FormItem>
           )}

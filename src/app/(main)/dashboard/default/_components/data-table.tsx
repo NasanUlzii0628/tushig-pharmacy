@@ -140,16 +140,24 @@ export function DataTable({
           </Select>
 
 
-          <Button onClick={handleSearch} disabled={isLoading} size="sm" className="flex-1 sm:w-[100px] sm:flex-none">
-            <Search className="mr-2 h-4 w-4" />
-            Хайх
-          </Button>
-
-          {(searchQuery || selectedSupplier) && (
-            <Button onClick={handleClearFilters} disabled={isLoading} variant="outline" size="sm" className="w-full sm:w-auto">
-              <RefreshCcwIcon className="mr-2 h-4 w-4" />
+          <div className="flex gap-2">
+            <Button onClick={handleSearch} disabled={isLoading} size="sm" className="flex-1 sm:w-[100px] sm:flex-none">
+              <Search className="mr-2 h-4 w-4" />
+              Хайх
             </Button>
-          )}
+
+            {searchQuery || selectedSupplier && (
+              <Button
+                onClick={handleClearFilters}
+                disabled={isLoading}
+                variant="outline"
+                size="sm"
+                className="flex-1 sm:w-[50px] sm:flex-none"
+              >
+                <RefreshCcwIcon className="h-4 w-4" />
+              </Button>
+            )}
+          </div>
         </div>
 
         <TabsContent value="outline" className="relative flex flex-col gap-4 overflow-auto">
