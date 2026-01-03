@@ -18,7 +18,6 @@ import type { ProductType } from "@/types/product";
 import type { SupplierType } from "@/types/supplier";
 import { updateProduct } from "@/services/actions/product";
 import { uploadProductImages } from "@/services/actions/upload";
-import { getImageUrl } from "@/utils/image";
 
 const MAX_FILE_SIZE = 5 * 1024 * 1024;
 const MAX_ADDITIONAL_IMAGES = 2;
@@ -119,9 +118,9 @@ function UpdateProductForm({
   }, [product.addi_imgs]);
 
   const [existingAddiImages, setExistingAddiImages] = React.useState<string[]>(validAddiImgs);
-  const [previewMain, setPreviewMain] = React.useState<string>(getImageUrl(product.img));
+  const [previewMain, setPreviewMain] = React.useState<string>(product.img);
   const [previewAddi, setPreviewAddi] = React.useState<string[]>(
-    validAddiImgs.map(getImageUrl).filter((url) => url && !url.includes("placeholder")),
+    validAddiImgs.filter((url) => url && !url.includes("placeholder")),
   );
 
   React.useEffect(() => {
@@ -133,8 +132,8 @@ function UpdateProductForm({
     setMainImage(null);
     setAddiImages([]);
     setExistingAddiImages(validAddiImgs);
-    setPreviewMain(getImageUrl(product.img));
-    setPreviewAddi(validAddiImgs.map(getImageUrl).filter((url) => url && !url.includes("placeholder")));
+    setPreviewMain(product.img);
+    setPreviewAddi(validAddiImgs.filter((url) => url && !url.includes("placeholder")));
   }, [product, validAddiImgs, form]);
 
   const validateFile = (file: File) => {

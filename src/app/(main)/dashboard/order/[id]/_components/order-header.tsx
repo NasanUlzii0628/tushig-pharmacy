@@ -17,7 +17,6 @@ import ExcelJS from "exceljs";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import type { OrderDetailTypes } from "@/types/order";
-import { getImageUrl } from "@/utils/image";
 
 type OrderHeaderProps = {
     orderId: number;
@@ -134,7 +133,7 @@ export function OrderHeader({ orderId, orderDate, orderData }: OrderHeaderProps)
 
                 if (item.product_image) {
                     try {
-                        const imageUrl = getImageUrl(item.product_image);
+                        const imageUrl = item.product_image;
                         const response = await fetch(imageUrl);
                         if (!response.ok) throw new Error("Image fetch failed");
 
@@ -294,7 +293,7 @@ export function OrderHeader({ orderId, orderDate, orderData }: OrderHeaderProps)
 
                 if (item.product_image) {
                     try {
-                        const res = await fetch(getImageUrl(item.product_image));
+                        const res = await fetch(item.product_image);
                         if (res.ok) {
                             const blob = await res.blob();
                             imageData = await new Promise<string>((resolve) => {

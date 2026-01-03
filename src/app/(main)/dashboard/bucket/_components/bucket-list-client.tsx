@@ -39,7 +39,6 @@ import { orderBucketList, fetchBucketList, updateBucketItem, deleteBucketList } 
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { SupplierType } from "@/types/supplier";
-import { getImageUrl } from "@/utils/image";
 
 interface BucketListClientProps {
   items: BucketList[];
@@ -347,7 +346,7 @@ export function BucketListClient({
                       <DialogTrigger asChild>
                         <div className="h-16 w-16 shrink-0 overflow-hidden rounded-lg border bg-muted cursor-pointer sm:h-20 sm:w-20">
                           <img
-                            src={getImageUrl(item.product_img)}
+                            src={item.product_img}
                             alt={item.product_name}
                             className="h-full w-full object-cover transition-transform group-hover:scale-105"
                           />
@@ -358,7 +357,7 @@ export function BucketListClient({
                           {item.product_name}
                         </DialogTitle>
                         <img
-                          src={getImageUrl(item.product_img)}
+                          src={item.product_img}
                           alt={item.product_name}
                           className="max-h-[85vh] w-full rounded-xl object-contain"
                         />

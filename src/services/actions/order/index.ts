@@ -160,7 +160,6 @@ export async function deleteOrderList(order_id: number) {
     const body = {
         order_id,
     }
-
     console.log(body)
     const path = "/order/delete"
     return POST({ path, payload: body })

@@ -8,7 +8,6 @@ import {
     TableHeader,
     TableRow,
 } from "@/components/ui/table";
-import { getImageUrl } from "@/utils/image";
 import { ShoppingCart } from "lucide-react";
 
 type OrderItem = {
@@ -58,7 +57,7 @@ export function OrderItemsTable({ items }: OrderItemsTableProps) {
                             ) : (
                                 items.map((item) => {
                                     const imageUrl = item.product_image
-                                        ? getImageUrl(item.product_image)
+                                        ? item.product_image
                                         : null;
 
                                     return (

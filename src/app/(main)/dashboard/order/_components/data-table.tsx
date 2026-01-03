@@ -61,7 +61,6 @@ export function DataTable({ initialData, initialTotalPages = 1, suppliers = [] }
     const [date, setDate] = React.useState<DateRange | undefined>(undefined);
     const [supplierId, setSupplierId] = React.useState<string>("");
 
-    // Active filters used for fetching data
     const [activeDate, setActiveDate] = React.useState<DateRange | undefined>(undefined);
     const [activeSupplierId, setActiveSupplierId] = React.useState<string>("");
 
@@ -84,14 +83,11 @@ export function DataTable({ initialData, initialTotalPages = 1, suppliers = [] }
         }
     }, [activeDate, activeSupplierId]);
 
-    // Apply filters when "Filter" button is clicked
     const handleApplyFilters = () => {
-        setPagination((prev) => ({ ...prev, pageIndex: 0 })); // Reset to first page
+        setPagination((prev) => ({ ...prev, pageIndex: 0 }));
         setActiveDate(date);
         setActiveSupplierId(supplierId);
-        // fetchData will be triggered by useEffect because setActive updates will recreate fetchData (if dependencies used)
-        // actually fetchData depends on activeDate/activeSupplierId, so it changes.
-        // And useEffect depends on fetchData. So it will run.
+
     };
 
     const handleResetFilters = () => {

@@ -13,7 +13,6 @@ import {
 import { Dialog, DialogContent, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { DataTableColumnHeader } from "@/components/data-table/data-table-column-header";
 import { DeleteProductDialog } from "./delete";
-import { getImageUrl } from "@/utils/image";
 
 import type { ProductType } from "@/types/product";
 import { UpdateProductDrawer } from "./update";
@@ -69,12 +68,11 @@ export const productColumns = (
       accessorKey: "img",
       header: ({ column }) => <DataTableColumnHeader column={column} title="Бүтээгдэхүүний зураг" />,
       cell: ({ row }) => {
-        const imageUrl = getImageUrl(row.original.img);
-
+        const imageUrl = row.original.img;
         const addiImgs = row.original.addi_imgs;
         const hasAdditional = Array.isArray(addiImgs) && addiImgs.length > 0 && addiImgs[0];
 
-        const additionalImageUrl = hasAdditional ? getImageUrl(addiImgs[0]) : null;
+        const additionalImageUrl = hasAdditional ? addiImgs[0] : null;
 
         return (
           <div className="flex flex-row gap-2">
