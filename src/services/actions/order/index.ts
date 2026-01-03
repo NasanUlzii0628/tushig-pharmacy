@@ -25,6 +25,15 @@ export async function orderBucketList(bucket_item_ids: number[]) {
     return POST({ path, payload: body })
 }
 
+export async function deleteBucketList(product_id: number) {
+    const body = {
+        product_id,
+    }
+    const path = "/order/bucket/delete"
+    return POST({ path, payload: body })
+}
+
+
 export async function checkOrder(product_id: number) {
     const filters = {
         product_id,
@@ -76,7 +85,7 @@ export async function fetchBucketList(params?: {
 
 
 
-type FetchOrderParams = Record<string, string | number>
+type FetchOrderParams = Record<string, string | number | undefined>
 
 type PaginatedOrdersResponse = {
     data: OrderTypes[]
@@ -89,9 +98,19 @@ type PaginatedOrdersResponse = {
 }
 
 export async function FetchOrderList(params: FetchOrderParams) {
-    const filters = {
+    const filters: Record<string, string | number> = {
         page: params.page || DEFAULT_PAGE,
         limit: params.size || DEFAULT_SIZE,
+    }
+
+    if (params.start_date) {
+        filters.start_date = params.start_date
+    }
+    if (params.end_date) {
+        filters.end_date = params.end_date
+    }
+    if (params.supplier_id) {
+        filters.supplier_id = params.supplier_id
     }
 
     const queryString = getQueryString(filters)
@@ -135,6 +154,18 @@ export async function updateBucketItem(product_id: number, unit_price: number, s
     const path = "/order/bucket/update"
     return POST({ path, payload: body })
 }
+
+export async function deleteOrderList(order_id: number) {
+
+    const body = {
+        order_id,
+    }
+
+    console.log(body)
+    const path = "/order/delete"
+    return POST({ path, payload: body })
+}
+
 
 
 

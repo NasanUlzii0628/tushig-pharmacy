@@ -5,7 +5,7 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { BucketList } from "@/types/order";
-import { Search, RefreshCcw, Pencil } from "lucide-react";
+import { Search, RefreshCcw, Pencil, Trash } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -35,7 +35,7 @@ import {
   SelectContent,
   SelectItem,
 } from "@/components/ui/select";
-import { orderBucketList, fetchBucketList, updateBucketItem } from "@/services/actions/order";
+import { orderBucketList, fetchBucketList, updateBucketItem, deleteBucketList } from "@/services/actions/order";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { SupplierType } from "@/types/supplier";
@@ -63,7 +63,13 @@ export function BucketListClient({
   const [editUnitPrice, setEditUnitPrice] = useState("");
   const [editSupplierId, setEditSupplierId] = useState("");
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+
+  // Delete modal state
+  const [deleteItem, setDeleteItem] = useState<BucketList | null>(null);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+
   const [isUpdating, setIsUpdating] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const router = useRouter();
   const canOrder = userRole !== "STAFF";
@@ -79,6 +85,31 @@ export function BucketListClient({
     setEditUnitPrice(item.unit_price?.toString() || "");
     setEditSupplierId(item.supplier_id?.toString() || "");
     setIsEditDialogOpen(true);
+  };
+
+  const openDeleteDialog = (item: BucketList) => {
+    setDeleteItem(item);
+    setIsDeleteDialogOpen(true);
+  };
+
+  const handleDeleteSubmit = async () => {
+    if (!deleteItem) return;
+
+    setIsDeleting(true);
+    try {
+      const result = await deleteBucketList(deleteItem.product_id);
+      if (result.success) {
+        toast.success("Амжилттай устгагдлаа");
+        setIsDeleteDialogOpen(false);
+        await handleSearch();
+      } else {
+        toast.error(result.message || "Устгахэд алдаа гарлаа");
+      }
+    } catch {
+      toast.error("Устгахэд алдаа гарлаа");
+    } finally {
+      setIsDeleting(false);
+    }
   };
 
   const handleEditSubmit = async () => {
@@ -371,6 +402,14 @@ export function BucketListClient({
                       variant="ghost"
                       size="icon"
                       className="size-8 text-muted-foreground hover:text-primary"
+                      onClick={() => openDeleteDialog(item)}
+                    >
+                      <Trash className="size-4" />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="size-8 text-muted-foreground hover:text-primary"
                       onClick={() => openEditDialog(item)}
                     >
                       <Pencil className="size-4" />
@@ -454,6 +493,35 @@ export function BucketListClient({
               disabled={isUpdating || !editUnitPrice || !editSupplierId}
             >
               {isUpdating ? "Хадгалж байна..." : "Хадгалах"}
+            </Button>
+          </DialogFooter>
+
+
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Бүтээгдэхүүн устгах</DialogTitle>
+            <DialogDescription>
+              {deleteItem?.product_name} Бүтээгдэхүүн устгахдаа итгэлтэй байна уу?
+            </DialogDescription>
+          </DialogHeader>
+
+          <DialogFooter className="gap-2">
+            <Button
+              variant="outline"
+              onClick={() => setIsDeleteDialogOpen(false)}
+              disabled={isDeleting}
+            >
+              Болих
+            </Button>
+            <Button
+              onClick={handleDeleteSubmit}
+              disabled={isDeleting}
+            >
+              {isDeleting ? "Устгаж байна..." : "Устгах"}
             </Button>
           </DialogFooter>
         </DialogContent>

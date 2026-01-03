@@ -9,10 +9,12 @@ import {
     DropdownMenuContent,
     DropdownMenuTrigger,
     DropdownMenuItem,
+    DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
 import { DataTableColumnHeader } from "@/components/data-table/data-table-column-header";
 
 import type { OrderTypes } from "@/types/order";
+import { DeleteOrderDialog } from "./delete";
 
 export const orderColumns = (
     onRefresh: () => void,
@@ -74,6 +76,13 @@ export const orderColumns = (
                         <DropdownMenuItem onClick={() => handleNavigate(row.original.id)}>
                             Дэлгэрэнгүй
                         </DropdownMenuItem>
+
+                        <DropdownMenuSeparator />
+
+                        <DeleteOrderDialog
+                            orderId={row.original.id}
+                            onDeleted={onRefresh}
+                        />
                     </DropdownMenuContent>
                 </DropdownMenu>
             ),

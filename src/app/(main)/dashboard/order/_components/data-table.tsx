@@ -4,7 +4,6 @@
 import * as React from "react";
 import { useRouter } from "next/navigation";
 
-import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent } from "@/components/ui/tabs";
 import {
     ColumnFiltersState,
@@ -26,13 +25,23 @@ import { withDndColumn } from "@/components/data-table/table-utils";
 import { orderColumns } from "./columns";
 import type { OrderTypes } from "@/types/order";
 import { FetchOrderList } from "@/services/actions/order";
+import { SupplierType } from "@/types/supplier";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Button } from "@/components/ui/button";
+import { Calendar } from "@/components/ui/calendar";
+import { CalendarIcon, Search, X } from "lucide-react";
+import { format } from "date-fns";
+import { cn } from "@/lib/utils";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { DateRange } from "react-day-picker";
 
 type DataTableProps = {
     initialData: OrderTypes[];
     initialTotalPages?: number;
+    suppliers: SupplierType[];
 };
 
-export function DataTable({ initialData, initialTotalPages = 1 }: DataTableProps) {
+export function DataTable({ initialData, initialTotalPages = 1, suppliers = [] }: DataTableProps) {
     const router = useRouter();
     const [data, setData] = React.useState<OrderTypes[]>(initialData);
     const [loadingMap, setLoadingMap] = React.useState<Record<number, boolean>>({});
@@ -49,12 +58,22 @@ export function DataTable({ initialData, initialTotalPages = 1 }: DataTableProps
     const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
     const [sorting, setSorting] = React.useState<SortingState>([]);
 
+    const [date, setDate] = React.useState<DateRange | undefined>(undefined);
+    const [supplierId, setSupplierId] = React.useState<string>("");
+
+    // Active filters used for fetching data
+    const [activeDate, setActiveDate] = React.useState<DateRange | undefined>(undefined);
+    const [activeSupplierId, setActiveSupplierId] = React.useState<string>("");
+
     const fetchData = React.useCallback(async (pageIndex: number, pageSize: number) => {
         setIsRefreshing(true);
         try {
             const res = await FetchOrderList({
                 page: pageIndex + 1,
-                size: pageSize
+                size: pageSize,
+                start_date: activeDate?.from ? format(activeDate.from, "yyyy-MM-dd") : undefined,
+                end_date: activeDate?.to ? format(activeDate.to, "yyyy-MM-dd") : undefined,
+                supplier_id: activeSupplierId || undefined,
             });
             setData(res.data ?? []);
             const totalElements = res.totalElements ?? 0;
@@ -63,7 +82,25 @@ export function DataTable({ initialData, initialTotalPages = 1 }: DataTableProps
         } finally {
             setIsRefreshing(false);
         }
-    }, []);
+    }, [activeDate, activeSupplierId]);
+
+    // Apply filters when "Filter" button is clicked
+    const handleApplyFilters = () => {
+        setPagination((prev) => ({ ...prev, pageIndex: 0 })); // Reset to first page
+        setActiveDate(date);
+        setActiveSupplierId(supplierId);
+        // fetchData will be triggered by useEffect because setActive updates will recreate fetchData (if dependencies used)
+        // actually fetchData depends on activeDate/activeSupplierId, so it changes.
+        // And useEffect depends on fetchData. So it will run.
+    };
+
+    const handleResetFilters = () => {
+        setDate(undefined);
+        setSupplierId("");
+        setActiveDate(undefined);
+        setActiveSupplierId("");
+        setPagination((prev) => ({ ...prev, pageIndex: 0 }));
+    };
 
     React.useEffect(() => {
         fetchData(pagination.pageIndex, pagination.pageSize);
@@ -94,7 +131,7 @@ export function DataTable({ initialData, initialTotalPages = 1 }: DataTableProps
             columnFilters,
             pagination,
         },
-        manualPagination: true, // Enable server-side pagination
+        manualPagination: true,
         enableRowSelection: true,
         getRowId: (row) => row.id.toString(),
         onRowSelectionChange: setRowSelection,
@@ -111,15 +148,75 @@ export function DataTable({ initialData, initialTotalPages = 1 }: DataTableProps
 
     return (
         <Tabs defaultValue="outline" className="w-full flex-col justify-start gap-6">
-            <div className="flex items-center justify-between">
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                 <h4>Захиалгын жагсаалт</h4>
+            </div>
 
-                <Label htmlFor="view-selector" className="sr-only">
-                    View
-                </Label>
+            <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+                <Popover>
+                    <PopoverTrigger asChild>
+                        <Button
+                            id="date"
+                            variant={"outline"}
+                            className={cn(
+                                "w-full justify-start text-left font-normal sm:w-[300px]",
+                                !date && "text-muted-foreground"
+                            )}
+                        >
+                            <CalendarIcon className="mr-2 h-4 w-4" />
+                            {date?.from ? (
+                                date.to ? (
+                                    <>
+                                        {format(date.from, "LLL dd, y")} -{" "}
+                                        {format(date.to, "LLL dd, y")}
+                                    </>
+                                ) : (
+                                    format(date.from, "LLL dd, y")
+                                )
+                            ) : (
+                                <span>Огноо сонгоно уу</span>
+                            )}
+                        </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0" align="start">
+                        <Calendar
+                            initialFocus
+                            mode="range"
+                            defaultMonth={date?.from}
+                            selected={date}
+                            onSelect={setDate}
+                            numberOfMonths={2}
+                        />
+                    </PopoverContent>
+                </Popover>
 
-                <div className="flex items-center gap-2">
-                </div>
+                <Select value={supplierId} onValueChange={setSupplierId}>
+                    <SelectTrigger className="w-full sm:w-[180px]">
+                        <SelectValue placeholder="Нийлүүлэгч" />
+                    </SelectTrigger>
+                    <SelectContent>
+                        {suppliers.map((sup) => (
+                            <SelectItem key={sup.id} value={sup.id.toString()}>
+                                {sup.name}
+                            </SelectItem>
+                        ))}
+                    </SelectContent>
+                </Select>
+
+                {(date || supplierId) && (
+                    <Button
+                        variant="ghost"
+                        onClick={handleResetFilters}
+                    >
+                        Цэвэрлэх
+                        <X className="ml-2 h-4 w-4" />
+                    </Button>
+                )}
+
+                <Button onClick={handleApplyFilters}>
+                    <Search className="mr-2 h-4 w-4" />
+                    Хайх
+                </Button>
             </div>
 
             <TabsContent value="outline" className="relative flex flex-col gap-4 overflow-auto">

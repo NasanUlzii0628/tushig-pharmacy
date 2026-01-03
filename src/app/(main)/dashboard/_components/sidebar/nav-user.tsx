@@ -70,7 +70,6 @@ export function NavUser({
             <DropdownMenuItem
               onClick={async () => {
                 await logoutAction();
-                window.location.href = "/auth/login";
               }}
             >
               <LogOut />
