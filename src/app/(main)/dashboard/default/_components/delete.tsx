@@ -56,14 +56,21 @@ export function DeleteProductDialog({
                         className="bg-red-600 hover:bg-red-700"
                         onClick={async () => {
                             await toast.promise(
-                                deleteProduct(productId),
+                                (async () => {
+                                    const res = await deleteProduct(productId)
+
+                                    if (!res.success) {
+                                        throw new Error(res.message)
+                                    }
+                                    return res
+                                })(),
                                 {
                                     loading: "Устгаж байна...",
                                     success: async () => {
                                         await onDeleted()
-                                        return "Нийлүүлэгч амжилттай устгагдлаа!"
+                                        return "Бүтээгдэхүүн амжилттай устгагдлаа!"
                                     },
-                                    error: "Устгах үед алдаа гарлаа",
+                                    error: (err) => err?.message || "Устгах үед алдаа гарлаа",
                                 }
                             )
                         }}

@@ -85,11 +85,11 @@ export function LayoutControls() {
         <div className="flex flex-col gap-5">
           <div className="space-y-1.5">
             <h4 className="text-sm leading-none font-medium">Тохиргоо</h4>
-            <p className="text-muted-foreground text-xs">Хяналтын самбарын харагдах байдлыг тохируулах.</p>
+            <p className="text-muted-foreground text-xs">Дэлгэцийн харагдах байдлыг тохируулах</p>
           </div>
           <div className="space-y-3 **:data-[slot=toggle-group]:w-full **:data-[slot=toggle-group-item]:flex-1 **:data-[slot=toggle-group-item]:text-xs">
             <div className="space-y-1">
-              <Label className="text-xs font-medium">Theme Preset</Label>
+              <Label className="text-xs font-medium">Хуудасны загвар</Label>
               <Select value={themePreset} onValueChange={onThemePresetChange}>
                 <SelectTrigger size="sm" className="w-full text-xs">
                   <SelectValue placeholder="Preset" />
@@ -111,7 +111,7 @@ export function LayoutControls() {
             </div>
 
             <div className="space-y-1">
-              <Label className="text-xs font-medium">Theme Mode</Label>
+              <Label className="text-xs font-medium">Хуудасны өнгө</Label>
               <ToggleGroup
                 size="sm"
                 variant="outline"
@@ -120,15 +120,15 @@ export function LayoutControls() {
                 onValueChange={onThemeModeChange}
               >
                 <ToggleGroupItem value="light" aria-label="Toggle inset">
-                  Light
+                  Цагаан
                 </ToggleGroupItem>
                 <ToggleGroupItem value="dark" aria-label="Toggle sidebar">
-                  Dark
+                  Хар
                 </ToggleGroupItem>
               </ToggleGroup>
             </div>
 
-            <div className="space-y-1">
+            {/* <div className="space-y-1">
               <Label className="text-xs font-medium">Хуудасны зохион байгуулалт</Label>
               <ToggleGroup
                 size="sm"
@@ -144,7 +144,7 @@ export function LayoutControls() {
                   Full Width
                 </ToggleGroupItem>
               </ToggleGroup>
-            </div>
+            </div> */}
           </div>
         </div>
       </PopoverContent>

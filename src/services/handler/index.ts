@@ -182,6 +182,10 @@ export const DELETE = async <T>({ path }: GetParams): Promise<ResponseType<T>> =
       headers: buildHeaders(accessToken),
     });
 
+    if (response.status === 400) {
+      return handleBadRequest(response);
+    }
+
     return handleResponse<T>(response);
   } catch (error) {
     logger.error(`DELETE request error: ${error}`);

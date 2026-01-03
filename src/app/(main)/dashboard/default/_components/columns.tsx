@@ -84,7 +84,10 @@ export const productColumns = (
               </div>
             )}
 
-            {additionalImageUrl && <ImagePreview src={additionalImageUrl} alt={`${row.original.name} - additional`} />}
+            {addiImgs && Array.isArray(addiImgs) && addiImgs.length > 0 &&
+              addiImgs.map((img: string, index: number) => (
+                <ImagePreview key={`${row.original.id}-addi-${index}`} src={img} alt={`${row.original.name} - additional ${index + 1}`} />
+              ))}
           </div>
         );
       },

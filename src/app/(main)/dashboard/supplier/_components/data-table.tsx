@@ -89,7 +89,6 @@ export function DataTable() {
         </div>
 
         <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:gap-4">
-          {/* Search Inputs */}
           {/* Name */}
           <div className="relative w-full sm:w-auto">
             <Search className="text-muted-foreground pointer-events-none absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />

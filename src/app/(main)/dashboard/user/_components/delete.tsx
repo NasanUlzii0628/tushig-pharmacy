@@ -44,7 +44,7 @@ export function DeleteUserDialog({
         <AlertDialogHeader>
           <AlertDialogTitle>Устгах уу?</AlertDialogTitle>
           <AlertDialogDescription>
-            <b>{supplierName}</b> нийлүүлэгчийг устгахдаа итгэлтэй байна уу?
+            <b>{supplierName}</b> хэрэглэгчийг устгахдаа итгэлтэй байна уу?
             Энэ үйлдлийг буцаах боломжгүй.
           </AlertDialogDescription>
         </AlertDialogHeader>
@@ -61,7 +61,7 @@ export function DeleteUserDialog({
                   loading: "Устгаж байна...",
                   success: async () => {
                     await onDeleted()
-                    return "Нийлүүлэгч амжилттай устгагдлаа!"
+                    return "Хэрэглэгч амжилттай устгагдлаа!"
                   },
                   error: "Устгах үед алдаа гарлаа",
                 }

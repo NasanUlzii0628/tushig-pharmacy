@@ -44,7 +44,7 @@ export function DeleteSupplierDialog({
         <AlertDialogHeader>
           <AlertDialogTitle>Устгах уу?</AlertDialogTitle>
           <AlertDialogDescription>
-            <b>{supplierName}</b> хэрэглэгч устгахдаа итгэлтэй байна уу?
+            <b>{supplierName}</b> нийлүүлэгчийг устгахдаа итгэлтэй байна уу?
             Энэ үйлдлийг буцаах боломжгүй.
           </AlertDialogDescription>
         </AlertDialogHeader>
@@ -56,14 +56,20 @@ export function DeleteSupplierDialog({
             className="bg-red-600 hover:bg-red-700"
             onClick={async () => {
               await toast.promise(
-                deleteSupplier(supplierId),
+                (async () => {
+                  const res = await deleteSupplier(supplierId)
+                  if (!res.success) {
+                    throw new Error(res.message)
+                  }
+                  return res
+                })(),
                 {
                   loading: "Устгаж байна...",
                   success: async () => {
                     await onDeleted()
-                    return "Хэрэглэгч амжилттай устгагдлаа!"
+                    return "Нийлүүлэгч амжилттай устгагдлаа!"
                   },
-                  error: "Устгах үед алдаа гарлаа",
+                  error: (err) => err?.message || "Устгах үед алдаа гарлаа",
                 }
               )
             }}

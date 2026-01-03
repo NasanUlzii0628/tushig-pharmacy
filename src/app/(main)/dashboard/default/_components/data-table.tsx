@@ -18,7 +18,7 @@ import { SupplierType } from "@/types/supplier";
 import { fetchCustomers } from "@/services/actions/product";
 import { OrderDialog } from "./order";
 import { Input } from "@/components/ui/input";
-import { Search, X } from "lucide-react";
+import { Search, RefreshCcwIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { SelectTrigger, SelectValue, SelectContent, SelectItem, Select } from "@/components/ui/select";
 
@@ -39,14 +39,17 @@ export function DataTable({
   const [selectedSupplier, setSelectedSupplier] = React.useState<string>("");
   const [isLoading, setIsLoading] = React.useState(false);
 
-  const refreshProducts = React.useCallback(async () => {
+  const refreshProducts = React.useCallback(async (params?: { search?: string; supplier?: string }) => {
     setIsLoading(true);
     try {
+      const name = params?.search ?? searchQuery;
+      const supplier = params?.supplier !== undefined ? params.supplier : selectedSupplier;
+
       const res = await fetchCustomers({
         page: 1,
         size: 10,
-        name: searchQuery || undefined,
-        supplier_id: selectedSupplier && selectedSupplier !== "" ? selectedSupplier : undefined,
+        name: name || undefined,
+        supplier_id: supplier && supplier !== "" ? supplier : undefined,
       });
       setData(res.data ?? []);
     } finally {
@@ -54,14 +57,6 @@ export function DataTable({
     }
   }, [searchQuery, selectedSupplier]);
 
-  // Debounced search
-  React.useEffect(() => {
-    const timer = setTimeout(() => {
-      refreshProducts();
-    }, 500); // 500ms debounce
-
-    return () => clearTimeout(timer);
-  }, [searchQuery, selectedSupplier, refreshProducts]);
 
   const openOrder = (product: ProductType) => {
     setSelectedProduct(product);
@@ -78,7 +73,13 @@ export function DataTable({
 
   const handleClearFilters = () => {
     setSearchQuery("");
-    setSelectedSupplier("all");
+    setSelectedSupplier("");
+    refreshProducts({ search: "", supplier: "" });
+  };
+
+  // Trigger search manually
+  const handleSearch = () => {
+    refreshProducts();
   };
 
   const columns = withDndColumn(productColumns(openOrder, refreshProducts, supplierData));
@@ -138,10 +139,15 @@ export function DataTable({
             </SelectContent>
           </Select>
 
+
+          <Button onClick={handleSearch} disabled={isLoading} size="sm" className="flex-1 sm:w-[100px] sm:flex-none">
+            <Search className="mr-2 h-4 w-4" />
+            Хайх
+          </Button>
+
           {(searchQuery || selectedSupplier) && (
             <Button onClick={handleClearFilters} disabled={isLoading} variant="outline" size="sm" className="w-full sm:w-auto">
-              <X className="mr-2 h-4 w-4" />
-              Цэвэрлэх
+              <RefreshCcwIcon className="mr-2 h-4 w-4" />
             </Button>
           )}
         </div>
