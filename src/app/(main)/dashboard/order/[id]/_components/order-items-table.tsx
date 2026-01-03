@@ -65,7 +65,7 @@ export function OrderItemsTable({ items }: OrderItemsTableProps) {
                                             <TableCell>
                                                 {imageUrl ? (
                                                     <img
-                                                        src={imageUrl}
+                                                        src={`https://cdn.tushig.online/${imageUrl}`}
                                                         alt={item.product_name}
                                                         className="h-12 w-12 rounded-md object-cover border"
                                                     />

@@ -40,7 +40,7 @@ export async function uploadProductImages(files: File[]): Promise<UploadImagesRe
 
 
     if (response.success && response.data?.files) {
-        const filenames = response.data.files.map((file) => file.url);
+        const filenames = response.data.files.map((file) => file.fileName);
 
         return {
             success: true,

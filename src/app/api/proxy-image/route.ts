@@ -8,7 +8,7 @@ export async function GET(request: NextRequest) {
     }
 
     try {
-        const response = await fetch(imageUrl);
+        const response = await fetch(`https://cdn.tushig.online/${imageUrl}`);
 
         if (!response.ok) {
             throw new Error('Failed to fetch image');

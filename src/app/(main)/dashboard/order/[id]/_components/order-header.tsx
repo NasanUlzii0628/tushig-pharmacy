@@ -40,8 +40,15 @@ export function OrderHeader({ orderId, orderDate, orderData }: OrderHeaderProps)
                 try {
                     const date = new Date(dateString);
                     if (isNaN(date.getTime())) return dateString;
-                    return date.toLocaleDateString('mn-MN');
-                } catch {
+
+                    const year = date.getFullYear();
+                    const month = String(date.getMonth() + 1).padStart(2, '0');
+                    const day = String(date.getDate()).padStart(2, '0');
+                    const hours = String(date.getHours()).padStart(2, '0');
+                    const minutes = String(date.getMinutes()).padStart(2, '0');
+
+                    return `${year}/${month}/${day} ${hours}:${minutes}`;
+                } catch (error) {
                     return dateString;
                 }
             };
@@ -273,8 +280,20 @@ export function OrderHeader({ orderId, orderDate, orderData }: OrderHeaderProps)
 
             /* ================= HEADER ================= */
             const formatDate = (dateString: string) => {
-                const d = new Date(dateString);
-                return isNaN(d.getTime()) ? dateString : d.toLocaleDateString("mn-MN");
+                try {
+                    const date = new Date(dateString);
+                    if (isNaN(date.getTime())) return dateString;
+
+                    const year = date.getFullYear();
+                    const month = String(date.getMonth() + 1).padStart(2, '0');
+                    const day = String(date.getDate()).padStart(2, '0');
+                    const hours = String(date.getHours()).padStart(2, '0');
+                    const minutes = String(date.getMinutes()).padStart(2, '0');
+
+                    return `${year}/${month}/${day} ${hours}:${minutes}`;
+                } catch (error) {
+                    return dateString;
+                }
             };
 
             doc.setFontSize(12);
@@ -445,13 +464,14 @@ export function OrderHeader({ orderId, orderDate, orderData }: OrderHeaderProps)
         try {
             const date = new Date(dateString);
             if (isNaN(date.getTime())) return dateString;
-            return date.toLocaleString('mn-MN', {
-                year: 'numeric',
-                month: '2-digit',
-                day: '2-digit',
-                hour: '2-digit',
-                minute: '2-digit'
-            });
+
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            const hours = String(date.getHours()).padStart(2, '0');
+            const minutes = String(date.getMinutes()).padStart(2, '0');
+
+            return `${year}/${month}/${day} ${hours}:${minutes}`;
         } catch (error) {
             return dateString;
         }

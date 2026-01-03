@@ -327,7 +327,7 @@ function UpdateProductForm({
           <FormLabel>Үндсэн зураг</FormLabel>
           <label className="hover:bg-accent mt-2 flex h-32 cursor-pointer items-center justify-center rounded-md border-2 border-dashed">
             {previewMain ? (
-              <img src={previewMain} alt="Main product" className="h-full w-full rounded-md object-cover" />
+              <img src={`https://cdn.tushig.online/${previewMain}`} alt="Main product" className="h-full w-full rounded-md object-cover" />
             ) : (
               <Upload className="text-muted-foreground" />
             )}
@@ -349,7 +349,7 @@ function UpdateProductForm({
           <div className="flex flex-wrap gap-2">
             {previewAddi.map((src, i) => (
               <div key={i} className="relative h-20 w-20">
-                <img src={src} alt={`Additional ${i + 1}`} className="h-full w-full rounded-md border object-cover" />
+                <img src={`https://cdn.tushig.online/${src}`} alt={`Additional ${i + 1}`} className="h-full w-full rounded-md border object-cover" />
                 <button
                   type="button"
                   className="absolute top-1 right-1 rounded-full bg-black/60 p-1 hover:bg-black/80"

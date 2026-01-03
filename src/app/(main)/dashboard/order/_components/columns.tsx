@@ -32,9 +32,17 @@ export const orderColumns = (
             header: ({ column }) => (
                 <DataTableColumnHeader column={column} title="Огноо" />
             ),
-            cell: ({ row }) => (
-                <span>{new Date(row.original.order_date).toISOString().slice(0, 10)}</span>
-            ),
+            cell: ({ row }) => {
+                const date = new Date(row.original.order_date);
+                const formattedDate = date.toLocaleDateString('en-CA'); // YYYY-MM-DD
+                const formattedTime = date.toLocaleTimeString('en-GB', {
+                    hour: '2-digit',
+                    minute: '2-digit'
+                }); // HH:MM
+                return (
+                    <span>{formattedDate} {formattedTime}</span>
+                );
+            },
         },
 
         {

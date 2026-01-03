@@ -187,6 +187,7 @@ export function BucketListClient({
       if (result.success) {
         setSelectedIds([]);
         toast.success("Захиалга амжилттай үүсгэгдсэн");
+        await handleSearch();
         router.refresh();
       } else {
         toast.error(result.message || "Захиалга үүсгэхэд алдаа гарлаа");
@@ -346,7 +347,7 @@ export function BucketListClient({
                       <DialogTrigger asChild>
                         <div className="h-16 w-16 shrink-0 overflow-hidden rounded-lg border bg-muted cursor-pointer sm:h-20 sm:w-20">
                           <img
-                            src={item.product_img}
+                            src={`https://cdn.tushig.online/${item.product_img}`}
                             alt={item.product_name}
                             className="h-full w-full object-cover transition-transform group-hover:scale-105"
                           />
@@ -357,7 +358,7 @@ export function BucketListClient({
                           {item.product_name}
                         </DialogTitle>
                         <img
-                          src={item.product_img}
+                          src={`https://cdn.tushig.online/${item.product_img}`}
                           alt={item.product_name}
                           className="max-h-[85vh] w-full rounded-xl object-contain"
                         />

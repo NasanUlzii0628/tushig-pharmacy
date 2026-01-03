@@ -77,7 +77,7 @@ export const productColumns = (
         return (
           <div className="flex flex-row gap-2">
             {imageUrl ? (
-              <ImagePreview src={imageUrl} alt={row.original.name} />
+              <ImagePreview src={`https://cdn.tushig.online/${imageUrl}`} alt={row.original.name} />
             ) : (
               <div className="bg-muted flex h-10 w-10 items-center justify-center rounded-md border">
                 <span className="text-muted-foreground text-xs">No img</span>
@@ -86,7 +86,7 @@ export const productColumns = (
 
             {addiImgs && Array.isArray(addiImgs) && addiImgs.length > 0 &&
               addiImgs.map((img: string, index: number) => (
-                <ImagePreview key={`${row.original.id}-addi-${index}`} src={img} alt={`${row.original.name} - additional ${index + 1}`} />
+                <ImagePreview key={`${row.original.id}-addi-${index}`} src={`https://cdn.tushig.online/${img}`} alt={`${row.original.name} - additional ${index + 1}`} />
               ))}
           </div>
         );
