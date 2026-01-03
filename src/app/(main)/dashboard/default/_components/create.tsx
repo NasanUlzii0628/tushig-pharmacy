@@ -22,7 +22,8 @@ import type { SupplierType } from "@/types/supplier";
 import { createProdcut } from "@/services/actions/product";
 import { uploadProductImages } from "@/services/actions/upload";
 
-const MAX_FILE_SIZE = 5 * 1024 * 1024;
+const MAX_FILE_SIZE = 40 * 1024 * 1024;
+const MAX_ADDITIONAL_FILE_SIZE = 80 * 1024 * 1024;
 const MAX_ADDITIONAL_IMAGES = 2;
 const ACCEPTED_IMAGE_TYPES = ["image/jpeg", "image/jpg", "image/png", "image/webp"];
 
@@ -108,15 +109,13 @@ export function ProductForm({
   const [previewMain, setPreviewMain] = React.useState<string>("");
   const [previewAddi, setPreviewAddi] = React.useState<string[]>([]);
 
-  const validateFile = (file: File): boolean => {
-
-
+  const validateFile = (file: File, maxSize: number = MAX_FILE_SIZE): boolean => {
     if (!ACCEPTED_IMAGE_TYPES.includes(file.type)) {
       toast.error(`${file.name}: Зөвхөн зураг файл байх ёстой (JPG, PNG, WEBP)`);
       return false;
     }
-    if (file.size > MAX_FILE_SIZE) {
-      toast.error(`${file.name}: Файлын хэмжээ 5MB-аас бага байх ёстой`);
+    if (file.size > maxSize) {
+      toast.error(`${file.name}: Файлын хэмжээ ${maxSize / (1024 * 1024)}MB-аас бага байх ёстой`);
       return false;
     }
 
@@ -138,7 +137,7 @@ export function ProductForm({
   };
 
   const handleAddiImages = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = Array.from(e.target.files || []).filter(validateFile);
+    const files = Array.from(e.target.files || []).filter((f) => validateFile(f, MAX_ADDITIONAL_FILE_SIZE));
 
     if (!files.length) return;
 
@@ -336,7 +335,7 @@ export function ProductForm({
           <label className="hover:bg-accent flex h-32 cursor-pointer flex-col items-center justify-center rounded-md border-2 border-dashed transition-colors">
             <Upload className="text-muted-foreground mb-2 h-6 w-6" />
             <span className="text-muted-foreground text-sm">Зураг сонгох</span>
-            <span className="text-muted-foreground mt-1 text-xs">JPG, PNG эсвэл WEBP (max 5MB)</span>
+            <span className="text-muted-foreground mt-1 text-xs">JPG, PNG эсвэл WEBP (max 40MB)</span>
             <input
               type="file"
               accept="image/jpeg,image/jpg,image/png,image/webp"
@@ -353,7 +352,7 @@ export function ProductForm({
         <label className="hover:bg-accent flex h-24 cursor-pointer flex-col items-center justify-center rounded-md border-2 border-dashed transition-colors">
           <Upload className="text-muted-foreground mb-1 h-5 w-5" />
           <span className="text-muted-foreground text-xs">Нэмэлт зураг оруулах</span>
-          <span className="text-muted-foreground text-xs">JPG, PNG эсвэл WEBP (max 5MB)</span>
+          <span className="text-muted-foreground text-xs">JPG, PNG эсвэл WEBP (max 80MB)</span>
           <input
             type="file"
             multiple
