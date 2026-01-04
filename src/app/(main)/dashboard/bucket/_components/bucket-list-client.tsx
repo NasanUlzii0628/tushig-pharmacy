@@ -257,7 +257,7 @@ export function BucketListClient({
             <div className="relative w-full sm:w-auto">
               <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
               <Input
-                className="w-full pl-9 sm:w-[300px]"
+                className="w-full pl-9 sm:w-[300px] text-base"
                 placeholder="Бүтээгдэхүүн хайх..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
@@ -451,6 +451,7 @@ export function BucketListClient({
             <div className="space-y-2">
               <label className="text-sm font-medium">Нэгж үнэ (¥)</label>
               <Input
+                className="text-base"
                 type="number"
                 placeholder="Нэгж үнэ оруулах..."
                 value={editUnitPrice}

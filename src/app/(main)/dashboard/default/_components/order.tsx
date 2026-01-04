@@ -93,7 +93,7 @@ export function OrderDialog({ open, onOpenChange, product }: Props) {
         <form className="grid gap-4" onSubmit={handleSubmit}>
           <div className="grid gap-2">
             <Label>Бүтээгдэхүүн</Label>
-            <Input value={product.name} disabled />
+            <Input value={product.name} disabled className="text-base" />
           </div>
 
           <div className="grid gap-2">
@@ -106,7 +106,7 @@ export function OrderDialog({ open, onOpenChange, product }: Props) {
                 setQuantity(parseInt(e.target.value, 10) || 0)
                 setQuantityError(null)
               }}
-              className={quantityError ? "border-red-500" : ""}
+              className={quantityError ? "border-red-500 text-base" : ""}
             />
             {quantityError && (
               <p className="text-sm text-red-500">{quantityError}</p>

@@ -80,7 +80,7 @@ export function DataTable() {
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none c" />
             <Input
               placeholder="Хэрэглэгчийн нэр..."
-              className="pl-9 w-[300px]"
+              className="pl-9 w-[300px] text-base"
               value={usernameQuery}
               onChange={(e) => setUsernameQuery(e.target.value)}
               disabled={loading}

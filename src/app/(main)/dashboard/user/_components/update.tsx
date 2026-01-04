@@ -171,7 +171,7 @@ function UserForm({
                 Хэрэглэгчийн нэр <span className="text-destructive">*</span>
               </FormLabel>
               <FormControl>
-                <Input {...field} />
+                <Input {...field} className="text-base" />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -190,6 +190,7 @@ function UserForm({
                   type="password"
                   placeholder="Хоосон орхивол өөрчлөгдөхгүй"
                   autoComplete="new-password"
+                  className="text-base"
                   {...field}
                 />
               </FormControl>

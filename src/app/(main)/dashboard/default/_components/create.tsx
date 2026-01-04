@@ -259,6 +259,7 @@ export function ProductForm({
           Бүтээгдэхүүний нэр <span className="text-red-500">*</span>
         </label>
         <Input
+          className="text-base"
           value={product.name}
           onChange={(e) => {
             setProduct((p) => ({ ...p, name: e.target.value }));
@@ -274,6 +275,7 @@ export function ProductForm({
           Үнэ (¥) <span className="text-red-500">*</span>
         </label>
         <Input
+          className="text-base"
           type="number"
           step="0.01"
           min="0"

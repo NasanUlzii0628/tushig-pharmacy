@@ -266,7 +266,7 @@ function UpdateProductForm({
                 Бүтээгдэхүүний нэр <span className="text-destructive">*</span>
               </FormLabel>
               <FormControl>
-                <Input placeholder="Бүтээгдэхүүний нэр" {...field} />
+                <Input placeholder="Бүтээгдэхүүний нэр" {...field} className="text-base" />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -290,6 +290,7 @@ function UpdateProductForm({
                     const value = e.target.value;
                     field.onChange(value === "" ? 0 : Number(value));
                   }}
+                  className="text-base"
                 />
               </FormControl>
               <FormMessage />

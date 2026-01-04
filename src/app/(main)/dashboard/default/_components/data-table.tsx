@@ -115,7 +115,7 @@ export function DataTable({
             <Search className="text-muted-foreground absolute top-1/2 left-3 size-4 -translate-y-1/2" />
             <Input
               placeholder="Бүтээгдэхүүн хайх..."
-              className="w-full pl-9 sm:w-[300px]"
+              className="w-full pl-9 sm:w-[300px] text-base"
               value={searchQuery}
               onChange={handleSearchChange}
               disabled={isLoading}

@@ -138,7 +138,7 @@ function SupplierForm({
                 Нэр <span className="text-destructive">*</span>
               </FormLabel>
               <FormControl>
-                <Input placeholder="Нэр" {...field} />
+                <Input placeholder="Нэр" {...field} className="text-base" />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -154,7 +154,7 @@ function SupplierForm({
                 WeChat <span className="text-destructive">*</span>
               </FormLabel>
               <FormControl>
-                <Input placeholder="WeChat дугаар" {...field} />
+                <Input placeholder="WeChat дугаар" {...field} className="text-base" />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -168,7 +168,7 @@ function SupplierForm({
             <FormItem>
               <FormLabel>Имэйл</FormLabel>
               <FormControl>
-                <Input placeholder="Имэйл" {...field} />
+                <Input placeholder="Имэйл" {...field} className="text-base" />
               </FormControl>
               <FormMessage />
             </FormItem>

@@ -94,7 +94,7 @@ export function DataTable() {
             <Search className="text-muted-foreground pointer-events-none absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
             <Input
               placeholder="Нийлүүлэгчийн нэр..."
-              className="w-full pl-9 sm:w-[300px]"
+              className="w-full pl-9 sm:w-[300px] text-base"
               value={nameQuery}
               onChange={(e) => setNameQuery(e.target.value)}
               disabled={loading}
@@ -108,7 +108,7 @@ export function DataTable() {
             <Search className="text-muted-foreground pointer-events-none absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
             <Input
               placeholder="WeChat..."
-              className="w-full pl-9 sm:w-[300px]"
+              className="w-full pl-9 sm:w-[300px] text-base"
               value={wechatQuery}
               onChange={(e) => setWechatQuery(e.target.value)}
               disabled={loading}
@@ -123,7 +123,7 @@ export function DataTable() {
             <Search className="text-muted-foreground pointer-events-none absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
             <Input
               placeholder="Имэйл..."
-              className="w-full pl-9 sm:w-[300px]"
+              className="w-full pl-9 sm:w-[300px] text-base"
               value={contactQuery}
               onChange={(e) => setContactQuery(e.target.value)}
               disabled={loading}
