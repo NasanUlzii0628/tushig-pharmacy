@@ -91,7 +91,7 @@ export function DataTable() {
     });
   };
 
-  const columns = withDndColumn(supplierColumns(() => loadSuppliers()));
+  const columns = withDndColumn(supplierColumns(() => loadSuppliers(), pageIndex, pageSize));
 
   const table = useDataTableInstanceClient({
     data,
@@ -175,7 +175,7 @@ export function DataTable() {
       <TabsContent value="outline" className="flex flex-col gap-4">
         <div className="rounded-lg border overflow-hidden">
           {loading ? (
-            <div className="p-6 text-center text-muted-foreground">Loading...</div>
+            <div className="p-6 text-center text-muted-foreground">Уншиж байна...</div>
           ) : (
             <DataTableNew table={table} columns={columns} />
           )}

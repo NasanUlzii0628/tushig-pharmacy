@@ -57,11 +57,15 @@ export const productColumns = (
   onOrder: (product: ProductType) => void,
   onDelete: () => Promise<void>,
   supplierData: SupplierType[],
+  pageIndex: number,
+  pageSize: number,
 ): ColumnDef<ProductType>[] => [
     {
       id: "index",
       header: () => <span>#</span>,
-      cell: ({ row }) => <span>{row.index + 1}</span>,
+      cell: ({ row }) => (
+        <span>{pageIndex * pageSize + row.index + 1}</span>
+      ),
       enableSorting: false,
     },
     {

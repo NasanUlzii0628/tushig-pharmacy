@@ -1,8 +1,8 @@
 // DataTable component
 "use client";
 "use no memo";
-
-import * as React from "react";
+import { useState, useEffect } from "react";
+import React from "react";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent } from "@/components/ui/tabs";
 import { useDataTableInstance } from "@/hooks/use-data-table-instance";
@@ -22,6 +22,7 @@ import { Search, RefreshCcwIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { SelectTrigger, SelectValue, SelectContent, SelectItem, Select } from "@/components/ui/select";
 
+
 type DataTableProps = {
   initialData: ProductType[];
   initialTotalPages?: number;
@@ -29,29 +30,28 @@ type DataTableProps = {
 };
 
 export function DataTable({ initialData, initialTotalPages = 1, supplierData = [] }: DataTableProps) {
-  const [data, setData] = React.useState<ProductType[]>(initialData);
-  const [openDrawer, setOpenDrawer] = React.useState(false);
-  const [orderOpen, setOrderOpen] = React.useState(false);
-  const [selectedProduct, setSelectedProduct] = React.useState<ProductType | null>(null);
-  const [pagination, setPagination] = React.useState({
+  const [data, setData] = useState<ProductType[]>(initialData);
+  const [openDrawer, setOpenDrawer] = useState(false);
+  const [orderOpen, setOrderOpen] = useState(false);
+  const [selectedProduct, setSelectedProduct] = useState<ProductType | null>(null);
+  const [pagination, setPagination] = useState({
     pageIndex: 0,
     pageSize: 10,
   });
 
-  const [totalPages, setTotalPages] = React.useState(initialTotalPages);
+  const [totalPages, setTotalPages] = useState(initialTotalPages);
 
-  // Filter states
-  const [searchQuery, setSearchQuery] = React.useState("");
-  const [refreshKey, setRefreshKey] = React.useState(0);
-  const [selectedSupplier, setSelectedSupplier] = React.useState<string>("");
-  const [isLoading, setIsLoading] = React.useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [refreshKey, setRefreshKey] = useState(0);
+  const [selectedSupplier, setSelectedSupplier] = useState<string>("");
+  const [isLoading, setIsLoading] = useState(false);
 
   const refreshProducts = React.useCallback(async (): Promise<void> => {
     setPagination((prev) => ({ ...prev, pageIndex: 0 }));
     setRefreshKey((k) => k + 1);
   }, []);
 
-  React.useEffect(() => {
+  useEffect(() => {
     const load = async () => {
       setIsLoading(true);
 
@@ -78,9 +78,6 @@ export function DataTable({ initialData, initialTotalPages = 1, supplierData = [
   ]);
 
 
-
-
-
   const openOrder = (product: ProductType) => {
     setSelectedProduct(product);
     setOrderOpen(true);
@@ -105,7 +102,15 @@ export function DataTable({ initialData, initialTotalPages = 1, supplierData = [
   };
 
 
-  const columns = withDndColumn(productColumns(openOrder, refreshProducts, supplierData));
+  const columns = withDndColumn(
+    productColumns(
+      openOrder,
+      refreshProducts,
+      supplierData,
+      pagination.pageIndex,
+      pagination.pageSize
+    )
+  );
 
   const table = useDataTableInstance({
     data,
@@ -189,7 +194,13 @@ export function DataTable({ initialData, initialTotalPages = 1, supplierData = [
 
         <TabsContent value="outline" className="relative flex flex-col gap-4 overflow-auto">
           <div className="overflow-hidden rounded-lg border">
-            <DataTableNew dndEnabled table={table} columns={columns} onReorder={setData} />
+            <div className="rounded-lg border overflow-hidden">
+              {isLoading ? (
+                <div className="p-6 text-center text-muted-foreground">Уншиж байна...</div>
+              ) : (
+                <DataTableNew dndEnabled table={table} columns={columns} onReorder={setData} />
+              )}
+            </div>
           </div>
 
           <DataTablePagination table={table} />

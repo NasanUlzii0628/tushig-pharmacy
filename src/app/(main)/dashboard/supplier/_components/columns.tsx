@@ -17,12 +17,15 @@ import { UpdateDrawer } from "./update"
 import { DeleteSupplierDialog } from "./delete"
 
 export const supplierColumns = (
-  onUpdated: () => Promise<void>
+  onUpdated: () => Promise<void>,
+  pageIndex: number,
+  pageSize: number,
 ): ColumnDef<SupplierType>[] => [
+
     {
       id: "index",
       header: () => <span>#</span>,
-      cell: ({ row }) => <span>{row.index + 1}</span>,
+      cell: ({ row }) => <span>{pageIndex * pageSize + row.index + 1}</span>,
       enableSorting: false,
     },
 
