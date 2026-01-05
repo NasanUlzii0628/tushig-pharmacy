@@ -21,6 +21,11 @@ import { Input } from "@/components/ui/input";
 import { Search, RefreshCcwIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { SelectTrigger, SelectValue, SelectContent, SelectItem, Select } from "@/components/ui/select";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip"
 
 
 type DataTableProps = {
@@ -64,7 +69,6 @@ export function DataTable({ initialData, initialTotalPages = 1, supplierData = [
 
       setData(res.data ?? []);
       setTotalPages(res.totalPages ?? 1);
-
       setIsLoading(false);
     };
 
@@ -72,19 +76,13 @@ export function DataTable({ initialData, initialTotalPages = 1, supplierData = [
   }, [
     pagination.pageIndex,
     pagination.pageSize,
-    searchQuery,
-    selectedSupplier,
-    refreshKey,
+    refreshKey, // ✅ only explicit refresh
   ]);
 
 
   const openOrder = (product: ProductType) => {
     setSelectedProduct(product);
     setOrderOpen(true);
-  };
-
-  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchQuery(e.target.value);
   };
 
   const handleSupplierChange = (value: string) => {
@@ -94,11 +92,16 @@ export function DataTable({ initialData, initialTotalPages = 1, supplierData = [
   const handleClearFilters = () => {
     setSearchQuery("");
     setSelectedSupplier("");
-    refreshProducts();
+    setPagination((prev) => ({ ...prev, pageIndex: 0 }));
+    setRefreshKey((k) => k + 1);
   };
 
   const handleSearch = () => {
-    refreshProducts();
+    setPagination((prev) => ({
+      ...prev,
+      pageIndex: 0, // ✅ force page 1
+    }));
+    setRefreshKey((k) => k + 1);
   };
 
 
@@ -148,7 +151,7 @@ export function DataTable({ initialData, initialTotalPages = 1, supplierData = [
               placeholder="Бүтээгдэхүүн хайх..."
               className="w-full pl-9 sm:w-[300px] text-base"
               value={searchQuery}
-              onChange={handleSearchChange}
+              onChange={(e) => setSearchQuery(e.target.value)}
               disabled={isLoading}
             />
           </div>
