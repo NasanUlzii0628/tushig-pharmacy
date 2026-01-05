@@ -9,9 +9,12 @@ type FetchUserParams = Record<string, string | number>
 
 type PaginatedCustomers = {
   data: UserType[]
-  content: UserType[]
-  totalElements: number
-  totalPages: number
+  pagination: {
+    total: number
+    page: number
+    limit: number
+    totalPages: number
+  }
 }
 
 export async function fetchUser(params: FetchUserParams) {

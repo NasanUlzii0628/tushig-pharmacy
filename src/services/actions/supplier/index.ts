@@ -16,9 +16,12 @@ type FetchSupplierParams = {
 
 type PaginatedCustomers = {
   data: SupplierType[]
-  content: SupplierType[]
-  totalElements: number
-  totalPages: number
+  pagination: {
+    total: number
+    page: number
+    limit: number
+    totalPages: number
+  }
 }
 
 export async function FetchSupplier(params: FetchSupplierParams) {

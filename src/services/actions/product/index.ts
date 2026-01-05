@@ -6,22 +6,19 @@ import { DEFAULT_PAGE, DEFAULT_SIZE } from '@/constants'
 import { GET, POST, PUT, DELETE } from '@/services/handler'
 import { getQueryString } from '@/utils'
 
-type FetchCustomerParams = {
-  page?: number;
-  size?: number;
-  name?: string;
-  supplier_id?: string;
-  [key: string]: string | number | undefined;
-}
+type FetchProductParams = Record<string, string | number | undefined>
 
-type PaginatedCustomers = {
+type PaginatedProductsResponse = {
   data: ProductType[]
-  content: ProductType[]
-  totalElements: number
-  totalPages: number
+  pagination: {
+    total: number
+    page: number
+    limit: number
+    totalPages: number
+  }
 }
 
-export async function fetchCustomers(params: FetchCustomerParams) {
+export async function fetchCustomers(params: FetchProductParams) {
   const filters: Record<string, string | number> = {
     page: params.page || DEFAULT_PAGE,
     limit: params.size || DEFAULT_SIZE,
@@ -39,10 +36,13 @@ export async function fetchCustomers(params: FetchCustomerParams) {
 
   const path = `/product/list${queryString}`
 
-  const { data, message, success, httpStatus } = await GET<PaginatedCustomers>({ path })
+  const { data, message, success, httpStatus } = await GET<PaginatedProductsResponse>({ path })
 
   return {
-    ...data,
+    data: data?.data ?? [],
+    totalElements: data?.pagination?.total ?? 0,
+    totalPages: data?.pagination?.totalPages ?? 1,
+    page: data?.pagination?.page ?? 1,
     httpStatus,
     message,
     success,

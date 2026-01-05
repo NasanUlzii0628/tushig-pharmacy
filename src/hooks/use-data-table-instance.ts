@@ -15,35 +15,40 @@ import {
   useReactTable,
 } from "@tanstack/react-table";
 
+type PaginationState = {
+  pageIndex: number;
+  pageSize: number;
+};
+
 type UseDataTableInstanceProps<TData, TValue> = {
   data: TData[];
   columns: ColumnDef<TData, TValue>[];
+  pagination: PaginationState;
+  pageCount: number;
   enableRowSelection?: boolean;
-  defaultPageIndex?: number;
-  defaultPageSize?: number;
+  onPaginationChange: React.Dispatch<React.SetStateAction<PaginationState>>;
   getRowId?: (row: TData, index: number) => string;
 };
 
 export function useDataTableInstance<TData, TValue>({
   data,
   columns,
+  pagination,
+  pageCount,
   enableRowSelection = true,
-  defaultPageIndex,
-  defaultPageSize,
+  onPaginationChange,
   getRowId,
 }: UseDataTableInstanceProps<TData, TValue>) {
   const [rowSelection, setRowSelection] = React.useState({});
   const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({});
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
   const [sorting, setSorting] = React.useState<SortingState>([]);
-  const [pagination, setPagination] = React.useState({
-    pageIndex: defaultPageIndex ?? 0,
-    pageSize: defaultPageSize ?? 10,
-  });
 
   const table = useReactTable({
     data,
     columns,
+    manualPagination: true,
+    pageCount,
     state: {
       sorting,
       columnVisibility,
@@ -51,16 +56,16 @@ export function useDataTableInstance<TData, TValue>({
       columnFilters,
       pagination,
     },
+    onPaginationChange,
     enableRowSelection,
     getRowId: getRowId ?? ((row) => (row as any).id.toString()),
     onRowSelectionChange: setRowSelection,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
     onColumnVisibilityChange: setColumnVisibility,
-    onPaginationChange: setPagination,
     getCoreRowModel: getCoreRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
+    // getPaginationRowModel: getPaginationRowModel(),
     getSortedRowModel: getSortedRowModel(),
     getFacetedRowModel: getFacetedRowModel(),
     getFacetedUniqueValues: getFacetedUniqueValues(),

@@ -22,40 +22,63 @@ import { Search, RefreshCcwIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { SelectTrigger, SelectValue, SelectContent, SelectItem, Select } from "@/components/ui/select";
 
-export function DataTable({
-  data: initialData,
-  supplier: supplierData,
-}: {
-  data: ProductType[];
-  supplier: SupplierType[];
-}) {
+type DataTableProps = {
+  initialData: ProductType[];
+  initialTotalPages?: number;
+  supplierData: SupplierType[];
+};
+
+export function DataTable({ initialData, initialTotalPages = 1, supplierData = [] }: DataTableProps) {
   const [data, setData] = React.useState<ProductType[]>(initialData);
   const [openDrawer, setOpenDrawer] = React.useState(false);
   const [orderOpen, setOrderOpen] = React.useState(false);
   const [selectedProduct, setSelectedProduct] = React.useState<ProductType | null>(null);
+  const [pagination, setPagination] = React.useState({
+    pageIndex: 0,
+    pageSize: 10,
+  });
+
+  const [totalPages, setTotalPages] = React.useState(initialTotalPages);
 
   // Filter states
   const [searchQuery, setSearchQuery] = React.useState("");
+  const [refreshKey, setRefreshKey] = React.useState(0);
   const [selectedSupplier, setSelectedSupplier] = React.useState<string>("");
   const [isLoading, setIsLoading] = React.useState(false);
 
-  const refreshProducts = React.useCallback(async (params?: { search?: string; supplier?: string }) => {
-    setIsLoading(true);
-    try {
-      const name = params?.search ?? searchQuery;
-      const supplier = params?.supplier !== undefined ? params.supplier : selectedSupplier;
+  const refreshProducts = React.useCallback(async (): Promise<void> => {
+    setPagination((prev) => ({ ...prev, pageIndex: 0 }));
+    setRefreshKey((k) => k + 1);
+  }, []);
+
+  React.useEffect(() => {
+    const load = async () => {
+      setIsLoading(true);
 
       const res = await fetchCustomers({
-        page: 1,
-        size: 10,
-        name: name || undefined,
-        supplier_id: supplier && supplier !== "" ? supplier : undefined,
+        page: pagination.pageIndex + 1,
+        size: pagination.pageSize,
+        name: searchQuery || undefined,
+        supplier_id: selectedSupplier || undefined,
       });
+
       setData(res.data ?? []);
-    } finally {
+      setTotalPages(res.totalPages ?? 1);
+
       setIsLoading(false);
-    }
-  }, [searchQuery, selectedSupplier]);
+    };
+
+    load();
+  }, [
+    pagination.pageIndex,
+    pagination.pageSize,
+    searchQuery,
+    selectedSupplier,
+    refreshKey,
+  ]);
+
+
+
 
 
   const openOrder = (product: ProductType) => {
@@ -74,19 +97,22 @@ export function DataTable({
   const handleClearFilters = () => {
     setSearchQuery("");
     setSelectedSupplier("");
-    refreshProducts({ search: "", supplier: "" });
+    refreshProducts();
   };
 
-  // Trigger search manually
   const handleSearch = () => {
     refreshProducts();
   };
+
 
   const columns = withDndColumn(productColumns(openOrder, refreshProducts, supplierData));
 
   const table = useDataTableInstance({
     data,
     columns,
+    pagination,
+    pageCount: totalPages,
+    onPaginationChange: setPagination,
     getRowId: (row) => row.id.toString(),
   });
 
@@ -146,7 +172,7 @@ export function DataTable({
               Хайх
             </Button>
 
-            {searchQuery || selectedSupplier && (
+            {(searchQuery || selectedSupplier) && (
               <Button
                 onClick={handleClearFilters}
                 disabled={isLoading}
@@ -157,6 +183,7 @@ export function DataTable({
                 <RefreshCcwIcon className="h-4 w-4" />
               </Button>
             )}
+
           </div>
         </div>
 
