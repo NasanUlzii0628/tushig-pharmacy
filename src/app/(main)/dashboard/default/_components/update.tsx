@@ -112,6 +112,7 @@ function UpdateProductForm({
 
   const [mainImage, setMainImage] = React.useState<File | null>(null);
   const [addiImages, setAddiImages] = React.useState<File[]>([]);
+  const [removeMainImage, setRemoveMainImage] = React.useState(false);
 
   const validAddiImgs = React.useMemo(() => {
     if (!Array.isArray(product.addi_imgs)) return [];
@@ -119,7 +120,7 @@ function UpdateProductForm({
   }, [product.addi_imgs]);
 
   const [existingAddiImages, setExistingAddiImages] = React.useState<string[]>(validAddiImgs);
-  const [previewMain, setPreviewMain] = React.useState<string>(product.img);
+  const [previewMain, setPreviewMain] = React.useState<string>(product.img || "");
   const [previewAddi, setPreviewAddi] = React.useState<string[]>(
     validAddiImgs.filter((url) => url && !url.includes("placeholder")),
   );
@@ -132,8 +133,9 @@ function UpdateProductForm({
     });
     setMainImage(null);
     setAddiImages([]);
+    setRemoveMainImage(false);
     setExistingAddiImages(validAddiImgs);
-    setPreviewMain(product.img);
+    setPreviewMain(product.img || "");
     setPreviewAddi(validAddiImgs.filter((url) => url && !url.includes("placeholder")));
   }, [product, validAddiImgs, form]);
 
@@ -154,7 +156,17 @@ function UpdateProductForm({
     if (!file || !validateFile(file)) return;
 
     setMainImage(file);
+    setRemoveMainImage(false);
     setPreviewMain(URL.createObjectURL(file));
+  };
+
+  const handleRemoveMainImage = () => {
+    if (previewMain.startsWith("blob:")) {
+      URL.revokeObjectURL(previewMain);
+    }
+    setMainImage(null);
+    setRemoveMainImage(true);
+    setPreviewMain("");
   };
 
   const handleAddiImages = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -209,7 +221,7 @@ function UpdateProductForm({
     setIsSubmitting(true);
 
     try {
-      let img = product.img;
+      let img: string = removeMainImage ? "" : (product.img || "");
       let addi_imgs: string[] = [...existingAddiImages];
 
       if (mainImage) {
@@ -327,18 +339,30 @@ function UpdateProductForm({
 
         <div>
           <FormLabel>Үндсэн зураг</FormLabel>
-          <label className="hover:bg-accent mt-2 flex h-32 cursor-pointer items-center justify-center rounded-md border-2 border-dashed">
-            {previewMain ? (
+          {previewMain ? (
+            <div className="relative mt-2 h-32 w-32">
               <img
                 src={previewMain.startsWith('blob:') ? previewMain : `https://cdn.tushig.online/${previewMain}`}
                 alt="Main product"
-                className="h-full w-full rounded-md object-cover"
+                className="h-full w-full rounded-md border object-cover"
               />
-            ) : (
-              <Upload className="text-muted-foreground" />
-            )}
-            <input type="file" hidden onChange={handleMainImage} accept="image/*" />
-          </label>
+              <button
+                type="button"
+                className="absolute top-1 right-1 rounded-full bg-black/60 p-1 transition-colors hover:bg-black/80"
+                onClick={handleRemoveMainImage}
+                disabled={isSubmitting}
+              >
+                <X className="h-4 w-4 text-white" />
+              </button>
+            </div>
+          ) : (
+            <label className="hover:bg-accent mt-2 flex h-32 cursor-pointer flex-col items-center justify-center rounded-md border-2 border-dashed transition-colors">
+              <Upload className="text-muted-foreground mb-2 h-6 w-6" />
+              <span className="text-muted-foreground text-sm">Зураг сонгох</span>
+              <span className="text-muted-foreground mt-1 text-xs">JPG, PNG эсвэл WEBP (max 40MB)</span>
+              <input type="file" hidden onChange={handleMainImage} accept="image/*" disabled={isSubmitting} />
+            </label>
+          )}
         </div>
 
         <div>
@@ -347,7 +371,7 @@ function UpdateProductForm({
             <Upload className="text-muted-foreground mb-1 h-5 w-5" />
             <span className="text-muted-foreground text-xs">Нэмэлт зураг оруулах</span>
             <span className="text-muted-foreground text-xs">JPG, PNG, WEBP (max 80MB)</span>
-            <input type="file" multiple hidden onChange={handleAddiImages} accept="image/*" />
+            <input type="file" multiple hidden onChange={handleAddiImages} accept="image/*" disabled={isSubmitting} />
           </label>
         </div>
 
@@ -364,6 +388,7 @@ function UpdateProductForm({
                   type="button"
                   className="absolute top-1 right-1 rounded-full bg-black/60 p-1 hover:bg-black/80"
                   onClick={() => removeAddiImage(i)}
+                  disabled={isSubmitting}
                 >
                   <X className="h-3 w-3 text-white" />
                 </button>

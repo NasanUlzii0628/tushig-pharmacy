@@ -190,23 +190,22 @@ export function ProductForm({
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
 
-    if (!mainImage) {
-      toast.error("Үндсэн зураг заавал оруулна уу!");
-      return;
-    }
-
     setIsSubmitting(true);
-    const toastId = toast.loading("Зураг байршуулж байна...");
+    const toastId = toast.loading("Хадгалж байна...");
 
     try {
+      let imgName: string | null = null;
 
-      const mainUploadRes = await uploadProductImages([mainImage]);
+      if (mainImage) {
+        toast.loading("Зураг байршуулж байна...", { id: toastId });
+        const mainUploadRes = await uploadProductImages([mainImage]);
 
-      if (!mainUploadRes.success || !mainUploadRes.data || mainUploadRes.data.length === 0) {
-        throw new Error(mainUploadRes.message || "Үндсэн зураг байршуулахад алдаа гарлаа");
+        if (!mainUploadRes.success || !mainUploadRes.data || mainUploadRes.data.length === 0) {
+          throw new Error(mainUploadRes.message || "Үндсэн зураг байршуулахад алдаа гарлаа");
+        }
+
+        imgName = mainUploadRes.data[0];
       }
-
-      const imgName = mainUploadRes.data[0];
 
       let addiImgNames: string[] = [];
       if (addiImages.length > 0) {
@@ -226,7 +225,7 @@ export function ProductForm({
 
       const payload = {
         name: product.name,
-        img: imgName,
+        img: imgName || "",
         addi_imgs: addiImgNames,
         default_price: product.default_price,
         default_supplier_id: product.default_supplier_id,
@@ -319,7 +318,7 @@ export function ProductForm({
 
       <div className="grid gap-2">
         <label className="text-sm font-medium">
-          Үндсэн зураг <span className="text-red-500">*</span>
+          Үндсэн зураг
         </label>
         {previewMain ? (
           <div className="relative h-32 w-32">

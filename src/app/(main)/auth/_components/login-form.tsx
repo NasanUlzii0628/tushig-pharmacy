@@ -32,11 +32,13 @@ export function LoginForm() {
     },
   });
 
-  // Load saved username on mount
+  // Load saved credentials on mount
   useEffect(() => {
     const savedUsername = localStorage.getItem("rememberedUsername");
-    if (savedUsername) {
+    const savedPassword = localStorage.getItem("rememberedPassword");
+    if (savedUsername && savedPassword) {
       form.setValue("username", savedUsername);
+      form.setValue("password", savedPassword);
       form.setValue("remember", true);
     }
   }, [form]);
@@ -51,8 +53,10 @@ export function LoginForm() {
 
     if (data.remember) {
       localStorage.setItem("rememberedUsername", data.username);
+      localStorage.setItem("rememberedPassword", data.password);
     } else {
       localStorage.removeItem("rememberedUsername");
+      localStorage.removeItem("rememberedPassword");
     }
 
     toast.success("Амжилттай нэвтэрлээ!");
