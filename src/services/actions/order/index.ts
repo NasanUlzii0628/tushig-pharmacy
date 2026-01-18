@@ -56,6 +56,7 @@ export async function checkOrder(product_id: number) {
 export async function fetchBucketList(params?: {
     product_id?: number;
     name?: string;
+    currency?: string;
     supplier_id?: string;
 }) {
     const filters: Record<string, any> = {};
@@ -65,6 +66,9 @@ export async function fetchBucketList(params?: {
     }
     if (params?.name) {
         filters.name = params.name;
+    }
+    if (params?.currency) {
+        filters.currency = params.currency;
     }
     if (params?.supplier_id) {
         filters.supplier_id = params.supplier_id;
@@ -145,11 +149,12 @@ export const fetchOrderDetail = async (id: string) => {
     }
 }
 
-export async function updateBucketItem(product_id: number, unit_price: number, supplier_id: number) {
+export async function updateBucketItem(product_id: number, unit_price: number, supplier_id: number, quantity: number) {
     const body = {
         product_id,
         unit_price,
         supplier_id,
+        quantity,
     }
     const path = "/order/bucket/update"
     return POST({ path, payload: body })

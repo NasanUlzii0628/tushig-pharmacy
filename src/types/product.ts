@@ -2,6 +2,7 @@ export interface ProductType {
   id: number
   name: string
   img: string
+  currency: string
   addi_imgs: string
   default_price: number
   default_supplier_id: number
@@ -17,6 +18,7 @@ export interface ProductType {
 export interface ProductCreateForm {
   name: string
   img: string
+  currency: string
   addi_imgs: string[]
   default_price: number
   default_supplier_id: number
@@ -31,7 +33,7 @@ export interface ProductUpdateForm {
   default_supplier_id: number
 }
 
-export interface   defaultSupplier {
+export interface defaultSupplier {
   id: number,
   name: string
 }

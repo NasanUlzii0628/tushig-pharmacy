@@ -21,11 +21,6 @@ import { Input } from "@/components/ui/input";
 import { Search, RefreshCcwIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { SelectTrigger, SelectValue, SelectContent, SelectItem, Select } from "@/components/ui/select";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "@/components/ui/tooltip"
 
 
 type DataTableProps = {

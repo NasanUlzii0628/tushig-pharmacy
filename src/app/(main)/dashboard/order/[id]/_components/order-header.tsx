@@ -86,7 +86,7 @@ export function OrderHeader({ orderId, orderDate, orderData }: OrderHeaderProps)
             const headerRow = worksheet.getRow(6);
             headerRow.values = hidePrices
                 ? ["Д/дугаар", "Барааны нэр", "Зураг", "Тоо ширхэг"]
-                : ["Д/дугаар", "Барааны нэр", "Зураг", "Тоо ширхэг", "Нэгжийн үнэ /¥/", "Нийт үнэ /¥/"];
+                : ["Д/дугаар", "Барааны нэр", "Зураг", "Тоо ширхэг", `Нэгжийн үнэ /${orderData.currency === "CNY" ? "¥" : "₮"}/`, `Нийт үнэ /${orderData.currency === "CNY" ? "¥" : "₮"}/`];
             headerRow.height = 30;
 
             headerRow.eachCell((cell) => {
@@ -393,8 +393,8 @@ export function OrderHeader({ orderId, orderDate, orderData }: OrderHeaderProps)
                     "Барааны нэр",
                     "Зураг",
                     "Тоо ширхэг",
-                    "Нэгжийн үнэ /¥/",
-                    "Нийт үнэ /¥/",
+                    `Нэгжийн үнэ /${orderData.currency === "CNY" ? "¥" : "MNT"}/`,
+                    `Нийт үнэ /${orderData.currency === "CNY" ? "¥" : "MNT"}/`,
                 ]],
 
                 body: tableData,

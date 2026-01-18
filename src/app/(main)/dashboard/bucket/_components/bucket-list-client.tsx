@@ -35,10 +35,16 @@ import {
   SelectContent,
   SelectItem,
 } from "@/components/ui/select";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { orderBucketList, fetchBucketList, updateBucketItem, deleteBucketList } from "@/services/actions/order";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { SupplierType } from "@/types/supplier";
+
+const currencyOptions = {
+  CNY: "ЮАНЬ",
+  MNT: "ТӨГРӨГ",
+} as const;
 
 interface BucketListClientProps {
   items: BucketList[];
@@ -54,12 +60,15 @@ export function BucketListClient({
   const [items, setItems] = useState<BucketList[]>(initialItems);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedSupplier, setSelectedSupplier] = useState<string>("");
+  const [selectedCurrency, setSelectedCurrency] = useState<string>("CNY");
   const [selectedIds, setSelectedIds] = useState<number[]>([]);
   const [isLoading, setIsLoading] = useState(false);
 
   // Edit modal state
   const [editItem, setEditItem] = useState<BucketList | null>(null);
   const [editUnitPrice, setEditUnitPrice] = useState("");
+  const [editQuantity, setEditQuantity] = useState(0);
+
   const [editSupplierId, setEditSupplierId] = useState("");
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
 
@@ -83,6 +92,7 @@ export function BucketListClient({
     setEditItem(item);
     setEditUnitPrice(item.unit_price?.toString() || "");
     setEditSupplierId(item.supplier_id?.toString() || "");
+    setEditQuantity(item.quantity || 0);
     setIsEditDialogOpen(true);
   };
 
@@ -119,7 +129,8 @@ export function BucketListClient({
       const result = await updateBucketItem(
         editItem.product_id,
         Number(editUnitPrice),
-        Number(editSupplierId)
+        Number(editSupplierId),
+        Number(editQuantity)
       );
 
       if (result.success) {
@@ -137,11 +148,12 @@ export function BucketListClient({
     }
   };
 
-  const handleSearch = async () => {
+  const handleSearch = async (currency?: string) => {
     setIsLoading(true);
     try {
       const result = await fetchBucketList({
         name: searchQuery || undefined,
+        currency: currency || selectedCurrency,
         supplier_id:
           selectedSupplier && selectedSupplier !== ""
             ? selectedSupplier
@@ -160,13 +172,19 @@ export function BucketListClient({
     }
   };
 
+  const handleCurrencyChange = async (currency: string) => {
+    setSelectedCurrency(currency);
+    setSelectedIds([]);
+    await handleSearch(currency);
+  };
+
   const handleClearFilters = async () => {
     setSearchQuery("");
     setSelectedSupplier("");
     setIsLoading(true);
 
     try {
-      const result = await fetchBucketList();
+      const result = await fetchBucketList({ currency: selectedCurrency });
       const fetchedItems: BucketList[] = Array.isArray(result.data?.data)
         ? result.data.data
         : result.data?.data
@@ -218,6 +236,7 @@ export function BucketListClient({
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <CardTitle>Захиалгын хүсэлт</CardTitle>
 
+
             {canOrder && (
               <AlertDialog>
                 <AlertDialogTrigger asChild>
@@ -253,6 +272,16 @@ export function BucketListClient({
             )}
           </div>
 
+          <Tabs value={selectedCurrency} onValueChange={handleCurrencyChange} className="mb-4">
+            <TabsList className="grid w-full max-w-[400px] grid-cols-2">
+              {Object.entries(currencyOptions).map(([key, label]) => (
+                <TabsTrigger key={key} value={key} disabled={isLoading}>
+                  {label}
+                </TabsTrigger>
+              ))}
+            </TabsList>
+          </Tabs>
+
           <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:gap-4">
             <div className="relative w-full sm:w-auto">
               <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
@@ -284,7 +313,7 @@ export function BucketListClient({
             </Select>
 
             <div className="flex gap-2 w-full sm:w-auto">
-              <Button size="sm" onClick={handleSearch} disabled={isLoading} className="flex-1 sm:flex-none">
+              <Button size="sm" onClick={() => handleSearch()} disabled={isLoading} className="flex-1 sm:flex-none">
                 <Search className="mr-2 h-4 w-4" />
                 Хайх
               </Button>
@@ -308,7 +337,7 @@ export function BucketListClient({
           {/* Select All */}
           <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <p className="text-sm font-bold sm:text-base">
-              Нийт: {selectedIds.reduce((total, id) => total + Number(items.find((i) => i.id === id)?.unit_price || 0) * Number(items.find((i) => i.id === id)?.quantity || 0), 0).toLocaleString()} ¥
+              Нийт: {selectedIds.reduce((total, id) => total + Number(items.find((i) => i.id === id)?.unit_price || 0) * Number(items.find((i) => i.id === id)?.quantity || 0), 0).toLocaleString()} {selectedCurrency === "CNY" ? "¥" : "₮"}
             </p>
 
             <div className="flex items-center gap-2">
@@ -387,12 +416,12 @@ export function BucketListClient({
                       {item.unit_price && (
                         <span>
                           Нэгж:{" "}
-                          {Number(item.unit_price).toLocaleString()} ¥
+                          {Number(item.unit_price).toLocaleString()} {item.currency === "CNY" ? "¥" : "₮"}
                         </span>
                       )}
                       <span className="text-primary">
                         Нийт:{" "}
-                        {(Number(item.unit_price) * item.quantity).toLocaleString()} ¥
+                        {(Number(item.unit_price) * item.quantity).toLocaleString()} {item.currency === "CNY" ? "¥" : "₮"}
                       </span>
                     </div>
                   </div>
@@ -457,6 +486,18 @@ export function BucketListClient({
                 value={editUnitPrice}
                 onChange={(e) => setEditUnitPrice(e.target.value)}
                 disabled={isUpdating}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Тоо ширхэг</label>
+              <Input
+                type="number"
+                placeholder="Тоо ширхэг"
+                value={editQuantity === 0 ? '' : editQuantity}
+                onChange={(e) => {
+                  setEditQuantity(parseInt(e.target.value, 10) || 0)
+                }}
               />
             </div>
 

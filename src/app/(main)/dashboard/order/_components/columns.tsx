@@ -51,7 +51,17 @@ export const orderColumns = (
                 <DataTableColumnHeader column={column} title="Дүн" />
             ),
             cell: ({ row }) => (
-                <span className="font-medium">{row.original.amount} ¥</span>
+                <span className="font-medium">{row.original.amount} {row.original.currency === "CNY" ? "¥" : "₮"}</span>
+            ),
+        },
+
+        {
+            accessorKey: "currency",
+            header: ({ column }) => (
+                <DataTableColumnHeader column={column} title="Дүн" />
+            ),
+            cell: ({ row }) => (
+                <span className="font-medium">{row.original.currency}</span>
             ),
         },
 

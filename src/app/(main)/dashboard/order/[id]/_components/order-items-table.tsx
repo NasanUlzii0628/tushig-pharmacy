@@ -14,6 +14,7 @@ type OrderItem = {
     product_id: number;
     product_name: string;
     product_image: string | null;
+    currency: string;
     quantity: number;
     unit_price: string | null;
     total_price: string;
@@ -84,10 +85,10 @@ export function OrderItemsTable({ items }: OrderItemsTableProps) {
                                                 {item.quantity}
                                             </TableCell>
                                             <TableCell className="text-right">
-                                                {item.unit_price ? `${item.unit_price} ¥` : "-"}
+                                                {item.unit_price ? `${item.unit_price} ${item.currency === "CNY" ? "¥" : "₮"}` : "-"}
                                             </TableCell>
                                             <TableCell className="text-right font-medium">
-                                                {item.total_price} ¥
+                                                {item.total_price} {item.currency === "CNY" ? "¥" : "₮"}
                                             </TableCell>
                                         </TableRow>
                                     );

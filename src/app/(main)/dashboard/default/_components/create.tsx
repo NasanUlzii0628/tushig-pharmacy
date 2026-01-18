@@ -27,6 +27,11 @@ const MAX_ADDITIONAL_FILE_SIZE = 80 * 1024 * 1024;
 const MAX_ADDITIONAL_IMAGES = 2;
 const ACCEPTED_IMAGE_TYPES = ["image/jpeg", "image/jpg", "image/png", "image/webp"];
 
+const currency = {
+  CNY: "ЮАНЬ",
+  MNT: "ТӨГРӨГ",
+}
+
 export function CreateDrawer({
   supplierData,
   open,
@@ -101,6 +106,7 @@ export function ProductForm({
 }) {
   const [product, setProduct] = React.useState({
     name: "",
+    currency: "CNY",
     default_price: 0,
     default_supplier_id: supplierData[0]?.id || 1,
   });
@@ -227,6 +233,7 @@ export function ProductForm({
         name: product.name,
         img: imgName || "",
         addi_imgs: addiImgNames,
+        currency: product.currency,
         default_price: product.default_price,
         default_supplier_id: product.default_supplier_id,
       };
@@ -290,6 +297,30 @@ export function ProductForm({
           required
           disabled={isSubmitting}
         />
+      </div>
+
+      <div className="grid gap-2">
+        <label className="text-sm font-medium">
+          Ханш <span className="text-red-500">*</span>
+        </label>
+        <Select
+          value={product.currency}
+          onValueChange={(value) => {
+            setProduct((p) => ({ ...p, currency: value }));
+          }}
+          disabled={isSubmitting}
+        >
+          <SelectTrigger className="w-full">
+            <SelectValue placeholder="Ханш сонгох" />
+          </SelectTrigger>
+          <SelectContent>
+            {Object.entries(currency).map(([key, label]) => (
+              <SelectItem key={key} value={key}>
+                {label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
       </div>
 
       <div className="grid gap-2">

@@ -64,7 +64,7 @@ export function OrderInfoCard({ order, amount, itemCount }: OrderInfoCardProps) 
         <div className="space-y-4">
           <div className="flex items-center gap-2 sm:justify-between">
             <span className="text-sm sm:text-base font-semibold">Нийт дүн:</span>
-            <span className="text-primary text-lg sm:text-xl font-bold">{totalAmount.toFixed(2)} ¥</span>
+            <span className="text-primary text-lg sm:text-xl font-bold">{totalAmount.toFixed(2)} {order.currency === "CNY" ? "¥" : "₮"}</span>
           </div>
         </div>
       </CardContent>

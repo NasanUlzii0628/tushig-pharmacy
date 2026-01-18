@@ -108,7 +108,14 @@ export const productColumns = (
     {
       accessorKey: "default_price",
       header: ({ column }) => <DataTableColumnHeader column={column} title="Үнэ" />,
-      cell: ({ row }) => <span>{row.original.default_price} ¥</span>,
+      cell: ({ row }) => <span>{row.original.default_price}  {row.original.currency === "CNY" ? "¥" : "₮"}</span>,
+    },
+
+
+    {
+      accessorKey: "currency",
+      header: ({ column }) => <DataTableColumnHeader column={column} title="Ханш" />,
+      cell: ({ row }) => <span>{row.original.currency}</span>,
     },
 
     {

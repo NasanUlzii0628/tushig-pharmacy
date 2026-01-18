@@ -13,6 +13,7 @@ export interface BucketList {
   product_id: number
   quantity: number
   unit_price: string
+  currency: string
   createdAt: string
   updatedAt: string
   product_name: string
@@ -26,6 +27,7 @@ export interface OrderTypes {
   id: number
   order_date: string
   amount: string
+  currency: string
   supplier_id: number
   supplier_name: string
 }
@@ -40,6 +42,7 @@ export interface OrderDetailTypes {
   id: number
   order_date: string
   amount: string
+  currency: string
   order_number: string
   supplier_id: number
   supplier_name: string
@@ -51,6 +54,7 @@ export interface Detail {
   product_name: string
   product_image: any
   quantity: number
+  currency: string
   unit_price: any
   total_price: string
 }
