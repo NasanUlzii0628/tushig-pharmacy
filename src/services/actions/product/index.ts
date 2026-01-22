@@ -1,5 +1,5 @@
 'use server'
-import { notFound } from 'next/navigation'
+import { revalidatePath } from 'next/cache'
 
 import type { ProductCreateForm, ProductType, ProductUpdateForm } from '@/types/product'
 import { DEFAULT_PAGE, DEFAULT_SIZE } from '@/constants'
@@ -18,7 +18,8 @@ type PaginatedProductsResponse = {
   }
 }
 
-export async function fetchCustomers(params: FetchProductParams) {
+// ✅ Add optional token parameter
+export async function fetchCustomers(params: FetchProductParams, token?: string) {
   const filters: Record<string, string | number> = {
     page: params.page || DEFAULT_PAGE,
     limit: params.size || DEFAULT_SIZE,
@@ -33,10 +34,13 @@ export async function fetchCustomers(params: FetchProductParams) {
   }
 
   const queryString = getQueryString(filters)
-
   const path = `/product/list${queryString}`
 
-  const { data, message, success, httpStatus } = await GET<PaginatedProductsResponse>({ path })
+  // ✅ Pass token to GET handler
+  const { data, message, success, httpStatus } = await GET<PaginatedProductsResponse>({ 
+    path,
+    token // Pass token if provided
+  })
 
   return {
     data: data?.data ?? [],
@@ -50,22 +54,36 @@ export async function fetchCustomers(params: FetchProductParams) {
 }
 
 export async function createProdcut(payload: ProductCreateForm) {
-  const body = {
-    ...payload,
-  }
+  const body = { ...payload }
   const path = "/product/create"
-  return POST({ path, payload: body })
+  const result = await POST({ path, payload: body })
+  
+  if (result.success) {
+    revalidatePath("/dashboard/default", "page")
+  }
+  
+  return result
 }
 
 export async function updateProduct(payload: ProductUpdateForm) {
-  const body = {
-    ...payload
-  }
+  const body = { ...payload }
   const path = "/product/update"
-  return PUT({ path, payload: body })
+  const result = await PUT({ path, payload: body })
+  
+  if (result.success) {
+    revalidatePath("/dashboard/default", "page")
+  }
+  
+  return result
 }
 
 export async function deleteProduct(id: number) {
   const path = `/product/delete/${id}`
-  return DELETE({ path })
+  const result = await DELETE({ path })
+  
+  if (result.success) {
+    revalidatePath("/dashboard/default", "page")
+  }
+  
+  return result
 }
