@@ -24,7 +24,7 @@ type PaginatedCustomers = {
   }
 }
 
-export async function FetchSupplier(params: FetchSupplierParams) {
+export async function FetchSupplier(params: FetchSupplierParams, token?: string) {
   const filters: Record<string, string | number> = {
     page: params.page || DEFAULT_PAGE,
     limit: params.size || DEFAULT_SIZE,
@@ -47,7 +47,7 @@ export async function FetchSupplier(params: FetchSupplierParams) {
 
   const path = `/supplier/list${queryString}`
 
-  const { data, message, success, httpStatus } = await GET<PaginatedCustomers>({ path })
+  const { data, message, success, httpStatus } = await GET<PaginatedCustomers>({ path,token })
 
   return {
     ...data,

@@ -10,8 +10,13 @@ type RequestPayloadType = {
   path: string;
   payload: Record<string, unknown> | FormData;
   plainRequest?: boolean;
+  token?: string; // ✅ Add optional token
 };
-type GetParams = { path: string };
+
+type GetParams = { 
+  path: string;
+  token?: string; // ✅ Add optional token
+};
 
 type ResponseType<T> = {
   success: boolean;
@@ -51,7 +56,6 @@ const handleBadRequest = async <T>(response: Response): Promise<ResponseType<T>>
 const handleSuccess = async <T>(response: Response, plain: boolean): Promise<ResponseType<T>> => {
   const status = response.status;
 
-  // ✅ FIX: Try to parse JSON for 201 responses too
   if (status === 201) {
     try {
       const data = await response.json();
@@ -89,7 +93,6 @@ const handleSuccess = async <T>(response: Response, plain: boolean): Promise<Res
   }
 };
 
-// --- MAIN RESPONSE HANDLER (now simplified) ---
 const handleResponse = async <T>(response: Response, plainRequest = false): Promise<ResponseType<T>> => {
   const status = response.status;
 
@@ -106,14 +109,36 @@ const handleResponse = async <T>(response: Response, plainRequest = false): Prom
   return handleSuccess<T>(response, plainRequest);
 };
 
+// ✅ Updated to accept optional token
+const getAccessToken = async (providedToken?: string): Promise<string> => {
+  if (providedToken) {
+    return providedToken;
+  }
+  
+  const cookieStore = await cookies();
+  const accessToken = cookieStore.get("token")?.value;
+  
+  if (!accessToken) {
+    throw new Error("Authentication required");
+  }
+  
+  return accessToken;
+};
+
 // --- API REQUESTS ---
 
-export const GET = async <T>({ path }: GetParams): Promise<ResponseType<T>> => {
-  const { url, accessToken } = await validateAndGetUrl(path);
+export const GET = async <T>({ path, token }: GetParams): Promise<ResponseType<T>> => {
+  const apiUrl = process.env.API_BASE_URL;
+  const accessToken = await getAccessToken(token);
+  const url = `${apiUrl}${path}`;
+  
   logger.info(`GET request URL: ${url}`);
 
   try {
-    const response = await fetch(url, { method: "GET", headers: buildHeaders(accessToken) });
+    const response = await fetch(url, { 
+      method: "GET", 
+      headers: buildHeaders(accessToken) 
+    });
     return handleResponse<T>(response);
   } catch (error) {
     logger.error(`Error in GET request: ${error}`);
@@ -125,8 +150,12 @@ export const POST = async <T>({
   path,
   payload,
   plainRequest = false,
+  token,
 }: RequestPayloadType): Promise<ResponseType<T>> => {
-  const { url, accessToken } = await validateAndGetUrl(path);
+  const apiUrl = process.env.API_BASE_URL;
+  const accessToken = await getAccessToken(token);
+  const url = `${apiUrl}${path}`;
+  
   logger.info(`POST request URL: ${url}`);
 
   const isFormData = payload instanceof FormData;
@@ -135,9 +164,7 @@ export const POST = async <T>({
     const response = await fetch(url, {
       method: "POST",
       headers: isFormData
-        ? {
-          Authorization: `Bearer ${accessToken}`,
-        }
+        ? { Authorization: `Bearer ${accessToken}` }
         : buildHeaders(accessToken),
       body: isFormData ? payload : JSON.stringify(payload),
     });
@@ -154,8 +181,16 @@ export const POST = async <T>({
   }
 };
 
-export const PUT = async <T>({ path, payload, plainRequest = false }: RequestPayloadType): Promise<ResponseType<T>> => {
-  const { url, accessToken } = await validateAndGetUrl(path);
+export const PUT = async <T>({ 
+  path, 
+  payload, 
+  plainRequest = false,
+  token,
+}: RequestPayloadType): Promise<ResponseType<T>> => {
+  const apiUrl = process.env.API_BASE_URL;
+  const accessToken = await getAccessToken(token);
+  const url = `${apiUrl}${path}`;
+  
   logger.info(`PUT request URL: ${url}`);
 
   try {
@@ -172,8 +207,11 @@ export const PUT = async <T>({ path, payload, plainRequest = false }: RequestPay
   }
 };
 
-export const DELETE = async <T>({ path }: GetParams): Promise<ResponseType<T>> => {
-  const { url, accessToken } = await validateAndGetUrl(path);
+export const DELETE = async <T>({ path, token }: GetParams): Promise<ResponseType<T>> => {
+  const apiUrl = process.env.API_BASE_URL;
+  const accessToken = await getAccessToken(token);
+  const url = `${apiUrl}${path}`;
+  
   logger.info(`DELETE request URL: ${url}`);
 
   try {
@@ -193,9 +231,9 @@ export const DELETE = async <T>({ path }: GetParams): Promise<ResponseType<T>> =
   }
 };
 
+// ✅ Keep for backward compatibility (non-cached calls)
 export const validateAndGetUrl = async (path: string) => {
   const apiUrl = process.env.API_BASE_URL;
-
   const cookieStore = await cookies();
   const accessToken = cookieStore.get("token")?.value;
 

@@ -1,8 +1,9 @@
 // DataTable component
 "use client";
 "use no memo";
-import { useState, useEffect, useMemo, useCallback } from "react";
+import { useState, useEffect, useMemo, useCallback, useRef } from "react";
 import React from "react";
+import { useRouter } from "next/navigation";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent } from "@/components/ui/tabs";
 import { useDataTableInstance } from "@/hooks/use-data-table-instance";
@@ -15,13 +16,11 @@ import { productColumns } from "./columns";
 import type { ProductType } from "@/types/product";
 import { CreateDrawer } from "./create";
 import { SupplierType } from "@/types/supplier";
-import { fetchCustomers } from "@/services/actions/product";
 import { OrderDialog } from "./order";
 import { Input } from "@/components/ui/input";
 import { Search, RefreshCcwIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { SelectTrigger, SelectValue, SelectContent, SelectItem, Select } from "@/components/ui/select";
-
 
 type DataTableProps = {
   initialData: ProductType[];
@@ -30,6 +29,9 @@ type DataTableProps = {
 };
 
 export function DataTable({ initialData, initialTotalPages = 1, supplierData = [] }: DataTableProps) {
+  const router = useRouter();
+  const isFirstRender = useRef(true); // ✅ Track first render
+
   const [data, setData] = useState<ProductType[]>(initialData);
   const [openDrawer, setOpenDrawer] = useState(false);
   const [orderOpen, setOrderOpen] = useState(false);
@@ -40,38 +42,61 @@ export function DataTable({ initialData, initialTotalPages = 1, supplierData = [
   });
 
   const [totalPages, setTotalPages] = useState(initialTotalPages);
-
   const [searchQuery, setSearchQuery] = useState("");
   const [refreshKey, setRefreshKey] = useState(0);
   const [selectedSupplier, setSelectedSupplier] = useState<string>("");
   const [isLoading, setIsLoading] = useState(false);
 
   const refreshProducts = React.useCallback(async (): Promise<void> => {
+    router.refresh();
     setPagination((prev) => ({ ...prev, pageIndex: 0 }));
     setRefreshKey((k) => k + 1);
-  }, []);
+  }, [router]);
 
+  // ✅ Sync with server data when it changes
   useEffect(() => {
+    setData(initialData);
+    setTotalPages(initialTotalPages);
+  }, [initialData, initialTotalPages]);
+
+  // ✅ Fixed: Fetch data for ALL pagination/search changes
+  useEffect(() => {
+    // Only skip on very first render (we have initialData from server)
+    if (isFirstRender.current) {
+      isFirstRender.current = false;
+      return;
+    }
+
     const load = async () => {
       setIsLoading(true);
 
-      const res = await fetchCustomers({
-        page: pagination.pageIndex + 1,
-        size: pagination.pageSize,
-        name: searchQuery || undefined,
-        supplier_id: selectedSupplier || undefined,
+      const params = new URLSearchParams({
+        page: String(pagination.pageIndex + 1),
+        limit: String(pagination.pageSize),
       });
 
-      setData(res.data ?? []);
-      setTotalPages(res.totalPages ?? 1);
-      setIsLoading(false);
+      if (searchQuery) params.append("name", searchQuery);
+      if (selectedSupplier) params.append("supplier_id", selectedSupplier);
+
+      try {
+        const res = await fetch(`/api/product?${params.toString()}`);
+        const json = await res.json();
+
+        setData(json.data ?? []);
+        setTotalPages(json.pagination?.totalPages ?? 1);
+      } catch (error) {
+      } finally {
+        setIsLoading(false);
+      }
     };
 
     load();
   }, [
     pagination.pageIndex,
     pagination.pageSize,
-    refreshKey, // ✅ only explicit refresh
+    refreshKey,
+    searchQuery,
+    selectedSupplier,
   ]);
 
 
@@ -82,21 +107,20 @@ export function DataTable({ initialData, initialTotalPages = 1, supplierData = [
 
   const handleSupplierChange = (value: string) => {
     setSelectedSupplier(value);
+    setPagination((prev) => ({ ...prev, pageIndex: 0 }));
   };
 
   const handleClearFilters = () => {
     setSearchQuery("");
     setSelectedSupplier("");
     setPagination((prev) => ({ ...prev, pageIndex: 0 }));
-    setRefreshKey((k) => k + 1);
   };
 
   const handleSearch = () => {
     setPagination((prev) => ({
       ...prev,
-      pageIndex: 0, // ✅ force page 1
+      pageIndex: 0,
     }));
-    setRefreshKey((k) => k + 1);
   };
 
 
