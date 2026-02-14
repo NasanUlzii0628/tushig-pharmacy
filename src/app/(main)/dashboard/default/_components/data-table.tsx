@@ -1,7 +1,7 @@
 // DataTable component
 "use client";
 "use no memo";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo, useCallback } from "react";
 import React from "react";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent } from "@/components/ui/tabs";
@@ -75,10 +75,10 @@ export function DataTable({ initialData, initialTotalPages = 1, supplierData = [
   ]);
 
 
-  const openOrder = (product: ProductType) => {
+  const openOrder = useCallback((product: ProductType) => {
     setSelectedProduct(product);
     setOrderOpen(true);
-  };
+  }, []);
 
   const handleSupplierChange = (value: string) => {
     setSelectedSupplier(value);
@@ -100,14 +100,18 @@ export function DataTable({ initialData, initialTotalPages = 1, supplierData = [
   };
 
 
-  const columns = withDndColumn(
-    productColumns(
-      openOrder,
-      refreshProducts,
-      supplierData,
-      pagination.pageIndex,
-      pagination.pageSize
-    )
+  const columns = useMemo(
+    () =>
+      withDndColumn(
+        productColumns(
+          openOrder,
+          refreshProducts,
+          supplierData,
+          pagination.pageIndex,
+          pagination.pageSize
+        )
+      ),
+    [openOrder, refreshProducts, supplierData, pagination.pageIndex, pagination.pageSize]
   );
 
   const table = useDataTableInstance({
