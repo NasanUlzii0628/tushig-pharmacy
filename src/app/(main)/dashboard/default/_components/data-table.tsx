@@ -43,6 +43,7 @@ export function DataTable({ initialData, initialTotalPages = 1, supplierData = [
 
   const [totalPages, setTotalPages] = useState(initialTotalPages);
   const [searchQuery, setSearchQuery] = useState("");
+  const [inputValue, setInputValue] = useState("");
   const [refreshKey, setRefreshKey] = useState(0);
   const [selectedSupplier, setSelectedSupplier] = useState<string>("");
   const [isLoading, setIsLoading] = useState(false);
@@ -59,7 +60,6 @@ export function DataTable({ initialData, initialTotalPages = 1, supplierData = [
     setTotalPages(initialTotalPages);
   }, [initialData, initialTotalPages]);
 
-  // ✅ Fixed: Fetch data for ALL pagination/search changes
   useEffect(() => {
     // Only skip on very first render (we have initialData from server)
     if (isFirstRender.current) {
@@ -111,12 +111,14 @@ export function DataTable({ initialData, initialTotalPages = 1, supplierData = [
   };
 
   const handleClearFilters = () => {
+    setInputValue("");
     setSearchQuery("");
     setSelectedSupplier("");
     setPagination((prev) => ({ ...prev, pageIndex: 0 }));
   };
 
   const handleSearch = () => {
+    setSearchQuery(inputValue);
     setPagination((prev) => ({
       ...prev,
       pageIndex: 0,
@@ -173,8 +175,9 @@ export function DataTable({ initialData, initialTotalPages = 1, supplierData = [
             <Input
               placeholder="Бүтээгдэхүүн хайх..."
               className="w-full pl-9 sm:w-[300px] text-base"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
+              value={inputValue}
+              onChange={(e) => setInputValue(e.target.value)}
+              onKeyDown={(e) => { if (e.key === "Enter") handleSearch(); }}
               disabled={isLoading}
             />
           </div>
