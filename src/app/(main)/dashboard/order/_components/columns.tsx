@@ -15,6 +15,7 @@ import { DataTableColumnHeader } from "@/components/data-table/data-table-column
 
 import type { OrderTypes } from "@/types/order";
 import { DeleteOrderDialog } from "./delete";
+import { RevertOrderDialog } from "./revert";
 
 export const orderColumns = (
     onRefresh: () => void,
@@ -94,6 +95,13 @@ export const orderColumns = (
                         <DropdownMenuItem onClick={() => handleNavigate(row.original.id)}>
                             Дэлгэрэнгүй
                         </DropdownMenuItem>
+
+                        <DropdownMenuSeparator />
+
+                        <RevertOrderDialog
+                            orderId={row.original.id}
+                            onReverted={onRefresh}
+                        />
 
                         <DropdownMenuSeparator />
 

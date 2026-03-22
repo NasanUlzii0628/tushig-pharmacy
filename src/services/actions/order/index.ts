@@ -169,6 +169,12 @@ export async function deleteOrderList(order_id: number) {
     return POST({ path, payload: body })
 }
 
+export async function revertOrder(order_id: number) {
+    const body = { order_id }
+    const path = "/order/revert"
+    return POST({ path, payload: body })
+}
+
 
 
 
