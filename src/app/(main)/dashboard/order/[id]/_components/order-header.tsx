@@ -135,6 +135,23 @@ export function OrderHeader({ orderId, orderDate, orderData }: OrderHeaderProps)
                 };
             });
 
+            // Fetch all images in parallel first to avoid sequential waterfall
+            const imageResults = await Promise.all(
+                (orderData.details || []).map(async (item) => {
+                    if (!item.product_image) return null;
+                    try {
+                        const proxyUrl = `/api/proxy-image?url=${encodeURIComponent(item.product_image)}`;
+                        const response = await fetch(proxyUrl);
+                        if (!response.ok) throw new Error("Image fetch failed");
+                        const blob = await response.blob();
+                        return await compressImage(blob, 150, 0.7);
+                    } catch (err) {
+                        console.error(`✗ Image error (${item.product_name})`, err);
+                        return null;
+                    }
+                })
+            );
+
             let currentRow = 7;
             for (let index = 0; index < (orderData.details?.length || 0); index++) {
                 const item = orderData.details[index];
@@ -168,27 +185,17 @@ export function OrderHeader({ orderId, orderDate, orderData }: OrderHeaderProps)
                     };
                 });
 
-                if (item.product_image) {
-                    try {
-                        const proxyUrl = `/api/proxy-image?url=${encodeURIComponent(item.product_image)}`;
-                        const response = await fetch(proxyUrl);
-                        if (!response.ok) throw new Error("Image fetch failed");
+                const base64 = imageResults[index];
+                if (base64) {
+                    const imageId = workbook.addImage({
+                        base64,
+                        extension: "jpeg",
+                    });
 
-                        const blob = await response.blob();
-                        const base64 = await compressImage(blob, 150, 0.7);
-
-                        const imageId = workbook.addImage({
-                            base64,
-                            extension: "jpeg",
-                        });
-
-                        worksheet.addImage(imageId, {
-                            tl: { col: 2, row: currentRow - 1 },
-                            ext: { width: 80, height: 80 },
-                        });
-                    } catch (err) {
-                        console.error(`✗ Image error (${item.product_name})`, err);
-                    }
+                    worksheet.addImage(imageId, {
+                        tl: { col: 2, row: currentRow - 1 },
+                        ext: { width: 80, height: 80 },
+                    });
                 }
 
                 currentRow++;
@@ -328,20 +335,28 @@ export function OrderHeader({ orderId, orderDate, orderData }: OrderHeaderProps)
             const tableData: any[] = [];
             const rowImages: Record<number, string> = {};
 
-            for (let i = 0; i < (orderData.details?.length || 0); i++) {
-                const item = orderData.details[i];
-
-                if (item.product_image) {
+            // Fetch all images in parallel first
+            const pdfImageResults = await Promise.all(
+                (orderData.details || []).map(async (item) => {
+                    if (!item.product_image) return null;
                     try {
                         const proxyUrl = `/api/proxy-image?url=${encodeURIComponent(item.product_image)}`;
                         const response = await fetch(proxyUrl);
-                        if (response.ok) {
-                            const blob = await response.blob();
-                            rowImages[i] = await compressImage(blob, 150, 0.7, true);
-                        }
+                        if (!response.ok) return null;
+                        const blob = await response.blob();
+                        return await compressImage(blob, 150, 0.7, true);
                     } catch (err) {
                         console.error(`✗ Image error for PDF (${item.product_name})`, err);
+                        return null;
                     }
+                })
+            );
+
+            for (let i = 0; i < (orderData.details?.length || 0); i++) {
+                const item = orderData.details[i];
+
+                if (pdfImageResults[i]) {
+                    rowImages[i] = pdfImageResults[i];
                 }
 
                 const row = [
