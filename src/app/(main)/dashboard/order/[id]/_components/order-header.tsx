@@ -31,8 +31,8 @@ type OrderHeaderProps = {
  */
 async function compressImage(
     blob: Blob,
-    maxSize = 150,
-    quality = 0.7,
+    maxSize = 400,
+    quality = 0.92,
     withPrefix = false
 ): Promise<string> {
     const bitmap = await createImageBitmap(blob);
@@ -153,7 +153,7 @@ export function OrderHeader({ orderId, orderDate, orderData }: OrderHeaderProps)
                         const response = await fetch(proxyUrl);
                         if (!response.ok) throw new Error("Image fetch failed");
                         const blob = await response.blob();
-                        return await compressImage(blob, 150, 0.7);
+                        return await compressImage(blob);
                     } catch (err) {
                         console.error(`✗ Image error (${item.product_name})`, err);
                         return null;
@@ -353,7 +353,7 @@ export function OrderHeader({ orderId, orderDate, orderData }: OrderHeaderProps)
                         const response = await fetch(proxyUrl);
                         if (!response.ok) return null;
                         const blob = await response.blob();
-                        return await compressImage(blob, 150, 0.7, true);
+                        return await compressImage(blob, 400, 0.92, true);
                     } catch (err) {
                         console.error(`✗ Image error for PDF (${item.product_name})`, err);
                         return null;
