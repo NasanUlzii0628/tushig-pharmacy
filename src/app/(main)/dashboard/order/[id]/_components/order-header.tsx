@@ -24,6 +24,36 @@ type OrderHeaderProps = {
     orderData: OrderDetailTypes;
 };
 
+/**
+ * Resize and compress an image blob to a smaller JPEG via canvas.
+ * Returns a base64 string (without the data:... prefix) for Excel,
+ * or with prefix for PDF, depending on `withPrefix`.
+ */
+async function compressImage(
+    blob: Blob,
+    maxSize = 150,
+    quality = 0.7,
+    withPrefix = false
+): Promise<string> {
+    const bitmap = await createImageBitmap(blob);
+    const scale = Math.min(maxSize / bitmap.width, maxSize / bitmap.height, 1);
+    const w = Math.round(bitmap.width * scale);
+    const h = Math.round(bitmap.height * scale);
+
+    const canvas = new OffscreenCanvas(w, h);
+    const ctx = canvas.getContext("2d")!;
+    ctx.drawImage(bitmap, 0, 0, w, h);
+    bitmap.close();
+
+    const outBlob = await canvas.convertToBlob({ type: "image/jpeg", quality });
+    const buf = await outBlob.arrayBuffer();
+    const bytes = new Uint8Array(buf);
+    let binary = "";
+    for (let i = 0; i < bytes.length; i++) binary += String.fromCharCode(bytes[i]);
+    const b64 = btoa(binary);
+    return withPrefix ? `data:image/jpeg;base64,${b64}` : b64;
+}
+
 export function OrderHeader({ orderId, orderDate, orderData }: OrderHeaderProps) {
     const router = useRouter();
     const [isDownloading, setIsDownloading] = useState(false);
@@ -140,25 +170,16 @@ export function OrderHeader({ orderId, orderDate, orderData }: OrderHeaderProps)
 
                 if (item.product_image) {
                     try {
-                        // Proxy the image through your API to avoid CORS
                         const proxyUrl = `/api/proxy-image?url=${encodeURIComponent(item.product_image)}`;
                         const response = await fetch(proxyUrl);
                         if (!response.ok) throw new Error("Image fetch failed");
 
                         const blob = await response.blob();
-                        const base64 = await new Promise<string>((resolve, reject) => {
-                            const reader = new FileReader();
-                            reader.onloadend = () => {
-                                const result = reader.result as string;
-                                resolve(result.split(",")[1]);
-                            };
-                            reader.onerror = reject;
-                            reader.readAsDataURL(blob);
-                        });
+                        const base64 = await compressImage(blob, 150, 0.7);
 
                         const imageId = workbook.addImage({
                             base64,
-                            extension: "png",
+                            extension: "jpeg",
                         });
 
                         worksheet.addImage(imageId, {
@@ -312,20 +333,11 @@ export function OrderHeader({ orderId, orderDate, orderData }: OrderHeaderProps)
 
                 if (item.product_image) {
                     try {
-                        // Proxy the image through your API to avoid CORS
                         const proxyUrl = `/api/proxy-image?url=${encodeURIComponent(item.product_image)}`;
                         const response = await fetch(proxyUrl);
                         if (response.ok) {
                             const blob = await response.blob();
-                            const base64 = await new Promise<string>((resolve, reject) => {
-                                const reader = new FileReader();
-                                reader.onloadend = () => {
-                                    resolve(reader.result as string);
-                                };
-                                reader.onerror = reject;
-                                reader.readAsDataURL(blob);
-                            });
-                            rowImages[i] = base64;
+                            rowImages[i] = await compressImage(blob, 150, 0.7, true);
                         }
                     } catch (err) {
                         console.error(`✗ Image error for PDF (${item.product_name})`, err);

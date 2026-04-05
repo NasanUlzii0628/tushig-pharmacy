@@ -8,6 +8,7 @@ import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { Form, FormControl, FormField, FormItem, FormLabel } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { Loader2 } from "lucide-react";
 
 import { loginAction } from "@/lib/auth";
 import { useRouter } from "next/navigation";
@@ -112,7 +113,8 @@ export function LoginForm() {
           )}
         />
         <div className="pt-2">
-          <Button className="w-full" type="submit">
+          <Button className="w-full" type="submit" disabled={form.formState.isSubmitting}>
+            {form.formState.isSubmitting && <Loader2 className="animate-spin" />}
             Нэвтрэх
           </Button>
         </div>
