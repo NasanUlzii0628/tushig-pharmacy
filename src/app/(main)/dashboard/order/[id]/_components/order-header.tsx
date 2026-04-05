@@ -355,8 +355,9 @@ export function OrderHeader({ orderId, orderDate, orderData }: OrderHeaderProps)
             for (let i = 0; i < (orderData.details?.length || 0); i++) {
                 const item = orderData.details[i];
 
-                if (pdfImageResults[i]) {
-                    rowImages[i] = pdfImageResults[i];
+                const img = pdfImageResults[i];
+                if (img) {
+                    rowImages[i] = img;
                 }
 
                 const row = [
