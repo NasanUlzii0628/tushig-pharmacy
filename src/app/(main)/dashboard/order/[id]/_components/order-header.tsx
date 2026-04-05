@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import ExcelJS from "exceljs";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
@@ -58,6 +58,15 @@ export function OrderHeader({ orderId, orderDate, orderData }: OrderHeaderProps)
     const router = useRouter();
     const [isDownloading, setIsDownloading] = useState(false);
     const [hidePrices, setHidePrices] = useState(false);
+
+    // Prefetch images through the proxy on mount so they're browser-cached before download
+    useEffect(() => {
+        orderData.details?.forEach((item) => {
+            if (item.product_image) {
+                fetch(`/api/proxy-image?url=${encodeURIComponent(item.product_image)}`);
+            }
+        });
+    }, [orderData.details]);
 
     const handleDownloadExcel = async () => {
         setIsDownloading(true);
