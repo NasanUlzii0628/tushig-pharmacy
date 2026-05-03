@@ -1,5 +1,5 @@
 'use server'
-import { revalidatePath, revalidateTag } from 'next/cache'
+import { revalidatePath, updateTag } from 'next/cache'
 
 import type { ProductCreateForm, ProductType, ProductUpdateForm } from '@/types/product'
 import { DEFAULT_PAGE, DEFAULT_SIZE } from '@/constants'
@@ -59,7 +59,7 @@ export async function createProdcut(payload: ProductCreateForm) {
   const result = await POST({ path, payload: body })
 
   if (result.success) {
-    revalidateTag("products")
+    updateTag("products")
     revalidatePath("/dashboard/default", "page")
   }
 
@@ -72,7 +72,7 @@ export async function updateProduct(payload: ProductUpdateForm) {
   const result = await PUT({ path, payload: body })
 
   if (result.success) {
-    revalidateTag("products")
+    updateTag("products")
     revalidatePath("/dashboard/default", "page")
   }
 
@@ -84,7 +84,7 @@ export async function createProductsBulk(names: string[]) {
   const result = await POST({ path, payload: { names } })
 
   if (result.success) {
-    revalidateTag("products")
+    updateTag("products")
     revalidatePath("/dashboard/default", "page")
   }
 
@@ -96,7 +96,7 @@ export async function deleteProduct(id: number) {
   const result = await DELETE({ path })
 
   if (result.success) {
-    revalidateTag("products")
+    updateTag("products")
     revalidatePath("/dashboard/default", "page")
   }
 
