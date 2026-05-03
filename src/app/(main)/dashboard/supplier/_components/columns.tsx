@@ -42,7 +42,7 @@ export const supplierColumns = (
     {
       accessorKey: "contact",
       header: ({ column }) => (
-        <DataTableColumnHeader column={column} title="Имэйл" />
+        <DataTableColumnHeader column={column} title="Цахим шуудангийн хаяг" />
       ),
       cell: ({ row }) => <span>{row.original.contact}</span>,
     },
@@ -50,7 +50,7 @@ export const supplierColumns = (
     {
       accessorKey: "wechat",
       header: ({ column }) => (
-        <DataTableColumnHeader column={column} title="WeChat" />
+        <DataTableColumnHeader column={column} title="Утасны дугаар" />
       ),
       cell: ({ row }) => <span>{row.original.wechat}</span>,
     },
@@ -74,7 +74,7 @@ export const supplierColumns = (
     {
       accessorKey: "createdAt",
       header: ({ column }) => (
-        <DataTableColumnHeader column={column} title="Үүсгэсэн" />
+        <DataTableColumnHeader column={column} title="Бүртгэсэн" />
       ),
       cell: ({ row }) => (
         <span className="text-muted-foreground text-sm">

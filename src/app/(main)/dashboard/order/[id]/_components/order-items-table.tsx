@@ -85,10 +85,10 @@ export function OrderItemsTable({ items }: OrderItemsTableProps) {
                                                 {item.quantity}
                                             </TableCell>
                                             <TableCell className="text-right">
-                                                {item.unit_price ? `${item.unit_price} ${item.currency === "CNY" ? "¥" : "₮"}` : "-"}
+                                                {item.unit_price ? `${item.unit_price} ${item.currency === "MNT" ? "₮" : "₮"}` : "-"}
                                             </TableCell>
                                             <TableCell className="text-right font-medium">
-                                                {item.total_price} {item.currency === "CNY" ? "¥" : "₮"}
+                                                {item.total_price} {item.currency === "MNT" ? "₮" : "₮"}
                                             </TableCell>
                                         </TableRow>
                                     );

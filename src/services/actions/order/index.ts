@@ -12,7 +12,7 @@ export async function createOrder(payload: OrderAdd) {
     const body = {
         ...payload,
     }
-    const path = "/order/bucket/add"
+    const path = "/pharmacy/order/bucket/add"
     return POST({ path, payload: body })
 }
 
@@ -21,7 +21,7 @@ export async function orderBucketList(bucket_item_ids: number[]) {
     const body = {
         bucket_item_ids,
     }
-    const path = "/order/create"
+    const path = "/pharmacy/order/create"
     return POST({ path, payload: body })
 }
 
@@ -29,7 +29,7 @@ export async function deleteBucketList(product_id: number) {
     const body = {
         product_id,
     }
-    const path = "/order/bucket/delete"
+    const path = "/pharmacy/order/bucket/delete"
     return POST({ path, payload: body })
 }
 
@@ -41,7 +41,7 @@ export async function checkOrder(product_id: number) {
 
     const queryString = getQueryString(filters)
 
-    const path = `/order/bucket/check${queryString}`
+    const path = `/pharmacy/order/bucket/check${queryString}`
 
     const { data, message, success, httpStatus } = await GET<{ data: OrderCheck }>({ path })
 
@@ -74,8 +74,10 @@ export async function fetchBucketList(params?: {
         filters.supplier_id = params.supplier_id;
     }
 
+    console.log(params);
+    
     const queryString = getQueryString(filters);
-    const path = `/order/bucket/list${queryString}`;
+    const path = `/pharmacy/order/bucket/list${queryString}`;
 
     const { data, message, success, httpStatus } = await GET<{ data: BucketList }>({ path });
 
@@ -119,7 +121,7 @@ export async function FetchOrderList(params: FetchOrderParams) {
 
     const queryString = getQueryString(filters)
 
-    const path = `/order/list${queryString}`
+    const path = `/pharmacy/order/list${queryString}`
 
     const { data, message, success, httpStatus } = await GET<PaginatedOrdersResponse>({ path })
 
@@ -136,7 +138,7 @@ export async function FetchOrderList(params: FetchOrderParams) {
 
 
 export const fetchOrderDetail = async (id: string) => {
-    const path = `/order/detail/${id}`
+    const path = `/pharmacy/order/detail/${id}`
 
     const { data, success } = await GET<OrderDetailData>({ path })
 
@@ -156,7 +158,7 @@ export async function updateBucketItem(product_id: number, unit_price: number, s
         supplier_id,
         quantity,
     }
-    const path = "/order/bucket/update"
+    const path = "/pharmacy/order/bucket/update"
     return POST({ path, payload: body })
 }
 
@@ -165,13 +167,13 @@ export async function deleteOrderList(order_id: number) {
     const body = {
         order_id,
     }
-    const path = "/order/delete"
+    const path = "/pharmacy/order/delete"
     return POST({ path, payload: body })
 }
 
 export async function revertOrder(order_id: number) {
     const body = { order_id }
-    const path = "/order/revert"
+    const path = "/pharmacy/order/revert"
     return POST({ path, payload: body })
 }
 

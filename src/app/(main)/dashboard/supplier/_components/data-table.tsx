@@ -108,7 +108,7 @@ export function DataTable() {
   return (
     <Tabs defaultValue="outline" className="w-full flex-col justify-start gap-6">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <h4>Нийлүүлэгчид</h4>
+        <h4>Нийлүүлэгчдийн жагсаалт</h4>
 
         <Label htmlFor="view-selector" className="sr-only">
           View
@@ -125,7 +125,7 @@ export function DataTable() {
           <Search className="text-muted-foreground pointer-events-none absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
           <Input
             placeholder="Нийлүүлэгчийн нэр..."
-            className="w-full pl-9 sm:w-[300px] text-base"
+            className="pl-9 w-[300px]"
             value={nameQuery}
             onChange={(e) => setNameQuery(e.target.value)}
             disabled={loading}
@@ -138,8 +138,8 @@ export function DataTable() {
 
           <Search className="text-muted-foreground pointer-events-none absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
           <Input
-            placeholder="WeChat..."
-            className="w-full pl-9 sm:w-[300px] text-base"
+            placeholder="Утасны дугаар..."
+            className="pl-9 w-[300px]"
             value={wechatQuery}
             onChange={(e) => setWechatQuery(e.target.value)}
             disabled={loading}
@@ -147,20 +147,6 @@ export function DataTable() {
           />
         </div>
 
-
-        {/* Contact */}
-        <div className="relative w-full sm:w-auto">
-
-          <Search className="text-muted-foreground pointer-events-none absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
-          <Input
-            placeholder="Имэйл..."
-            className="w-full pl-9 sm:w-[300px] text-base"
-            value={contactQuery}
-            onChange={(e) => setContactQuery(e.target.value)}
-            disabled={loading}
-            onKeyDown={(e) => e.key === "Enter" && handleSearch()}
-          />
-        </div>
         <Button onClick={handleSearch} size="sm">
           <Search className="h-4 w-4 mr-2" /> Хайх
         </Button>

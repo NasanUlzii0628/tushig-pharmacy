@@ -15,6 +15,7 @@ import { withDndColumn } from "../../../../../components/data-table/table-utils"
 import { productColumns } from "./columns";
 import type { ProductType } from "@/types/product";
 import { CreateDrawer } from "./create";
+import { BulkCreateDialog } from "./bulk-create";
 import { SupplierType } from "@/types/supplier";
 import { OrderDialog } from "./order";
 import { Input } from "@/components/ui/input";
@@ -155,11 +156,12 @@ export function DataTable({ initialData, initialTotalPages = 1, supplierData = [
 
       <Tabs defaultValue="outline" className="w-full flex-col justify-start gap-6">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <h4>Бүтээгдэхүүн</h4>
+          <h4>Бүтээгдэхүүний жагсаалт</h4>
           <Label htmlFor="view-selector" className="sr-only">
             View
           </Label>
           <div className="flex items-center gap-2">
+            <BulkCreateDialog refresh={refreshProducts} />
             <CreateDrawer
               supplierData={supplierData}
               open={openDrawer}
@@ -174,7 +176,7 @@ export function DataTable({ initialData, initialTotalPages = 1, supplierData = [
             <Search className="text-muted-foreground absolute top-1/2 left-3 size-4 -translate-y-1/2" />
             <Input
               placeholder="Бүтээгдэхүүн хайх..."
-              className="w-full pl-9 sm:w-[300px] text-base"
+              className="pl-9 w-[300px]"
               value={inputValue}
               onChange={(e) => setInputValue(e.target.value)}
               onKeyDown={(e) => { if (e.key === "Enter") handleSearch(); }}

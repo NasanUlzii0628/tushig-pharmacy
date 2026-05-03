@@ -77,7 +77,7 @@ export function LayoutControls() {
   return (
     <Popover>
       <PopoverTrigger asChild>
-        <Button size="icon">
+        <Button size="icon" className="bg-[#245cb5] text-white hover:bg-[#245cb5]/90">
           <Settings />
         </Button>
       </PopoverTrigger>

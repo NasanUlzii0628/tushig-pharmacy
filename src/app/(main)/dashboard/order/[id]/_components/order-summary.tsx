@@ -28,12 +28,12 @@ export function OrderSummary({ amount, itemCount }: OrderSummaryProps) {
 
                     <div className="flex justify-between text-sm">
                         <span className="text-muted-foreground">Дэд дүн:</span>
-                        <span className="font-medium">{totalAmount.toFixed(2)} ¥</span>
+                        <span className="font-medium">{totalAmount.toFixed(2)} ₮</span>
                     </div>
 
                     <div className="flex justify-between text-sm">
                         <span className="text-muted-foreground">Хөнгөлөлт:</span>
-                        <span className="font-medium">0.00 ¥</span>
+                        <span className="font-medium">0.00 ₮</span>
                     </div>
                 </div>
 
@@ -42,7 +42,7 @@ export function OrderSummary({ amount, itemCount }: OrderSummaryProps) {
                 <div className="flex justify-between items-center">
                     <span className="text-lg font-semibold">Нийт дүн:</span>
                     <span className="text-2xl font-bold text-primary">
-                        {totalAmount.toFixed(2)} ¥
+                        {totalAmount.toFixed(2)} ₮
                     </span>
                 </div>
             </CardContent>

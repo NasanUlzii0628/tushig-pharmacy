@@ -26,7 +26,7 @@ export async function fetchUser(params: FetchUserParams) {
 
   const queryString = getQueryString(filters)
 
-  const path = `/user/list${queryString}`
+  const path = `/pharmacy/user/list${queryString}`
 
   const { data, message, success, httpStatus } = await GET<PaginatedCustomers>({ path })
 
@@ -43,7 +43,7 @@ export async function createUser(payload: UserCreateForm) {
   const body = {
     ...payload,
   }
-  const path = "/user/create"
+  const path = "/pharmacy/user/create"
   return POST({ path, payload: body })
 }
 
@@ -51,12 +51,12 @@ export async function updateUser(payload: UserUpdateForm) {
   const body = {
     ...payload
   }
-  const path = "/user/update"
+  const path = "/pharmacy/user/update"
   return PUT({ path, payload: body })
 }
 
 export async function deleteUser(id: number) {
-  const path = `/user/delete/${id}`
+  const path = `/pharmacy/user/delete/${id}`
   return DELETE({ path })
 }
 

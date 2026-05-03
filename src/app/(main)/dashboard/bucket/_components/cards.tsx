@@ -6,7 +6,7 @@ import { FetchSupplier } from "@/services/actions/supplier";
 
 const BucketCards = async () => {
     const [result, userRole, resSupplier] = await Promise.all([
-        fetchBucketList({ currency: "CNY" }),
+        fetchBucketList({ currency: "MNT" }),
         getCurrentUserRole(),
         FetchSupplier({ page: 1, size: 50 }),
     ]);

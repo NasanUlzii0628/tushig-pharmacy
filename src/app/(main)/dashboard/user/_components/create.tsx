@@ -50,12 +50,12 @@ export function CreateUserDrawer({ onCreated }: Props) {
   return (
     <Drawer direction="right" open={open} onOpenChange={setOpen}>
       <DrawerTrigger asChild>
-        <Button>Шинэ хэрэглэгч үүсгэх +</Button>
+        <Button>Хэрэглэгч бүртгэх +</Button>
       </DrawerTrigger>
 
       <DrawerContent className="w-[420px]">
         <DrawerHeader className="text-left">
-          <DrawerTitle>Хэрэглэгч нэмэх</DrawerTitle>
+          <DrawerTitle>Хэрэглэгч бүртгэх</DrawerTitle>
         </DrawerHeader>
 
         <UserForm
@@ -150,7 +150,7 @@ function UserForm({
                 Хэрэглэгчийн нэр <span className="text-destructive">*</span>
               </FormLabel>
               <FormControl>
-                <Input placeholder="username" {...field} className="text-base" />
+                <Input placeholder="" {...field} className="text-base" />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -164,7 +164,7 @@ function UserForm({
           render={({ field }) => (
             <FormItem>
               <FormLabel>
-                Нууц үг <span className="text-destructive">*</span>
+                Нэвтрэх нууц үг <span className="text-destructive">*</span>
               </FormLabel>
               <FormControl>
                 <Input

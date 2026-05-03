@@ -33,7 +33,7 @@ export async function uploadProductImages(files: File[]): Promise<UploadImagesRe
 
 
     const response = await POST<BackendUploadResponse>({
-        path: "/product/upload",
+        path: "/pharmacy/product/upload",
         payload: formData,
         plainRequest: false,
     });

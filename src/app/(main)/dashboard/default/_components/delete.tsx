@@ -42,10 +42,10 @@ export function DeleteProductDialog({
 
             <AlertDialogContent>
                 <AlertDialogHeader>
-                    <AlertDialogTitle>Устгах уу?</AlertDialogTitle>
+                    <AlertDialogTitle>Устгах</AlertDialogTitle>
                     <AlertDialogDescription>
-                        <b>{productName}</b> бүтээгдэхүүн устгахдаа итгэлтэй байна уу?
-                        Энэ үйлдлийг буцаах боломжгүй.
+                        <span>"{productName}"</span> бүтээгдэхүүнийг устгах гэж байна. 
+                        Энэ үйлдлийг буцаах боломжгүй. 
                     </AlertDialogDescription>
                 </AlertDialogHeader>
 

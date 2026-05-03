@@ -47,7 +47,7 @@ export function UpdateProductDrawer({ open, setOpen, product, supplierData, refr
     <Drawer direction="right" open={open} onOpenChange={setOpen}>
       <DrawerContent className="w-[420px] sm:w-[520px] md:w-[620px]">
         <DrawerHeader className="text-left">
-          <DrawerTitle>Бүтээгдэхүүн засах</DrawerTitle>
+          <DrawerTitle>Бүтээгдэхүүний мэдээлэл шинэчлэх</DrawerTitle>
         </DrawerHeader>
 
         <UpdateProductForm
@@ -101,12 +101,14 @@ function UpdateProductForm({
   setIsSubmitting: React.Dispatch<React.SetStateAction<boolean>>;
   onSuccess: () => Promise<void>;
 }) {
+  const resolvedSupplierId = product.default_supplier_id ?? product.default_supplier?.id ?? undefined;
+
   const form = useForm<ProductUpdateFormValues>({
     resolver: zodResolver(ProductUpdateSchema),
     defaultValues: {
-      name: product.name,
-      default_price: Number(product.default_price),
-      default_supplier_id: Number(product.default_supplier_id),
+      name: product.name ?? "",
+      default_price: product.default_price != null ? Number(product.default_price) : 0,
+      default_supplier_id: resolvedSupplierId,
     },
   });
 
@@ -126,9 +128,9 @@ function UpdateProductForm({
 
   React.useEffect(() => {
     form.reset({
-      name: product.name,
-      default_price: product.default_price,
-      default_supplier_id: product.default_supplier_id,
+      name: product.name ?? "",
+      default_price: product.default_price != null ? Number(product.default_price) : 0,
+      default_supplier_id: product.default_supplier_id ?? product.default_supplier?.id ?? undefined,
     });
     setMainImage(null);
     setAddiImages([]);
@@ -266,7 +268,12 @@ function UpdateProductForm({
                 Бүтээгдэхүүний нэр <span className="text-destructive">*</span>
               </FormLabel>
               <FormControl>
-                <Input placeholder="Бүтээгдэхүүний нэр" {...field} className="text-base" />
+                <Input
+                  placeholder="Бүтээгдэхүүний нэр"
+                  {...field}
+                  value={field.value ?? ""}
+                  className="text-base"
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -279,13 +286,13 @@ function UpdateProductForm({
           render={({ field }) => (
             <FormItem>
               <FormLabel>
-                Үнэ (¥)<span className="text-destructive">*</span>
+                Үнэ (₮)<span className="text-destructive">*</span>
               </FormLabel>
               <FormControl>
                 <Input
                   type="number"
                   placeholder="0"
-                  value={field.value}
+                  value={field.value ?? ""}
                   onChange={(e) => {
                     const value = e.target.value;
                     field.onChange(value === "" ? 0 : Number(value));
@@ -306,15 +313,23 @@ function UpdateProductForm({
               <FormLabel>
                 Нийлүүлэгч <span className="text-destructive">*</span>
               </FormLabel>
-              <Select value={field.value.toString()} onValueChange={(v) => field.onChange(Number(v))}>
+              <Select
+                value={
+                  field.value !== undefined && field.value !== null
+                    ? String(field.value)
+                    : ""
+                }
+                onValueChange={(v) => field.onChange(v ? Number(v) : null)}
+              >
                 <FormControl>
                   <SelectTrigger className="w-full">
                     <SelectValue placeholder="Нийлүүлэгч сонгох" />
                   </SelectTrigger>
                 </FormControl>
+
                 <SelectContent>
                   {supplierData.map((s) => (
-                    <SelectItem key={s.id} value={s.id.toString()}>
+                    <SelectItem key={s.id} value={String(s.id)}>
                       {s.name}
                     </SelectItem>
                   ))}
@@ -346,7 +361,7 @@ function UpdateProductForm({
           <label className="hover:bg-accent mt-2 flex h-24 cursor-pointer flex-col items-center justify-center rounded-md border-2 border-dashed">
             <Upload className="text-muted-foreground mb-1 h-5 w-5" />
             <span className="text-muted-foreground text-xs">Нэмэлт зураг оруулах</span>
-            <span className="text-muted-foreground text-xs">JPG, PNG, WEBP (max 80MB)</span>
+            <span className="text-muted-foreground text-xs">JPG, PNG, WEBP (max 5MB)</span>
             <input type="file" multiple hidden onChange={handleAddiImages} accept="image/*" />
           </label>
         </div>

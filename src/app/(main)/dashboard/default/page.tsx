@@ -5,7 +5,6 @@ import { unstable_cache } from "next/cache";
 import { cookies } from "next/headers";
 
 export default async function Page() {
-  // ✅ Get token OUTSIDE cache
   const cookieStore = await cookies();
   const token = cookieStore.get("token")?.value || "";
 

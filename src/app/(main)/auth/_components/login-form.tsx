@@ -8,12 +8,12 @@ import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { Form, FormControl, FormField, FormItem, FormLabel } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Loader2 } from "lucide-react";
+import { Loader2, User, Lock, Eye, EyeOff } from "lucide-react";
 
 import { loginAction } from "@/lib/auth";
 import { useRouter } from "next/navigation";
 import { Checkbox } from "@/components/ui/checkbox";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 const FormSchema = z.object({
   username: z.string().min(1, "Хэрэглэгчийн нэр шаардлагатай"),
@@ -23,6 +23,7 @@ const FormSchema = z.object({
 
 export function LoginForm() {
   const router = useRouter();
+  const [showPassword, setShowPassword] = useState(false);
 
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
@@ -74,7 +75,16 @@ export function LoginForm() {
             <FormItem>
               <FormLabel>Хэрэглэгчийн нэр</FormLabel>
               <FormControl>
-                <Input id="username" type="text" autoComplete="username" className="text-base"  {...field} />
+                <div className="relative">
+                  <User className="text-muted-foreground pointer-events-none absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
+                  <Input
+                    id="username"
+                    type="text"
+                    autoComplete="username"
+                    className="bg-muted/40 h-11 pl-10 text-base shadow-[0_1px_3px_rgba(0,0,0,0.08)]"
+                    {...field}
+                  />
+                </div>
               </FormControl>
             </FormItem>
           )}
@@ -87,7 +97,25 @@ export function LoginForm() {
             <FormItem>
               <FormLabel>Нууц үг</FormLabel>
               <FormControl>
-                <Input id="password" type="password" autoComplete="current-password" className="text-base"  {...field} />
+                <div className="relative">
+                  <Lock className="text-muted-foreground pointer-events-none absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
+                  <Input
+                    id="password"
+                    type={showPassword ? "text" : "password"}
+                    autoComplete="current-password"
+                    className="bg-muted/40 h-11 pr-10 pl-10 text-base shadow-[0_1px_3px_rgba(0,0,0,0.08)]"
+                    {...field}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword((v) => !v)}
+                    className="text-muted-foreground hover:text-foreground absolute top-1/2 right-3 -translate-y-1/2 transition-colors"
+                    tabIndex={-1}
+                    aria-label={showPassword ? "Нууц үг нуух" : "Нууц үг харах"}
+                  >
+                    {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                  </button>
+                </div>
               </FormControl>
             </FormItem>
           )}
@@ -113,7 +141,7 @@ export function LoginForm() {
           )}
         />
         <div className="pt-2">
-          <Button className="w-full" type="submit" disabled={form.formState.isSubmitting}>
+          <Button className="h-11 w-full text-base" type="submit" disabled={form.formState.isSubmitting}>
             {form.formState.isSubmitting && <Loader2 className="animate-spin" />}
             Нэвтрэх
           </Button>

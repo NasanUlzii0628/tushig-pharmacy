@@ -42,7 +42,7 @@ export function DeleteUserDialog({
 
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>Устгах уу?</AlertDialogTitle>
+          <AlertDialogTitle>Устгах</AlertDialogTitle>
           <AlertDialogDescription>
             <b>{supplierName}</b> хэрэглэгчийг устгахдаа итгэлтэй байна уу?
             Энэ үйлдлийг буцаах боломжгүй.

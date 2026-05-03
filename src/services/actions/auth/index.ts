@@ -22,7 +22,7 @@ export async function login({
 }): Promise<ActionResult<LoginResponse>> {
 
   const { response, data, errorData } = await makeApiRequest<LoginResponse>(
-    "/auth/login",
+    "/pharmacy/auth/login",
     "POST",
     { body: { username, password } }
   );

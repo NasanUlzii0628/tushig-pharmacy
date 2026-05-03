@@ -108,20 +108,13 @@ export const productColumns = (
     {
       accessorKey: "default_price",
       header: ({ column }) => <DataTableColumnHeader column={column} title="Үнэ" />,
-      cell: ({ row }) => <span>{row.original.default_price}  {row.original.currency === "CNY" ? "¥" : "₮"}</span>,
-    },
-
-
-    {
-      accessorKey: "currency",
-      header: ({ column }) => <DataTableColumnHeader column={column} title="Ханш" />,
-      cell: ({ row }) => <span>{row.original.currency}</span>,
+      cell: ({ row }) => <span>{row.original.default_price}  {row.original.currency === "MNT" ? "₮" : "₮"}</span>,
     },
 
     {
       accessorKey: "default_supplier",
       header: ({ column }) => <DataTableColumnHeader column={column} title="Нийлүүлэгч" />,
-      cell: ({ row }) => <span>{row.original.default_supplier.name}</span>,
+      cell: ({ row }) => <span>{row.original.default_supplier?.name || "-"}</span>,
     },
 
     {

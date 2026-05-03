@@ -41,11 +41,6 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { SupplierType } from "@/types/supplier";
 
-const currencyOptions = {
-  CNY: "ЮАНЬ",
-  MNT: "ТӨГРӨГ",
-} as const;
-
 interface BucketListClientProps {
   items: BucketList[];
   userRole?: string;
@@ -60,7 +55,7 @@ export function BucketListClient({
   const [items, setItems] = useState<BucketList[]>(initialItems);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedSupplier, setSelectedSupplier] = useState<string>("");
-  const [selectedCurrency, setSelectedCurrency] = useState<string>("CNY");
+  const [selectedCurrency, setSelectedCurrency] = useState<string>("MNT");
   const [selectedIds, setSelectedIds] = useState<number[]>([]);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -112,10 +107,10 @@ export function BucketListClient({
         setIsDeleteDialogOpen(false);
         await handleSearch();
       } else {
-        toast.error(result.message || "Устгахэд алдаа гарлаа");
+        toast.error(result.message || "Устгахад алдаа гарлаа");
       }
     } catch {
-      toast.error("Устгахэд алдаа гарлаа");
+      toast.error("Устгахад алдаа гарлаа");
     } finally {
       setIsDeleting(false);
     }
@@ -272,21 +267,11 @@ export function BucketListClient({
             )}
           </div>
 
-          <Tabs value={selectedCurrency} onValueChange={handleCurrencyChange} className="mb-4">
-            <TabsList className="grid w-full max-w-[400px] grid-cols-2">
-              {Object.entries(currencyOptions).map(([key, label]) => (
-                <TabsTrigger key={key} value={key} disabled={isLoading}>
-                  {label}
-                </TabsTrigger>
-              ))}
-            </TabsList>
-          </Tabs>
-
           <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:gap-4">
             <div className="relative w-full sm:w-auto">
               <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
               <Input
-                className="w-full pl-9 sm:w-[300px] text-base"
+                className="pl-9 w-[300px]"
                 placeholder="Бүтээгдэхүүн хайх..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
@@ -337,7 +322,7 @@ export function BucketListClient({
           {/* Select All */}
           <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <p className="text-sm font-bold sm:text-base">
-              Нийт: {selectedIds.reduce((total, id) => total + Number(items.find((i) => i.id === id)?.unit_price || 0) * Number(items.find((i) => i.id === id)?.quantity || 0), 0).toLocaleString()} {selectedCurrency === "CNY" ? "¥" : "₮"}
+              Нийт дүн: {selectedIds.reduce((total, id) => total + Number(items.find((i) => i.id === id)?.unit_price || 0) * Number(items.find((i) => i.id === id)?.quantity || 0), 0).toLocaleString()} {selectedCurrency === "MNT" ? "₮" : "₮"}
             </p>
 
             <div className="flex items-center gap-2">
@@ -416,12 +401,12 @@ export function BucketListClient({
                       {item.unit_price && (
                         <span>
                           Нэгж:{" "}
-                          {Number(item.unit_price).toLocaleString()} {item.currency === "CNY" ? "¥" : "₮"}
+                          {Number(item.unit_price).toLocaleString()} {item.currency === "MNT" ? "₮" : "₮"}
                         </span>
                       )}
                       <span className="text-primary">
                         Нийт:{" "}
-                        {(Number(item.unit_price) * item.quantity).toLocaleString()} {item.currency === "CNY" ? "¥" : "₮"}
+                        {(Number(item.unit_price) * item.quantity).toLocaleString()} {item.currency === "MNT" ? "₮" : "₮"}
                       </span>
                     </div>
                   </div>
@@ -470,19 +455,25 @@ export function BucketListClient({
       <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <DialogTitle>Бүтээгдэхүүн засах</DialogTitle>
-            <DialogDescription>
-              {editItem?.product_name}
-            </DialogDescription>
+            <DialogTitle>Бүтээгдэхүүний мэдээлэл шинэчлэх</DialogTitle>
           </DialogHeader>
 
-          <div className="space-y-4 py-4">
+          <div className="space-y-4 py-2">
             <div className="space-y-2">
-              <label className="text-sm font-medium">Нэгж үнэ (¥)</label>
+              <label className="text-sm font-medium">Бүтээгдэхүүний нэр</label>
+              <Input
+                className="text-base"
+                type="text"
+                value={editItem?.product_name}
+                disabled={true}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Нэгж үнэ (₮)</label>
               <Input
                 className="text-base"
                 type="number"
-                placeholder="Нэгж үнэ оруулах..."
                 value={editUnitPrice}
                 onChange={(e) => setEditUnitPrice(e.target.value)}
                 disabled={isUpdating}
@@ -493,7 +484,6 @@ export function BucketListClient({
               <label className="text-sm font-medium">Тоо ширхэг</label>
               <Input
                 type="number"
-                placeholder="Тоо ширхэг"
                 value={editQuantity === 0 ? '' : editQuantity}
                 onChange={(e) => {
                   setEditQuantity(parseInt(e.target.value, 10) || 0)
@@ -509,7 +499,7 @@ export function BucketListClient({
                 disabled={isUpdating}
               >
                 <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Нийлүүлэгч сонгох" />
+                  <SelectValue/>
                 </SelectTrigger>
                 <SelectContent>
                   {suppliers.map((s) => (
@@ -547,7 +537,7 @@ export function BucketListClient({
           <DialogHeader>
             <DialogTitle>Бүтээгдэхүүн хасах</DialogTitle>
             <DialogDescription>
-              {deleteItem?.product_name} бүтээгдэхүүнийг хасахдаа итгэлтэй байна уу?
+              "{deleteItem?.product_name}" бүтээгдэхүүнийг хасахдаа итгэлтэй байна уу?
             </DialogDescription>
           </DialogHeader>
 
@@ -563,7 +553,7 @@ export function BucketListClient({
               onClick={handleDeleteSubmit}
               disabled={isDeleting}
             >
-              {isDeleting ? "Устгаж байна..." : "Устгах"}
+              {isDeleting ? "Хасч байна..." : "Хасах"}
             </Button>
           </DialogFooter>
         </DialogContent>

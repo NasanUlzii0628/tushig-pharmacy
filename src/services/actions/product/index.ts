@@ -1,5 +1,5 @@
 'use server'
-import { revalidatePath } from 'next/cache'
+import { revalidatePath, revalidateTag } from 'next/cache'
 
 import type { ProductCreateForm, ProductType, ProductUpdateForm } from '@/types/product'
 import { DEFAULT_PAGE, DEFAULT_SIZE } from '@/constants'
@@ -34,7 +34,7 @@ export async function fetchCustomers(params: FetchProductParams, token?: string)
   }
 
   const queryString = getQueryString(filters)
-  const path = `/product/list${queryString}`
+  const path = `/pharmacy/product/list${queryString}`
 
   // ✅ Pass token to GET handler
   const { data, message, success, httpStatus } = await GET<PaginatedProductsResponse>({ 
@@ -55,35 +55,50 @@ export async function fetchCustomers(params: FetchProductParams, token?: string)
 
 export async function createProdcut(payload: ProductCreateForm) {
   const body = { ...payload }
-  const path = "/product/create"
+  const path = "/pharmacy/product/create"
   const result = await POST({ path, payload: body })
-  
+
   if (result.success) {
+    revalidateTag("products")
     revalidatePath("/dashboard/default", "page")
   }
-  
+
   return result
 }
 
 export async function updateProduct(payload: ProductUpdateForm) {
   const body = { ...payload }
-  const path = "/product/update"
+  const path = "/pharmacy/product/update"
   const result = await PUT({ path, payload: body })
-  
+
   if (result.success) {
+    revalidateTag("products")
     revalidatePath("/dashboard/default", "page")
   }
-  
+
+  return result
+}
+
+export async function createProductsBulk(names: string[]) {
+  const path = "/pharmacy/product/create-bulk"
+  const result = await POST({ path, payload: { names } })
+
+  if (result.success) {
+    revalidateTag("products")
+    revalidatePath("/dashboard/default", "page")
+  }
+
   return result
 }
 
 export async function deleteProduct(id: number) {
-  const path = `/product/delete/${id}`
+  const path = `/pharmacy/product/delete/${id}`
   const result = await DELETE({ path })
-  
+
   if (result.success) {
+    revalidateTag("products")
     revalidatePath("/dashboard/default", "page")
   }
-  
+
   return result
 }

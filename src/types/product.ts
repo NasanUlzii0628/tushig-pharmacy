@@ -5,7 +5,7 @@ export interface ProductType {
   currency: string
   addi_imgs: string
   default_price: number
-  default_supplier_id: number
+  default_supplier_id: number | null
   status: string
   created_user_id: number
   updated_user_id: string
@@ -21,7 +21,7 @@ export interface ProductCreateForm {
   currency: string
   addi_imgs: string[]
   default_price: number
-  default_supplier_id: number
+  default_supplier_id: number | null
 }
 
 export interface ProductUpdateForm {
@@ -30,7 +30,7 @@ export interface ProductUpdateForm {
   img: string
   addi_imgs: string[]
   default_price: number
-  default_supplier_id: number
+  default_supplier_id: number | null
 }
 
 export interface defaultSupplier {

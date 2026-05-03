@@ -48,7 +48,6 @@ export function AppSidebar({
           <SidebarMenuItem>
             <SidebarMenuButton asChild className="data-[slot=sidebar-menu-button]:p-1.5!">
               <Link prefetch={false} href="/dashboard/default">
-                <Command />
                 <span className="text-base font-semibold">{APP_CONFIG.name}</span>
               </Link>
             </SidebarMenuButton>

@@ -1,6 +1,16 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0 1000px var(--background) inset, 0 1px 3px rgba(0, 0, 0, 0.08) !important;
+  -webkit-text-fill-color: var(--foreground) !important;
+  caret-color: var(--foreground);
+  transition: background-color 9999s ease-in-out 0s;
+}
+
 /* Theme preset styles: these override CSS variables based on the selected data-theme-preset */
 @import "../styles/presets/brutalist.css";
 @import "../styles/presets/soft-pop.css";

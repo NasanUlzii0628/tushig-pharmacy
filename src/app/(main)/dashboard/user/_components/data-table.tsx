@@ -92,7 +92,7 @@ export function DataTable() {
   return (
     <Tabs defaultValue="outline" className="w-full flex-col gap-6">
       <div className="flex items-center justify-between">
-        <h4>Хэрэглэгчид</h4>
+        <h4>Хэрэглэгчдийн жагсаалт</h4>
         <CreateUserDrawer onCreated={() => loadUsers()} />
       </div>
 

@@ -45,7 +45,7 @@ export async function FetchSupplier(params: FetchSupplierParams, token?: string)
 
   const queryString = getQueryString(filters)
 
-  const path = `/supplier/list${queryString}`
+  const path = `/pharmacy/supplier/list${queryString}`
 
   const { data, message, success, httpStatus } = await GET<PaginatedCustomers>({ path,token })
 
@@ -62,7 +62,7 @@ export async function createSupplier(payload: SupplierCreateForm) {
   const body = {
     ...payload,
   }
-  const path = "/supplier/create"
+  const path = "/pharmacy/supplier/create"
   return POST({ path, payload: body })
 }
 
@@ -70,11 +70,11 @@ export async function updateSupplier(payload: SupplierUpdateForm) {
   const body = {
     ...payload
   }
-  const path = "/supplier/update"
+  const path = "/pharmacy/supplier/update"
   return PUT({ path, payload: body })
 }
 
 export async function deleteSupplier(id: number) {
-  const path = `/supplier/delete/${id}`
+  const path = `/pharmacy/supplier/delete/${id}`
   return DELETE({ path })
 }

@@ -55,13 +55,13 @@ export function UpdateUserDrawer({ user, onUpdated }: Props) {
     <Drawer direction="right" open={open} onOpenChange={setOpen}>
       <DrawerTrigger asChild>
         <Button variant="ghost" size="sm">
-          Засах
+          Шинэчлэх
         </Button>
       </DrawerTrigger>
 
       <DrawerContent className="w-[420px]">
         <DrawerHeader className="text-left">
-          <DrawerTitle>Хэрэглэгч засах</DrawerTitle>
+          <DrawerTitle>Хэрэглэгчийн мэдээлэл шинэчлэх</DrawerTitle>
         </DrawerHeader>
 
         <UserForm
@@ -188,7 +188,7 @@ function UserForm({
               <FormControl>
                 <Input
                   type="password"
-                  placeholder="Хоосон орхивол өөрчлөгдөхгүй"
+                  placeholder=""
                   autoComplete="new-password"
                   className="text-base"
                   {...field}

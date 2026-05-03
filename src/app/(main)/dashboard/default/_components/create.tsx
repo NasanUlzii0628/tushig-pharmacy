@@ -28,8 +28,7 @@ const MAX_ADDITIONAL_IMAGES = 2;
 const ACCEPTED_IMAGE_TYPES = ["image/jpeg", "image/jpg", "image/png", "image/webp"];
 
 const currency = {
-  CNY: "ЮАНЬ",
-  MNT: "ТӨГРӨГ",
+  MNT: "ТӨГРӨГ"
 }
 
 export function CreateDrawer({
@@ -47,12 +46,12 @@ export function CreateDrawer({
   return (
     <Drawer direction="right" open={open} onOpenChange={setOpen}>
       <DrawerTrigger asChild>
-        <Button>Бүтээгдэхүүн нэмэх +</Button>
+        <Button>Бүтээгдэхүүн бүртгэх +</Button>
       </DrawerTrigger>
 
       <DrawerContent className="w-[420px] sm:w-[520px] md:w-[620px]">
         <DrawerHeader className="text-left">
-          <DrawerTitle className="pt-4">Бүтээгдэхүүн нэмэх</DrawerTitle>
+          <DrawerTitle className="pt-4">Бүтээгдэхүүн бүртгэх</DrawerTitle>
         </DrawerHeader>
 
         <ProductForm
@@ -73,7 +72,7 @@ export function CreateDrawer({
                 Хадгалж байна...
               </>
             ) : (
-              "Хадгалах"
+              "Бүртгэх"
             )}
           </Button>
 
@@ -106,9 +105,9 @@ export function ProductForm({
 }) {
   const [product, setProduct] = React.useState({
     name: "",
-    currency: "CNY",
+    currency: "",
     default_price: 0,
-    default_supplier_id: supplierData[0]?.id || 1,
+    default_supplier_id: null as number | null,
   });
   const [mainImage, setMainImage] = React.useState<File | null>(null);
   const [addiImages, setAddiImages] = React.useState<File[]>([]);
@@ -270,7 +269,7 @@ export function ProductForm({
           onChange={(e) => {
             setProduct((p) => ({ ...p, name: e.target.value }));
           }}
-          placeholder="Жишээ: Нарийн лент"
+          placeholder=""
           required
           disabled={isSubmitting}
         />
@@ -278,14 +277,14 @@ export function ProductForm({
 
       <div className="grid gap-2">
         <label className="text-sm font-medium">
-          Үнэ (¥) <span className="text-red-500">*</span>
+          Үнэ (₮) <span className="text-red-500">*</span>
         </label>
         <Input
           className="text-base"
           type="number"
           step="0.01"
           min="0"
-          placeholder="Үнэ"
+          placeholder=""
           value={product.default_price === 0 ? "" : product.default_price}
           onChange={(e) => {
             const newPrice = e.target.value === "" ? 0 : Number(e.target.value);
@@ -311,7 +310,7 @@ export function ProductForm({
           disabled={isSubmitting}
         >
           <SelectTrigger className="w-full">
-            <SelectValue placeholder="Ханш сонгох" />
+            <SelectValue placeholder="Сонгох" />
           </SelectTrigger>
           <SelectContent>
             {Object.entries(currency).map(([key, label]) => (
@@ -328,14 +327,17 @@ export function ProductForm({
           Нийлүүлэгч <span className="text-red-500">*</span>
         </label>
         <Select
-          value={product.default_supplier_id.toString()}
+          value={product.default_supplier_id?.toString() ?? ""}
           onValueChange={(value) => {
-            setProduct((p) => ({ ...p, default_supplier_id: Number(value) }));
+            setProduct((p) => ({
+              ...p,
+              default_supplier_id: value ? Number(value) : null,
+            }));
           }}
           disabled={isSubmitting}
         >
           <SelectTrigger className="w-full">
-            <SelectValue placeholder="Нийлүүлэгч сонгох" />
+            <SelectValue placeholder="Сонгох" />
           </SelectTrigger>
           <SelectContent>
             {supplierData.map((s) => (
@@ -366,8 +368,8 @@ export function ProductForm({
         ) : (
           <label className="hover:bg-accent flex h-32 cursor-pointer flex-col items-center justify-center rounded-md border-2 border-dashed transition-colors">
             <Upload className="text-muted-foreground mb-2 h-6 w-6" />
-            <span className="text-muted-foreground text-sm">Зураг сонгох</span>
-            <span className="text-muted-foreground mt-1 text-xs">JPG, PNG эсвэл WEBP (max 40MB)</span>
+            <span className="text-muted-foreground text-xs">Зураг сонгох</span>
+            <span className="text-muted-foreground text-xs">JPG, PNG эсвэл WEBP (max 5MB)</span>
             <input
               type="file"
               accept="image/jpeg,image/jpg,image/png,image/webp"
@@ -384,7 +386,7 @@ export function ProductForm({
         <label className="hover:bg-accent flex h-24 cursor-pointer flex-col items-center justify-center rounded-md border-2 border-dashed transition-colors">
           <Upload className="text-muted-foreground mb-1 h-5 w-5" />
           <span className="text-muted-foreground text-xs">Нэмэлт зураг оруулах</span>
-          <span className="text-muted-foreground text-xs">JPG, PNG эсвэл WEBP (max 80MB)</span>
+          <span className="text-muted-foreground text-xs">JPG, PNG эсвэл WEBP (max 5MB)</span>
           <input
             type="file"
             multiple

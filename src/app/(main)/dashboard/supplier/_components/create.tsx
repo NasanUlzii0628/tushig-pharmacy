@@ -46,12 +46,12 @@ export function CreateDrawer({ onCreated }: Props) {
   return (
     <Drawer direction="right" open={open} onOpenChange={setOpen}>
       <DrawerTrigger asChild>
-        <Button>Нийлүүлэгч нэмэх +</Button>
+        <Button>Нийлүүлэгч бүртгэх +</Button>
       </DrawerTrigger>
 
       <DrawerContent className="w-[420px]">
         <DrawerHeader className="text-left">
-          <DrawerTitle>Нийлүүлэгч нэмэх</DrawerTitle>
+          <DrawerTitle>Нийлүүлэгч бүртгэх</DrawerTitle>
         </DrawerHeader>
 
         <SupplierForm
@@ -66,7 +66,7 @@ export function CreateDrawer({ onCreated }: Props) {
 
         <DrawerFooter className="gap-2">
           <Button type="submit" form="supplier-create-form" className="w-full" disabled={isSubmitting}>
-            {isSubmitting ? "Хадгалж байна..." : "Нэмэх"}
+            {isSubmitting ? "Хадгалж байна..." : "Бүртгэх"}
           </Button>
 
           <DrawerClose asChild>
@@ -138,7 +138,7 @@ function SupplierForm({
                 Нэр <span className="text-destructive">*</span>
               </FormLabel>
               <FormControl>
-                <Input placeholder="Нэр" {...field} className="text-base" />
+                <Input placeholder="" {...field} className="text-base" />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -151,10 +151,10 @@ function SupplierForm({
           render={({ field }) => (
             <FormItem>
               <FormLabel>
-                WeChat <span className="text-destructive">*</span>
+                Утасны дугаар <span className="text-destructive">*</span>
               </FormLabel>
               <FormControl>
-                <Input placeholder="WeChat дугаар" {...field} className="text-base" />
+                <Input placeholder="" {...field} className="text-base" />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -166,9 +166,9 @@ function SupplierForm({
           name="contact"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Имэйл</FormLabel>
+              <FormLabel>Цахим шуудангийн хаяг</FormLabel>
               <FormControl>
-                <Input placeholder="Имэйл" {...field} className="text-base" />
+                <Input placeholder="" {...field} className="text-base" />
               </FormControl>
               <FormMessage />
             </FormItem>

@@ -62,14 +62,12 @@ export function UpdateDrawer({ supplier, onUpdated }: Props) {
   return (
     <Drawer direction="right" open={open} onOpenChange={setOpen}>
       <DrawerTrigger asChild>
-        <Button variant="ghost" size="sm">
-          Засах
-        </Button>
+        <Button variant="ghost" size="sm">Шинэчлэх</Button>
       </DrawerTrigger>
 
       <DrawerContent className="w-[420px]">
         <DrawerHeader className="text-left">
-          <DrawerTitle>Нийлүүлэгч засах</DrawerTitle>
+          <DrawerTitle>Нийлүүлэгчийн мэдээлэл шинэчлэх</DrawerTitle>
         </DrawerHeader>
 
         <SupplierForm
@@ -195,7 +193,7 @@ function SupplierForm({
           render={({ field }) => (
             <FormItem>
               <FormLabel>
-                WeChat <span className="text-destructive">*</span>
+                Утасны дугаар <span className="text-destructive">*</span>
               </FormLabel>
               <FormControl>
                 <Input {...field} className="text-base" />
@@ -211,9 +209,9 @@ function SupplierForm({
           name="contact"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Имэйл</FormLabel>
+              <FormLabel>Цахим шуудангийн хаяг</FormLabel>
               <FormControl>
-                <Input placeholder="Имэйл (заавал биш)" {...field} className="text-base" />
+                <Input placeholder="" {...field} className="text-base" />
               </FormControl>
               <FormMessage />
             </FormItem>

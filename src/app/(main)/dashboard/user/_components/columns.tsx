@@ -35,7 +35,7 @@ export const userColumns = (onUpdated: () => Promise<void>): ColumnDef<UserType>
   },
   {
     accessorKey: "role",
-    header: ({ column }) => <DataTableColumnHeader column={column} title="Эрх" />,
+    header: ({ column }) => <DataTableColumnHeader column={column} title="Системийн эрх" />,
     cell: ({ row }) => <span>{roleTranslations[row.original.role as keyof typeof roleTranslations] || row.original.role}</span>,
   },
 
@@ -53,7 +53,7 @@ export const userColumns = (onUpdated: () => Promise<void>): ColumnDef<UserType>
 
   {
     accessorKey: "createdAt",
-    header: ({ column }) => <DataTableColumnHeader column={column} title="Үүсгэсэн" />,
+    header: ({ column }) => <DataTableColumnHeader column={column} title="Бүртгэсэн" />,
     cell: ({ row }) => (
       <span className="text-muted-foreground text-sm">
         {new Date(row.original.createdAt).toISOString().slice(0, 10)}
