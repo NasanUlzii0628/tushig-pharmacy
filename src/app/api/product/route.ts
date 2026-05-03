@@ -11,11 +11,11 @@ export async function GET(req: Request) {
   const isSearch = searchParams.has("name") || searchParams.has("supplier_id");
 
   // ✅ Log to see when backend is called
-  console.log(`API Route called: /api/product?${queryString} | isSearch: ${isSearch}`);
+  console.log(`API Route called: /pharmacy/api/product?${queryString} | isSearch: ${isSearch}`);
 
   const cookieStore = await cookies();
   const token = cookieStore.get("token")?.value || "";
-  const path = `/product/list${queryString}`;
+  const path = `/pharmacy/product/list${queryString}`;
 
   const result = await apiGet<{
     data: any[];
