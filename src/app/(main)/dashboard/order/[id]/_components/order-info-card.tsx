@@ -52,7 +52,7 @@ export function OrderInfoCard({ order, amount, itemCount }: OrderInfoCardProps) 
           <div className="space-y-1 sm:text-right">
             <p className="text-muted-foreground flex items-center gap-2 text-xs sm:text-sm sm:justify-end">
               <Calendar className="h-3 w-3 sm:h-4 sm:w-4 shrink-0" />
-              Огноо
+              Захиалга хийсэн огноо
             </p>
             <p className="font-medium text-sm sm:text-base">{formatDate(order.order_date)}</p>
           </div>

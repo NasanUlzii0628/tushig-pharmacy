@@ -2,6 +2,9 @@
 "use client";
 
 import * as React from "react";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import {
   Drawer,
@@ -12,6 +15,7 @@ import {
   DrawerTitle,
   DrawerTrigger,
 } from "@/components/ui/drawer";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
 import { X, Upload, Loader2 } from "lucide-react";
@@ -28,8 +32,17 @@ const MAX_ADDITIONAL_IMAGES = 2;
 const ACCEPTED_IMAGE_TYPES = ["image/jpeg", "image/jpg", "image/png", "image/webp"];
 
 const currency = {
-  MNT: "ТӨГРӨГ"
-}
+  MNT: "ТӨГРӨГ",
+};
+
+const ProductCreateSchema = z.object({
+  name: z.string().min(1, ""),
+  currency: z.string().min(1, ""),
+  default_price: z.coerce.number().min(1, ""),
+  default_supplier_id: z.coerce.number().min(1, ""),
+});
+
+type ProductCreateFormValues = z.infer<typeof ProductCreateSchema>;
 
 export function CreateDrawer({
   supplierData,
@@ -103,12 +116,16 @@ export function ProductForm({
   isSubmitting: boolean;
   setIsSubmitting: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
-  const [product, setProduct] = React.useState({
-    name: "",
-    currency: "",
-    default_price: 0,
-    default_supplier_id: null as number | null,
+  const form = useForm<ProductCreateFormValues>({
+    resolver: zodResolver(ProductCreateSchema),
+    defaultValues: {
+      name: "",
+      currency: "MNT",
+      default_price: 0,
+      default_supplier_id: undefined as unknown as number,
+    },
   });
+
   const [mainImage, setMainImage] = React.useState<File | null>(null);
   const [addiImages, setAddiImages] = React.useState<File[]>([]);
   const [previewMain, setPreviewMain] = React.useState<string>("");
@@ -192,9 +209,7 @@ export function ProductForm({
     };
   }, []);
 
-  async function onSubmit(e: React.FormEvent) {
-    e.preventDefault();
-
+  const onSubmit = async (data: ProductCreateFormValues) => {
     setIsSubmitting(true);
     const toastId = toast.loading("Хадгалж байна...");
 
@@ -229,12 +244,12 @@ export function ProductForm({
       toast.loading("Бүтээгдэхүүн хадгалж байна...", { id: toastId });
 
       const payload = {
-        name: product.name,
+        name: data.name,
         img: imgName || "",
         addi_imgs: addiImgNames,
-        currency: product.currency,
-        default_price: product.default_price,
-        default_supplier_id: product.default_supplier_id,
+        currency: data.currency,
+        default_price: data.default_price,
+        default_supplier_id: data.default_supplier_id,
       };
 
       const res = await createProdcut(payload);
@@ -245,176 +260,199 @@ export function ProductForm({
 
       toast.success("Бүтээгдэхүүн амжилттай нэмэгдлээ!", { id: toastId });
       closeDrawer();
-      await refresh();
+      refresh();
     } catch (err) {
       toast.error((err as Error).message || "Алдаа гарлаа!", { id: toastId });
     } finally {
       setIsSubmitting(false);
     }
-  }
+  };
 
   return (
-    <form
-      id="create-product-form"
-      className={cn("grid max-h-[calc(100vh-200px)] gap-6 overflow-y-auto", className)}
-      onSubmit={onSubmit}
-    >
-      <div className="grid gap-2">
-        <label className="text-sm font-medium">
-          Бүтээгдэхүүний нэр <span className="text-red-500">*</span>
-        </label>
-        <Input
-          className="text-base"
-          value={product.name}
-          onChange={(e) => {
-            setProduct((p) => ({ ...p, name: e.target.value }));
-          }}
-          placeholder=""
-          required
-          disabled={isSubmitting}
+    <Form {...form}>
+      <form
+        id="create-product-form"
+        onSubmit={form.handleSubmit(onSubmit)}
+        className={cn("grid max-h-[calc(100vh-200px)] gap-6 overflow-y-auto", className)}
+      >
+        <FormField
+          control={form.control}
+          name="name"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>
+                Бүтээгдэхүүний нэр <span className="text-destructive">*</span>
+              </FormLabel>
+              <FormControl>
+                <Input
+                  placeholder=""
+                  {...field}
+                  value={field.value ?? ""}
+                  className="text-base"
+                  disabled={isSubmitting}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
         />
-      </div>
 
-      <div className="grid gap-2">
-        <label className="text-sm font-medium">
-          Үнэ (₮) <span className="text-red-500">*</span>
-        </label>
-        <Input
-          className="text-base"
-          type="number"
-          step="0.01"
-          min="0"
-          placeholder=""
-          value={product.default_price === 0 ? "" : product.default_price}
-          onChange={(e) => {
-            const newPrice = e.target.value === "" ? 0 : Number(e.target.value);
-            setProduct((p) => ({
-              ...p,
-              default_price: newPrice,
-            }));
-          }}
-          required
-          disabled={isSubmitting}
+        <FormField
+          control={form.control}
+          name="default_price"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>
+                Үнэ (₮) <span className="text-destructive">*</span>
+              </FormLabel>
+              <FormControl>
+                <Input
+                  type="number"
+                  step="1"
+                  min="0"
+                  placeholder=""
+                  value={field.value === 0 || field.value === undefined ? "" : field.value}
+                  onChange={(e) => {
+                    const v = e.target.value;
+                    field.onChange(v === "" ? 0 : Number(v));
+                  }}
+                  className="text-base"
+                  disabled={isSubmitting}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
         />
-      </div>
 
-      <div className="grid gap-2">
-        <label className="text-sm font-medium">
-          Ханш <span className="text-red-500">*</span>
-        </label>
-        <Select
-          value={product.currency}
-          onValueChange={(value) => {
-            setProduct((p) => ({ ...p, currency: value }));
-          }}
-          disabled={isSubmitting}
-        >
-          <SelectTrigger className="w-full">
-            <SelectValue placeholder="Сонгох" />
-          </SelectTrigger>
-          <SelectContent>
-            {Object.entries(currency).map(([key, label]) => (
-              <SelectItem key={key} value={key}>
-                {label}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </div>
+        <FormField
+          control={form.control}
+          name="currency"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>
+                Валют <span className="text-destructive">*</span>
+              </FormLabel>
+              <Select
+                value={field.value ?? ""}
+                onValueChange={field.onChange}
+                disabled={isSubmitting}
+              >
+                <FormControl>
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Сонгох" />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  {Object.entries(currency).map(([key, label]) => (
+                    <SelectItem key={key} value={key}>
+                      {label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
 
-      <div className="grid gap-2">
-        <label className="text-sm font-medium">
-          Нийлүүлэгч <span className="text-red-500">*</span>
-        </label>
-        <Select
-          value={product.default_supplier_id?.toString() ?? ""}
-          onValueChange={(value) => {
-            setProduct((p) => ({
-              ...p,
-              default_supplier_id: value ? Number(value) : null,
-            }));
-          }}
-          disabled={isSubmitting}
-        >
-          <SelectTrigger className="w-full">
-            <SelectValue placeholder="Сонгох" />
-          </SelectTrigger>
-          <SelectContent>
-            {supplierData.map((s) => (
-              <SelectItem key={s.id} value={s.id.toString()}>
-                {s.name}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </div>
+        <FormField
+          control={form.control}
+          name="default_supplier_id"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>
+                Нийлүүлэгч <span className="text-destructive">*</span>
+              </FormLabel>
+              <Select
+                value={field.value ? String(field.value) : ""}
+                onValueChange={(v) => field.onChange(v ? Number(v) : undefined)}
+                disabled={isSubmitting}
+              >
+                <FormControl>
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Сонгох" />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  {supplierData.map((s) => (
+                    <SelectItem key={s.id} value={s.id.toString()}>
+                      {s.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </FormItem>
+          )}
+        />
 
-      <div className="grid gap-2">
-        <label className="text-sm font-medium">
-          Үндсэн зураг
-        </label>
-        {previewMain ? (
-          <div className="relative h-32 w-32">
-            <img src={previewMain} alt="Preview" className="h-full w-full rounded-md border object-cover" />
-            <button
-              type="button"
-              className="absolute top-1 right-1 rounded-full bg-black/60 p-1 transition-colors hover:bg-black/80"
-              onClick={removeMainImage}
-              disabled={isSubmitting}
-            >
-              <X className="h-4 w-4 text-white" />
-            </button>
-          </div>
-        ) : (
-          <label className="hover:bg-accent flex h-32 cursor-pointer flex-col items-center justify-center rounded-md border-2 border-dashed transition-colors">
-            <Upload className="text-muted-foreground mb-2 h-6 w-6" />
-            <span className="text-muted-foreground text-xs">Зураг сонгох</span>
-            <span className="text-muted-foreground text-xs">JPG, PNG эсвэл WEBP (max 5MB)</span>
+        <div className="grid gap-2">
+          <label className="text-sm font-medium">
+            Үндсэн зураг
+          </label>
+          {previewMain ? (
+            <div className="relative h-32 w-32">
+              <img src={previewMain} alt="Preview" className="h-full w-full rounded-md border object-cover" />
+              <button
+                type="button"
+                className="absolute top-1 right-1 rounded-full bg-black/60 p-1 transition-colors hover:bg-black/80"
+                onClick={removeMainImage}
+                disabled={isSubmitting}
+              >
+                <X className="h-4 w-4 text-white" />
+              </button>
+            </div>
+          ) : (
+            <label className="hover:bg-accent flex h-32 cursor-pointer flex-col items-center justify-center rounded-md border-2 border-dashed transition-colors">
+              <Upload className="text-muted-foreground mb-2 h-6 w-6" />
+              <span className="text-muted-foreground text-xs">Зураг оруулах</span>
+              <span className="text-muted-foreground text-xs">JPG, PNG эсвэл WEBP (max 5mb)</span>
+              <input
+                type="file"
+                accept="image/jpeg,image/jpg,image/png,image/webp"
+                className="hidden"
+                onChange={handleMainImage}
+                disabled={isSubmitting}
+              />
+            </label>
+          )}
+        </div>
+
+        <div className="grid gap-2">
+          <label className="text-sm font-medium">Нэмэлт зургууд</label>
+          <label className="hover:bg-accent flex h-24 cursor-pointer flex-col items-center justify-center rounded-md border-2 border-dashed transition-colors">
+            <Upload className="text-muted-foreground mb-1 h-5 w-5" />
+            <span className="text-muted-foreground text-xs">Нэмэлт зураг оруулах</span>
+            <span className="text-muted-foreground text-xs">JPG, PNG эсвэл WEBP (max 5mb)</span>
             <input
               type="file"
+              multiple
               accept="image/jpeg,image/jpg,image/png,image/webp"
               className="hidden"
-              onChange={handleMainImage}
+              onChange={handleAddiImages}
               disabled={isSubmitting}
             />
           </label>
-        )}
-      </div>
 
-      <div className="grid gap-2">
-        <label className="text-sm font-medium">Нэмэлт зургууд</label>
-        <label className="hover:bg-accent flex h-24 cursor-pointer flex-col items-center justify-center rounded-md border-2 border-dashed transition-colors">
-          <Upload className="text-muted-foreground mb-1 h-5 w-5" />
-          <span className="text-muted-foreground text-xs">Нэмэлт зураг оруулах</span>
-          <span className="text-muted-foreground text-xs">JPG, PNG эсвэл WEBP (max 5MB)</span>
-          <input
-            type="file"
-            multiple
-            accept="image/jpeg,image/jpg,image/png,image/webp"
-            className="hidden"
-            onChange={handleAddiImages}
-            disabled={isSubmitting}
-          />
-        </label>
-
-        {previewAddi.length > 0 && (
-          <div className="flex flex-wrap gap-2">
-            {previewAddi.map((src, i) => (
-              <div key={i} className="relative h-20 w-20">
-                <img src={src} alt={`Additional ${i + 1}`} className="h-full w-full rounded-md border object-cover" />
-                <button
-                  type="button"
-                  className="absolute top-1 right-1 rounded-full bg-black/60 p-1 transition-colors hover:bg-black/80"
-                  onClick={() => removeAddiImage(i)}
-                  disabled={isSubmitting}
-                >
-                  <X className="h-3 w-3 text-white" />
-                </button>
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
-    </form>
+          {previewAddi.length > 0 && (
+            <div className="flex flex-wrap gap-2">
+              {previewAddi.map((src, i) => (
+                <div key={i} className="relative h-20 w-20">
+                  <img src={src} alt={`Additional ${i + 1}`} className="h-full w-full rounded-md border object-cover" />
+                  <button
+                    type="button"
+                    className="absolute top-1 right-1 rounded-full bg-black/60 p-1 transition-colors hover:bg-black/80"
+                    onClick={() => removeAddiImage(i)}
+                    disabled={isSubmitting}
+                  >
+                    <X className="h-3 w-3 text-white" />
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </form>
+    </Form>
   );
 }

@@ -14,7 +14,7 @@ export async function GET(req: Request) {
   console.log(`API Route called: /pharmacy/api/product?${queryString} | isSearch: ${isSearch}`);
 
   const cookieStore = await cookies();
-  const token = cookieStore.get("token")?.value || "";
+  const token = cookieStore.get("tushig_pharmacy_token")?.value || "";
   const path = `/pharmacy/product/list${queryString}`;
 
   const result = await apiGet<{

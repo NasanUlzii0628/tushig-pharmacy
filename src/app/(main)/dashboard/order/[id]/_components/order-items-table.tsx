@@ -9,6 +9,7 @@ import {
     TableRow,
 } from "@/components/ui/table";
 import { ShoppingCart } from "lucide-react";
+import { OrderItemImage } from "./order-item-image";
 
 type OrderItem = {
     product_id: number;
@@ -57,26 +58,13 @@ export function OrderItemsTable({ items }: OrderItemsTableProps) {
                                 </TableRow>
                             ) : (
                                 items.map((item) => {
-                                    const imageUrl = item.product_image
-                                        ? item.product_image
-                                        : null;
-
                                     return (
                                         <TableRow key={item.product_id}>
                                             <TableCell>
-                                                {imageUrl ? (
-                                                    <img
-                                                        src={`https://cdn.tushig.online/${imageUrl}`}
-                                                        alt={item.product_name}
-                                                        className="h-12 w-12 rounded-md object-cover border"
-                                                    />
-                                                ) : (
-                                                    <div className="h-12 w-12 rounded-md bg-muted flex items-center justify-center border">
-                                                        <span className="text-xs text-muted-foreground">
-                                                            No img
-                                                        </span>
-                                                    </div>
-                                                )}
+                                                <OrderItemImage
+                                                    src={item.product_image}
+                                                    alt={item.product_name}
+                                                />
                                             </TableCell>
                                             <TableCell className="font-medium">
                                                 {item.product_name}

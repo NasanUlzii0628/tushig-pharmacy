@@ -42,9 +42,9 @@ export function DeleteUserDialog({
 
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>Устгах</AlertDialogTitle>
-          <AlertDialogDescription>
-            <b>{supplierName}</b> хэрэглэгчийг устгахдаа итгэлтэй байна уу?
+          <AlertDialogTitle>Бүртгэлийг устгах уу?</AlertDialogTitle>
+          <AlertDialogDescription className="text-sm">
+            "<span>{supplierName}</span>" хэрэглэгчийг устгах гэж байна. 
             Энэ үйлдлийг буцаах боломжгүй.
           </AlertDialogDescription>
         </AlertDialogHeader>

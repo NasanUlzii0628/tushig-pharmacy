@@ -338,7 +338,7 @@ export function OrderHeader({ orderId, orderDate, orderData }: OrderHeaderProps)
 
             doc.setFontSize(12);
             doc.text(`Захиалагчийн нэр: Түшиг барилгын материал`, 14, 22);
-            doc.text(`Огноо: ${formatDate(orderDate)}`, 14, 28);
+            doc.text(`Захиалга хийсэн огноо: ${formatDate(orderDate)}`, 14, 28);
 
             /* ================= TABLE DATA ================= */
             const tableData: any[] = [];
@@ -542,7 +542,8 @@ export function OrderHeader({ orderId, orderDate, orderData }: OrderHeaderProps)
                 </div>
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                        <Button variant="outline" size="sm" disabled={isDownloading}>
+                        <Button size="sm" disabled={isDownloading} className="bg-[#245cb5] text-white hover:bg-[#245cb5]/90">
+
                             {isDownloading ? (
                                 <>
                                     <Loader2 className="h-4 w-4 mr-2 animate-spin" />

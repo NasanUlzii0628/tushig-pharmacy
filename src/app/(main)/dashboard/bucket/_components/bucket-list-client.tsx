@@ -5,7 +5,7 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { BucketList } from "@/types/order";
-import { Search, RefreshCcw, Pencil, Trash } from "lucide-react";
+import { Search, RefreshCcw, Pencil, Trash, ImageOff, ImageIcon } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -40,6 +40,52 @@ import { orderBucketList, fetchBucketList, updateBucketItem, deleteBucketList } 
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { SupplierType } from "@/types/supplier";
+
+function ProductImage({ src, alt }: { src: string | null | undefined; alt: string }) {
+  const [hasError, setHasError] = useState(false);
+
+  if (!src) {
+    return (
+      <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-lg border bg-muted sm:h-20 sm:w-20">
+        <ImageOff className="text-muted-foreground h-6 w-6" />
+      </div>
+    );
+  }
+
+  if (hasError) {
+    return (
+      <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-lg border bg-muted sm:h-20 sm:w-20">
+        <ImageIcon className="text-muted-foreground h-6 w-6" />
+      </div>
+    );
+  }
+
+  const fullSrc = `https://cdn.tushig.online/${src}`;
+
+  return (
+    <Dialog>
+      <DialogTrigger asChild>
+        <div className="group h-16 w-16 shrink-0 overflow-hidden rounded-lg border bg-muted cursor-pointer sm:h-20 sm:w-20">
+          <img
+            src={fullSrc}
+            alt={alt}
+            className="h-full w-full object-cover transition-transform group-hover:scale-105"
+            onError={() => setHasError(true)}
+          />
+        </div>
+      </DialogTrigger>
+      <DialogContent className="max-w-4xl">
+        <DialogTitle className="sr-only">{alt}</DialogTitle>
+        <img
+          src={fullSrc}
+          alt={alt}
+          className="max-h-[85vh] w-full rounded-xl object-contain"
+          onError={() => setHasError(true)}
+        />
+      </DialogContent>
+    </Dialog>
+  );
+}
 
 interface BucketListClientProps {
   items: BucketList[];
@@ -147,7 +193,7 @@ export function BucketListClient({
     setIsLoading(true);
     try {
       const result = await fetchBucketList({
-        name: searchQuery || undefined,
+        product_name: searchQuery || undefined,
         currency: currency || selectedCurrency,
         supplier_id:
           selectedSupplier && selectedSupplier !== ""
@@ -237,6 +283,7 @@ export function BucketListClient({
                 <AlertDialogTrigger asChild>
                   <Button
                     disabled={selectedIds.length === 0 || isLoading}
+                    className="bg-[#245cb5] text-white hover:bg-[#245cb5]/90"
                   >
                     Захиалах
                   </Button>
@@ -356,29 +403,7 @@ export function BucketListClient({
                       : ""
                     }`}
                 >
-                  {item.product_img && (
-                    <Dialog>
-                      <DialogTrigger asChild>
-                        <div className="h-16 w-16 shrink-0 overflow-hidden rounded-lg border bg-muted cursor-pointer sm:h-20 sm:w-20">
-                          <img
-                            src={`https://cdn.tushig.online/${item.product_img}`}
-                            alt={item.product_name}
-                            className="h-full w-full object-cover transition-transform group-hover:scale-105"
-                          />
-                        </div>
-                      </DialogTrigger>
-                      <DialogContent className="max-w-4xl">
-                        <DialogTitle className="sr-only">
-                          {item.product_name}
-                        </DialogTitle>
-                        <img
-                          src={`https://cdn.tushig.online/${item.product_img}`}
-                          alt={item.product_name}
-                          className="max-h-[85vh] w-full rounded-xl object-contain"
-                        />
-                      </DialogContent>
-                    </Dialog>
-                  )}
+                  <ProductImage src={item.product_img} alt={item.product_name} />
 
                   <div className="flex-1 space-y-1">
                     <div className="flex items-center gap-2">
@@ -535,9 +560,10 @@ export function BucketListClient({
       <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Бүтээгдэхүүн хасах</DialogTitle>
+            <DialogTitle>Бүтээгдэхүүнийг хасах уу?</DialogTitle>
             <DialogDescription>
-              "{deleteItem?.product_name}" бүтээгдэхүүнийг хасахдаа итгэлтэй байна уу?
+              "{deleteItem?.product_name}" бүтээгдэхүүнийг хасах гэж байна. 
+              Энэ үйлдлийг буцаах боломжгүй.
             </DialogDescription>
           </DialogHeader>
 

@@ -5,7 +5,7 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
-import { Upload, X, Loader2 } from "lucide-react";
+import { Upload, X, Loader2, ImageIcon } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -26,7 +26,7 @@ const ACCEPTED_IMAGE_TYPES = ["image/jpeg", "image/jpg", "image/png", "image/web
 
 const ProductUpdateSchema = z.object({
   name: z.string().min(1, ""),
-  default_price: z.coerce.number().min(0, ""),
+  default_price: z.coerce.number().min(1, ""),
   default_supplier_id: z.coerce.number().min(1, ""),
 });
 
@@ -101,7 +101,7 @@ function UpdateProductForm({
   setIsSubmitting: React.Dispatch<React.SetStateAction<boolean>>;
   onSuccess: () => Promise<void>;
 }) {
-  const resolvedSupplierId = product.default_supplier_id ?? product.default_supplier?.id ?? undefined;
+  const resolvedSupplierId = product.default_supplier?.id ?? product.default_supplier_id ?? undefined;
 
   const form = useForm<ProductUpdateFormValues>({
     resolver: zodResolver(ProductUpdateSchema),
@@ -122,6 +122,7 @@ function UpdateProductForm({
 
   const [existingAddiImages, setExistingAddiImages] = React.useState<string[]>(validAddiImgs);
   const [previewMain, setPreviewMain] = React.useState<string>(product.img);
+  const [mainImageError, setMainImageError] = React.useState(false);
   const [previewAddi, setPreviewAddi] = React.useState<string[]>(
     validAddiImgs.filter((url) => url && !url.includes("placeholder")),
   );
@@ -130,12 +131,13 @@ function UpdateProductForm({
     form.reset({
       name: product.name ?? "",
       default_price: product.default_price != null ? Number(product.default_price) : 0,
-      default_supplier_id: product.default_supplier_id ?? product.default_supplier?.id ?? undefined,
+      default_supplier_id: product.default_supplier?.id ?? product.default_supplier_id ?? undefined,
     });
     setMainImage(null);
     setAddiImages([]);
     setExistingAddiImages(validAddiImgs);
     setPreviewMain(product.img);
+    setMainImageError(false);
     setPreviewAddi(validAddiImgs.filter((url) => url && !url.includes("placeholder")));
   }, [product, validAddiImgs, form]);
 
@@ -157,6 +159,7 @@ function UpdateProductForm({
 
     setMainImage(file);
     setPreviewMain(URL.createObjectURL(file));
+    setMainImageError(false);
   };
 
   const handleAddiImages = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -233,6 +236,7 @@ function UpdateProductForm({
         addi_imgs,
         default_price: data.default_price,
         default_supplier_id: data.default_supplier_id,
+        currency: "MNT"
       };
 
       await toast.promise(updateProduct(payload), {
@@ -335,22 +339,31 @@ function UpdateProductForm({
                   ))}
                 </SelectContent>
               </Select>
-              <FormMessage />
             </FormItem>
           )}
         />
 
         <div>
           <FormLabel>Үндсэн зураг</FormLabel>
-          <label className="hover:bg-accent mt-2 flex h-32 cursor-pointer items-center justify-center rounded-md border-2 border-dashed">
-            {previewMain ? (
+          <label className="hover:bg-accent mt-2 flex h-32 cursor-pointer flex-col items-center justify-center rounded-md border-2 border-dashed">
+            {!previewMain ? (
+              <>
+                <Upload className="text-muted-foreground mb-2 h-6 w-6" />
+                <span className="text-muted-foreground text-xs">Зураг оруулах</span>
+                <span className="text-muted-foreground text-xs">JPG, PNG эсвэл WEBP (max 5mb)</span>
+              </>
+            ) : mainImageError ? (
+              <>
+                <ImageIcon className="text-muted-foreground mb-2 h-6 w-6" />
+                <span className="text-muted-foreground text-xs">Зураг уншихад алдаа гарлаа!</span>
+              </>
+            ) : (
               <img
                 src={previewMain.startsWith('blob:') ? previewMain : `https://cdn.tushig.online/${previewMain}`}
                 alt="Main product"
                 className="h-full w-full rounded-md object-cover"
+                onError={() => setMainImageError(true)}
               />
-            ) : (
-              <Upload className="text-muted-foreground" />
             )}
             <input type="file" hidden onChange={handleMainImage} accept="image/*" />
           </label>
@@ -361,7 +374,7 @@ function UpdateProductForm({
           <label className="hover:bg-accent mt-2 flex h-24 cursor-pointer flex-col items-center justify-center rounded-md border-2 border-dashed">
             <Upload className="text-muted-foreground mb-1 h-5 w-5" />
             <span className="text-muted-foreground text-xs">Нэмэлт зураг оруулах</span>
-            <span className="text-muted-foreground text-xs">JPG, PNG, WEBP (max 5MB)</span>
+            <span className="text-muted-foreground text-xs">JPG, PNG, WEBP (max 5mb)</span>
             <input type="file" multiple hidden onChange={handleAddiImages} accept="image/*" />
           </label>
         </div>

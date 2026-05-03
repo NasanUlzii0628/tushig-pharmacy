@@ -42,9 +42,9 @@ export function DeleteSupplierDialog({
 
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>Устгах</AlertDialogTitle>
+          <AlertDialogTitle>Бүртгэлийг устгах уу?</AlertDialogTitle>
           <AlertDialogDescription>
-            <b>{supplierName}</b> нийлүүлэгчийг устгахдаа итгэлтэй байна уу?
+            "<span>{supplierName}</span>" нийлүүлэгчийг устгах гэж байна. 
             Энэ үйлдлийг буцаах боломжгүй.
           </AlertDialogDescription>
         </AlertDialogHeader>

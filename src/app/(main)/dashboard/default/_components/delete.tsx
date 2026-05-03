@@ -42,7 +42,7 @@ export function DeleteProductDialog({
 
             <AlertDialogContent>
                 <AlertDialogHeader>
-                    <AlertDialogTitle>Устгах</AlertDialogTitle>
+                    <AlertDialogTitle>Бүртгэлийг устгах уу?</AlertDialogTitle>
                     <AlertDialogDescription>
                         <span>"{productName}"</span> бүтээгдэхүүнийг устгах гэж байна. 
                         Энэ үйлдлийг буцаах боломжгүй. 

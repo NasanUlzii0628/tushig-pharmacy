@@ -116,7 +116,7 @@ const getAccessToken = async (providedToken?: string): Promise<string> => {
   }
   
   const cookieStore = await cookies();
-  const accessToken = cookieStore.get("token")?.value;
+  const accessToken = cookieStore.get("tushig_pharmacy_token")?.value;
   
   if (!accessToken) {
     throw new Error("Authentication required");
@@ -235,7 +235,7 @@ export const DELETE = async <T>({ path, token }: GetParams): Promise<ResponseTyp
 export const validateAndGetUrl = async (path: string) => {
   const apiUrl = process.env.API_BASE_URL;
   const cookieStore = await cookies();
-  const accessToken = cookieStore.get("token")?.value;
+  const accessToken = cookieStore.get("tushig_pharmacy_token")?.value;
 
   if (!accessToken) throw new Error("Authentication required");
 

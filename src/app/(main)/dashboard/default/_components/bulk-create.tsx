@@ -184,9 +184,9 @@ export function BulkCreateDialog({ refresh }: { refresh: () => Promise<void> | v
 
       <DialogContent className="sm:max-w-[520px]">
         <DialogHeader>
-          <DialogTitle>Excel-ээр бөөнөөр бүртгэх</DialogTitle>
+          <DialogTitle>Бүтээгдэхүүн олноор бүртгэх</DialogTitle>
           <DialogDescription>
-            Excel файлын <span className="font-medium">&quot;{NAME_COLUMN_HEADER}&quot;</span> баганаас уншиж бөөнөөр бүртгэнэ.
+            Excel файлын <span className="font-medium">&quot;{NAME_COLUMN_HEADER}&quot;</span> баганаас уншиж бүртгэнэ.
           </DialogDescription>
         </DialogHeader>
 

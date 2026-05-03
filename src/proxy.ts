@@ -16,8 +16,8 @@ function getUserRoleFromToken(token: string): string | null {
 export function proxy(req: NextRequest) {
   const { pathname } = req.nextUrl;
 
-  const token = req.cookies.get("token")?.value;
-  const userRole = req.cookies.get("userRole")?.value;
+  const token = req.cookies.get("tushig_pharmacy_token")?.value;
+  const userRole = req.cookies.get("tushig_pharmacy_user_role")?.value;
 
   const publicRoutes = [
     "/auth/login",

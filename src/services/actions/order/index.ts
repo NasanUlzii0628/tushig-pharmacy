@@ -55,7 +55,7 @@ export async function checkOrder(product_id: number) {
 
 export async function fetchBucketList(params?: {
     product_id?: number;
-    name?: string;
+    product_name?: string;
     currency?: string;
     supplier_id?: string;
 }) {
@@ -64,8 +64,8 @@ export async function fetchBucketList(params?: {
     if (params?.product_id) {
         filters.product_id = params.product_id;
     }
-    if (params?.name) {
-        filters.name = params.name;
+    if (params?.product_name) {
+        filters.product_name = params.product_name;
     }
     if (params?.currency) {
         filters.currency = params.currency;

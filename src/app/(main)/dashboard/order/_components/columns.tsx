@@ -59,7 +59,7 @@ export const orderColumns = (
         {
             accessorKey: "currency",
             header: ({ column }) => (
-                <DataTableColumnHeader column={column} title="Дүн" />
+                <DataTableColumnHeader column={column} title="Валют" />
             ),
             cell: ({ row }) => (
                 <span className="font-medium">{row.original.currency}</span>

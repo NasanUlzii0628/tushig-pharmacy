@@ -12,7 +12,6 @@ export default function LoginV1() {
           className="text-primary-foreground/[0.12] absolute -right-12 -bottom-16 h-[240px] w-[240px] -rotate-[20deg]"
           strokeWidth={0.9}
         />
-
         <Syringe
           className="text-primary-foreground/[0.14] absolute right-[170px] bottom-[40px] h-[150px] w-[150px] rotate-[35deg]"
           strokeWidth={0.9}

@@ -5,7 +5,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## Commands
 
 ```bash
-# Development (uses Turbopack, port 3030)
+# Development (uses Turbopack, port 3031)
 pnpm dev
 
 # Build
@@ -23,7 +23,7 @@ pnpm generate:presets
 
 The package manager is **pnpm**. There are no test commands — this project has no test suite.
 
-The dev server runs at `http://localhost:3030`.
+The dev server runs at `http://localhost:3031`.
 
 ## Environment
 

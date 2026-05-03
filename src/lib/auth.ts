@@ -15,13 +15,13 @@ export async function loginAction(username: string, password: string) {
   const token = res.data.token
   const user = res.data.user;
   const cookieStore = await cookies()
-  cookieStore.set("token", token, {
+  cookieStore.set("tushig_pharmacy_token", token, {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
     sameSite: "lax",
     path: "/",
   })
-  cookieStore.set("user", JSON.stringify(user), {
+  cookieStore.set("tushig_pharmacy_user", JSON.stringify(user), {
   httpOnly: false,        
   secure: false,
   sameSite: "lax",

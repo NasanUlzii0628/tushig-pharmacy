@@ -6,7 +6,7 @@ import { cookies } from "next/headers";
 
 export default async function Page() {
   const cookieStore = await cookies();
-  const token = cookieStore.get("token")?.value || "";
+  const token = cookieStore.get("tushig_pharmacy_token")?.value || "";
 
   const getCachedProducts = unstable_cache(
     async (authToken: string) => fetchCustomers({ page: 1, size: 10 }, authToken),

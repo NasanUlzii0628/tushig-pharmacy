@@ -1,6 +1,6 @@
 // columns.ts
 import { ColumnDef } from "@tanstack/react-table";
-import { EllipsisVertical } from "lucide-react";
+import { EllipsisVertical, ImageOff, ImageIcon } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -20,6 +20,16 @@ import React from "react";
 import { SupplierType } from "@/types/supplier";
 
 const ImagePreview = ({ src, alt }: { src: string; alt: string }) => {
+  const [hasError, setHasError] = React.useState(false);
+
+  if (hasError) {
+    return (
+      <div className="bg-muted flex h-10 w-10 items-center justify-center rounded-md border">
+        <ImageIcon className="text-muted-foreground h-5 w-5" />
+      </div>
+    );
+  }
+
   return (
     <Dialog>
       <DialogTrigger asChild>
@@ -27,11 +37,7 @@ const ImagePreview = ({ src, alt }: { src: string; alt: string }) => {
           src={src}
           alt={alt}
           className="h-10 w-10 cursor-pointer rounded-md border object-cover transition-opacity hover:opacity-80"
-          onError={(e) => {
-            const target = e.currentTarget;
-            target.src = "/placeholder.png";
-            target.onerror = null;
-          }}
+          onError={() => setHasError(true)}
         />
       </DialogTrigger>
 
@@ -42,11 +48,7 @@ const ImagePreview = ({ src, alt }: { src: string; alt: string }) => {
           src={src}
           alt={alt}
           className="h-auto w-full rounded-lg"
-          onError={(e) => {
-            const target = e.currentTarget;
-            target.src = "/placeholder.png";
-            target.onerror = null;
-          }}
+          onError={() => setHasError(true)}
         />
       </DialogContent>
     </Dialog>
@@ -84,7 +86,7 @@ export const productColumns = (
               <ImagePreview src={`https://cdn.tushig.online/${imageUrl}`} alt={row.original.name} />
             ) : (
               <div className="bg-muted flex h-10 w-10 items-center justify-center rounded-md border">
-                <span className="text-muted-foreground text-xs">No img</span>
+                <ImageOff className="text-muted-foreground h-5 w-5" />
               </div>
             )}
 
