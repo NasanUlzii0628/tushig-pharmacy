@@ -37,10 +37,10 @@ export function RevertOrderDialog({ orderId, onReverted }: Props) {
 
             <AlertDialogContent>
                 <AlertDialogHeader>
-                    <AlertDialogTitle>Захиалга цуцлах</AlertDialogTitle>
+                    <AlertDialogTitle>Захиалга цуцлах уу?</AlertDialogTitle>
                     <AlertDialogDescription>
                         Захиалгыг цуцалснаар бүтээгдэхүүнүүд захиалгын хүсэлтэд орно.
-                        Энэ үйлдлийг хийхдээ итгэлтэй байна уу?
+                        Энэ үйлдлийг буцаах боломжгүй.
                     </AlertDialogDescription>
                 </AlertDialogHeader>
 

@@ -42,7 +42,7 @@ export function DeleteOrderDialog({
                 <AlertDialogHeader>
                     <AlertDialogTitle>Бүртгэлийг устгах уу?</AlertDialogTitle>
                     <AlertDialogDescription>
-                        Захиалгыг устгахдаа итгэлтэй байна уу?
+                        Захиалгыг устгах гэж байна.
                         Энэ үйлдлийг буцаах боломжгүй. 
                     </AlertDialogDescription>
                 </AlertDialogHeader>
